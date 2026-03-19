@@ -13,33 +13,27 @@ from typing import Optional
 @dataclass
 class TreeNode:
     """樹狀索引節點，含 OpenViking 風格的 URI"""
-    node_id: str             # e.g. "tsmc_2025q1://1/1.1"
+
+    node_id: str  # e.g. "tsmc_2025q1://1/1.1"
     title: str
-    summary: str             # L0：一句話摘要（.abstract）
-    overview: str            # L1：段落摘要（.overview）
+    summary: str  # 一句話摘要
     start_page: int
     end_page: int
-    level: int               # 0=root, 1=章, 2=節, ...
-    structure_code: str      # PageIndex 風格：e.g. "1.2.3"
+    level: int  # 0=root, 1=章, 2=節, ...
+    structure_code: str  # PageIndex 風格：e.g. "1.2.3"
     parent_id: Optional[str] = None
     children: list = field(default_factory=list)
-    # OpenViking hotness 相關
-    access_count: int = 0
-    last_accessed: Optional[str] = None
 
     def to_dict(self) -> dict:
         return {
             "node_id": self.node_id,
             "title": self.title,
             "summary": self.summary,
-            "overview": self.overview,
             "start_page": self.start_page,
             "end_page": self.end_page,
             "level": self.level,
             "structure_code": self.structure_code,
             "parent_id": self.parent_id,
-            "access_count": self.access_count,
-            "last_accessed": self.last_accessed,
             "children": [c.to_dict() for c in self.children],
         }
 
@@ -49,14 +43,11 @@ class TreeNode:
             node_id=d["node_id"],
             title=d["title"],
             summary=d.get("summary", ""),
-            overview=d.get("overview", ""),
             start_page=d["start_page"],
             end_page=d["end_page"],
             level=d["level"],
             structure_code=d.get("structure_code", ""),
             parent_id=d.get("parent_id"),
-            access_count=d.get("access_count", 0),
-            last_accessed=d.get("last_accessed"),
         )
         node.children = [cls.from_dict(c) for c in d.get("children", [])]
         return node
@@ -84,12 +75,13 @@ class TreeNode:
 @dataclass
 class DocumentIndex:
     """完整文件索引：TreeNode 樹 + 元資料"""
+
     doc_id: str
     filename: str
     filepath: str
     total_pages: int
-    doc_summary: str          # 整份文件摘要
-    doc_overview: str         # 整份文件概述
+    doc_summary: str  # 整份文件摘要
+    doc_overview: str  # 整份文件概述
     root: TreeNode
     created_at: str = ""
     heading_source: str = ""  # bookmarks | font | llm

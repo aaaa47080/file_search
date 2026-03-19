@@ -6,7 +6,7 @@ LLM 包裝層，支援 OpenAI / Anthropic / Ollama（本地）
 """
 
 import os
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 
 class LLMClient:
@@ -21,9 +21,9 @@ class LLMClient:
     def __init__(
         self,
         provider: str = "openai",
-        model: str = None,
-        api_key: str = None,
-        base_url: str = None,
+        model: Optional[str] = None,
+        api_key: Optional[str] = None,
+        base_url: Optional[str] = None,
         temperature: float = 0.1,
     ):
         """
@@ -38,7 +38,7 @@ class LLMClient:
 
         # 設定預設模型
         defaults = {
-            "openai": "gpt-4o-mini",
+            "openai": "gpt-5.4-mini",
             "anthropic": "claude-3-5-haiku-20241022",
             "ollama": "llama3.2",
         }
@@ -66,19 +66,22 @@ class LLMClient:
             return self._client
 
         if self.provider == "openai":
-            from openai import OpenAI
+            from openai import OpenAI  # type: ignore[import-untyped]
+
             kwargs = {"api_key": self.api_key}
             if self.base_url:
                 kwargs["base_url"] = self.base_url
             self._client = OpenAI(**kwargs)
 
         elif self.provider == "anthropic":
-            from anthropic import Anthropic
+            from anthropic import Anthropic  # type: ignore[import-untyped]
+
             self._client = Anthropic(api_key=self.api_key)
 
         elif self.provider == "ollama":
             # Ollama 使用 OpenAI-compatible API
-            from openai import OpenAI
+            from openai import OpenAI  # type: ignore[import-untyped]
+
             self._client = OpenAI(
                 api_key="ollama",
                 base_url=self.base_url or "http://localhost:11434/v1",
@@ -108,12 +111,16 @@ class LLMClient:
             raise RuntimeError(f"LLM 呼叫失敗 ({self.provider}/{self.model}): {e}")
 
     def _chat_openai(self, client, messages: list, max_tokens: int) -> str:
-        response = client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=self.temperature,
-            max_tokens=max_tokens,
-        )
+        kwargs = dict(model=self.model, messages=messages, temperature=self.temperature)
+        try:
+            response = client.chat.completions.create(**kwargs, max_tokens=max_tokens)
+        except Exception as e:
+            if "max_completion_tokens" in str(e):
+                response = client.chat.completions.create(
+                    **kwargs, max_completion_tokens=max_tokens
+                )
+            else:
+                raise
         return response.choices[0].message.content.strip()
 
     def _chat_anthropic(self, client, messages: list, max_tokens: int) -> str:
@@ -147,7 +154,7 @@ class LLMClient:
             return False
 
 
-def create_llm(provider: str = None, **kwargs) -> LLMClient:
+def create_llm(provider: Optional[str] = None, **kwargs) -> LLMClient:
     """
     便捷工廠函數
 

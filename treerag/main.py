@@ -26,6 +26,9 @@ main.py ── TreeRAG 檢索系統入口（PageIndex 風格）
 
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -39,6 +42,7 @@ from llm_client import create_llm
 # ════════════════════════════════════════════════════════
 # 知識庫建立
 # ════════════════════════════════════════════════════════
+
 
 def setup_knowledge_base(
     pdf_paths: list[str],
@@ -59,10 +63,19 @@ def setup_knowledge_base(
             print(f"⚠️  找不到：{pdf_path}")
             continue
 
-        doc_id = Path(pdf_path).stem.replace(" ", "_").lower()
-        # 清理非 ASCII 字元
-        doc_id = "".join(c if c.isascii() and (c.isalnum() or c in "_-") else "_" for c in doc_id)
-        doc_id = doc_id.strip("_") or "doc"
+        stem = Path(pdf_path).stem
+        safe = "".join(
+            c if c.isascii() and (c.isalnum() or c in "_-") else "_"
+            for c in stem.replace(" ", "_").lower()
+        ).strip("_-")
+        # 若 ASCII 部分太短（大量中文被過濾），補上檔名的 MD5 前綴
+        import hashlib
+
+        if len(safe) < max(4, len(stem) * 0.3):
+            hash6 = hashlib.md5(stem.encode()).hexdigest()[:6]
+            doc_id = f"{hash6}_{safe}".strip("_-") if safe else hash6
+        else:
+            doc_id = safe or "doc"
 
         index_path = Path(index_dir) / f"{doc_id}.index.json"
 
@@ -75,6 +88,7 @@ def setup_knowledge_base(
             print("   ✅ 索引已存在，直接載入")
             if doc_id not in fs_index.entries:
                 from tree_index import DocumentIndex
+
                 doc_index = DocumentIndex.load(str(index_path))
                 fs_index.register(doc_index)
             continue
@@ -90,6 +104,7 @@ def setup_knowledge_base(
 # ════════════════════════════════════════════════════════
 # 互動模式（簡化版）
 # ════════════════════════════════════════════════════════
+
 
 def interactive_mode(retriever: SimpleRetriever, fs_index: FileSystemIndex):
     """簡化互動模式 - 專注檢索驗證"""
@@ -122,12 +137,14 @@ def interactive_mode(retriever: SimpleRetriever, fs_index: FileSystemIndex):
         except Exception as e:
             print(f"\n❌ 錯誤：{e}")
             import traceback
+
             traceback.print_exc()
 
 
 # ════════════════════════════════════════════════════════
 # CLI 入口
 # ════════════════════════════════════════════════════════
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -139,7 +156,7 @@ def main():
   python main.py --pdf1 TSMC.pdf --pdf2 form10-k.pdf
   python main.py --pdf TSMC.pdf --query "Q1 營收是多少？"
   python main.py --pdf TSMC.pdf --reindex
-        """
+        """,
     )
     parser.add_argument("--pdf", help="單一 PDF 檔案")
     parser.add_argument("--pdf1", help="第一個 PDF 檔案")
@@ -179,7 +196,7 @@ def main():
         llm_kwargs["model"] = args.model
     elif args.provider == "openai":
         # 預設用 gpt-4o-mini
-        llm_kwargs["model"] = "gpt-4o-mini"
+        llm_kwargs["model"] = "gpt-5.4-mini"
     if args.api_key:
         llm_kwargs["api_key"] = args.api_key
     try:
@@ -187,7 +204,9 @@ def main():
         print(f"   使用：{llm.provider} / {llm.model}")
     except Exception as e:
         print(f"❌ LLM 初始化失敗：{e}")
-        print("   請設定：export OPENAI_API_KEY=sk-... 或 export ANTHROPIC_API_KEY=sk-ant-...")
+        print(
+            "   請設定：export OPENAI_API_KEY=sk-... 或 export ANTHROPIC_API_KEY=sk-ant-..."
+        )
         sys.exit(1)
 
     # 建立知識庫
@@ -224,4 +243,5 @@ def main():
 
 if __name__ == "__main__":
     import argparse
+
     main()

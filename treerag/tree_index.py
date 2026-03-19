@@ -15,6 +15,7 @@ OpenViking BuildingTree：
 """
 
 import datetime
+from typing import Optional
 from _phase1_structure import _Phase1StructureMixin
 from _phase2_verify import _Phase2VerifyMixin
 from _phase3_tree import _Phase3TreeMixin
@@ -34,10 +35,10 @@ class TreeIndexBuilder(
     Phase 1：從書籤 or LLM 取得結構碼列表
     Phase 2：LLM 驗證每個章節的實際頁碼（fuzzy matching）
     Phase 3：post_processing → 建立父子關係樹
-    Phase 4：生成節點摘要（.abstract + .overview）
+    Phase 4：生成節點摘要
     """
 
-    TOC_SCAN_PAGES = 10               # 掃描前幾頁尋找目錄
+    TOC_SCAN_PAGES = 10  # 掃描前幾頁尋找目錄
     # 並行驗證的執行緒數（PageIndex 用 ThreadPoolExecutor）
     MAX_WORKERS = 4
     # 無 TOC 時全文掃描的批次大小（約 10K tokens，1 token ≈ 4 chars）
@@ -49,7 +50,7 @@ class TreeIndexBuilder(
     def __init__(self, llm_client):
         self.llm = llm_client
 
-    def build(self, pdf_doc, doc_id: str = None) -> DocumentIndex:
+    def build(self, pdf_doc, doc_id: Optional[str] = None) -> DocumentIndex:
         doc_id = doc_id or pdf_doc.path.stem.replace(" ", "_").lower()
         print(f"\n🔍 建立索引：{pdf_doc.filename}（{pdf_doc.total_pages}頁）")
 
@@ -62,26 +63,28 @@ class TreeIndexBuilder(
         print("   Phase 2: 驗證章節頁碼...")
         structure_list = self._verify_page_numbers(structure_list, pdf_doc)
 
-        # Phase 2b: 驗證失敗 fallback（accuracy ≤ 50% 或末頁 < 文件一半）
+        # Phase 2b: 驗證後結構為空時的處理
+        # 官方架構：TOC 路徑和全文掃描互斥，有 TOC 就留在 TOC 路徑不降級
         if not structure_list:
-            print("   → 驗證失敗，降級至 LLM 全文掃描...")
-            structure_list = self._llm_extract_structure(pdf_doc, doc_id)
-            structure_list = self._verify_page_numbers(structure_list, pdf_doc)
-
-        if not structure_list:
-            # LLM 全文掃描也失敗 → 再試 Pattern scan
-            # Pattern scan 直接從 PDF 實體頁面抓標題行，不依賴 TOC 頁碼，不需驗證
-            print("   → LLM 掃描失敗，嘗試 Pattern scan...")
-            structure_list = self._scan_heading_patterns(pdf_doc)
-            if structure_list:
+            if not getattr(self, "_toc_detected", False):
+                # 無 TOC 文件：允許降級至全文掃描
+                print("   → 驗證失敗，降級至 LLM 全文掃描...")
+                structure_list = self._llm_extract_structure(pdf_doc, doc_id)
                 for item in structure_list:
-                    item.setdefault("verified", True)
-                    item.setdefault("appear_start", True)
-                print(f"   → Pattern scan 找到 {len(structure_list)} 個章節（頁碼直接來自 PDF）")
+                    item["verified"] = True
+                    item.setdefault("appear_start", False)
             else:
-                print("   → Pattern scan 亦失敗，以空結構繼續（單節點樹）")
+                # 有 TOC 文件：不降級，以空結構繼續（單節點樹）
+                print("   → 驗證失敗（TOC 路徑），以空結構繼續（單節點樹）")
 
-        # Phase 2c: Gap 5 — 若首章節不從第 1 頁起，插入前言節點
+        if not structure_list:
+            print("   → 以空結構繼續（單節點樹）")
+
+        # Phase 2c: 按頁碼排序（保留原本的層級結構）
+        if structure_list:
+            structure_list.sort(key=lambda x: x.get("physical_index", 0))
+
+        # Phase 2d: Gap 5 — 若首章節不從第 1 頁起，插入前言節點
         structure_list = self._add_preface_if_needed(structure_list)
 
         # Phase 3: 建立樹結構（PageIndex 的 post_processing + list_to_tree）
@@ -89,7 +92,9 @@ class TreeIndexBuilder(
         root = self._build_tree(structure_list, doc_id, pdf_doc.total_pages)
 
         # Phase 3.5: 切分超大葉節點（對齊 PageIndex process_large_node_recursively）
-        print(f"   Phase 3.5: 切分超大葉節點（>{self.MAX_PAGES_PER_LEAF}頁的葉節點）...")
+        print(
+            f"   Phase 3.5: 切分超大葉節點（>{self.MAX_PAGES_PER_LEAF}頁的葉節點）..."
+        )
         self._split_large_nodes(root, pdf_doc)
 
         # Phase 4: 生成摘要

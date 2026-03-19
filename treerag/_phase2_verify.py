@@ -6,20 +6,26 @@ Phase 2: Verification of page numbers (PageIndex check_title_appearance)
 
 import re
 from concurrent.futures import ThreadPoolExecutor
+from typing import TYPE_CHECKING
 from utils import extract_json, retry_llm_call
+
+if TYPE_CHECKING:
+    from llm_client import LLMClient
 
 
 class _Phase2VerifyMixin:
+    if TYPE_CHECKING:
+        llm: "LLMClient"
+        MAX_WORKERS: int
     """Phase 2: LLM 驗證每個章節的實際頁碼（fuzzy matching）"""
 
     def _verify_page_numbers(self, structure_list: list[dict], pdf_doc) -> list[dict]:
         """
-        Phase 2：驗證頁碼，對齊 PageIndex meta_processor 三層邏輯：
+        Phase 2：驗證頁碼，對齊 PageIndex meta_processor 流程：
 
         1. 初步驗證（check_title_appearance）— 標題是否出現在指定頁
-        2. Gap 4：若最後節點頁碼 < 總頁數一半 → 結構嚴重不完整，回傳 [] 觸發降級
-        3. Gap 2：正確率 > 60% → 修復錯誤項目（最多 3 輪）
-                  正確率 ≤ 60% → 回傳 [] 觸發降級
+        2. 修復循環：嘗試修復錯誤項目（最多 3 輪，無進展即停止）
+        3. Gap 4：最後章節頁碼 < 總頁數一半 → 結構嚴重不完整，回傳 [] 觸發降級
         4. Gap 3：appear_start 第二輪驗證 — 標題是否在頁面開頭出現
                   影響 _build_tree 的 end_page 邊界計算
         """
@@ -60,8 +66,8 @@ class _Phase2VerifyMixin:
             # Normalise whitespace in both title and page text to eliminate
             # spaced-character mismatches common in Chinese financial PDFs
             # (e.g. TOC stores "合併資產負債表" but PDF text has "合 併 資 產 負 債 表")
-            norm_title = re.sub(r'\s+', ' ', item['title']).strip()
-            norm_page_text = re.sub(r'\s+', ' ', page.text).strip()
+            norm_title = re.sub(r"\s+", " ", item["title"]).strip()
+            norm_page_text = re.sub(r"\s+", " ", page.text).strip()
 
             prompt = f"""Your job is to check if the given section appears or starts in the given page_text.
 
@@ -79,8 +85,10 @@ Directly return the final JSON structure. Do not output anything else."""
 
             try:
                 resp = retry_llm_call(
-                    self.llm, [{"role": "user", "content": prompt}],
-                    max_tokens=200, label=f"驗證:{item['title'][:15]}"
+                    self.llm,
+                    [{"role": "user", "content": prompt}],
+                    max_tokens=200,
+                    label=f"驗證:{item['title'][:15]}",
                 )
                 data = extract_json(resp)
                 if isinstance(data, dict):
@@ -99,24 +107,12 @@ Directly return the final JSON structure. Do not output anything else."""
         order = {item.get("structure", ""): i for i, item in enumerate(structure_list)}
         verified.sort(key=lambda x: order.get(x.get("structure", ""), 0))
 
-        # ── Gap 4：早期放棄檢查 ──
-        # 若結構的最後一個頁碼 < 文件一半 → 結構嚴重殘缺，觸發降級
-        last_page = max((v.get("physical_index", 1) for v in verified), default=1)
-        if last_page < total_pages / 2:
-            print(f"   ⚠ 結構僅覆蓋到第 {last_page} 頁（總 {total_pages} 頁），觸發降級")
-            return []
-
-        # ── Gap 2：正確率計算與修復循環 ──
+        # ── Gap 2：正確率計算與修復循環（對齊官方：不設閾值，永遠嘗試修復）──
         correct = [v for v in verified if v.get("verified", True)]
         accuracy = len(correct) / len(verified) if verified else 0
-        print(f"   → 驗證正確率：{accuracy*100:.0f}% （{len(correct)}/{len(verified)}）")
-
-        # Threshold lowered from 0.6 → 0.5: only degrade to single-node when
-        # strictly fewer than half the chapters can be located (more lenient for
-        # Chinese financial PDFs where font-spaced text causes marginal failures)
-        if accuracy <= 0.5:
-            print("   ⚠ 正確率 ≤ 50%，觸發降級")
-            return []
+        print(
+            f"   → 驗證正確率：{accuracy * 100:.0f}% （{len(correct)}/{len(verified)}）"
+        )
 
         if accuracy < 1.0:
             # 有錯誤項目，嘗試修復（最多 3 輪）
@@ -124,12 +120,29 @@ Directly return the final JSON structure. Do not output anything else."""
                 incorrect = [v for v in verified if not v.get("verified", True)]
                 if not incorrect:
                     break
-                print(f"   → 修復第 {attempt+1} 輪，{len(incorrect)} 個錯誤項目...")
+                print(f"   → 修復第 {attempt + 1} 輪，{len(incorrect)} 個錯誤項目...")
                 self._repair_incorrect_items(verified, pdf_doc)
                 # 重新計算是否還有未修復的
                 still_bad = [v for v in verified if not v.get("verified", True)]
                 if len(still_bad) == len(incorrect):
                     break  # 修復無進展，停止
+
+        # ── Gap 4：結構完整性檢查（對齊官方 meta_processor）──
+        # 若所有已驗證章節中最後一個的頁碼 < 總頁數一半，
+        # 代表萃取嚴重不完整（e.g. 目錄無頁碼導致全擠在前幾頁）→ 回傳 [] 觸發降級
+        verified_ok_pages = [
+            v["physical_index"]
+            for v in verified
+            if v.get("verified", True) and v.get("physical_index")
+        ]
+        if verified_ok_pages:
+            last_page = max(verified_ok_pages)
+            if last_page < total_pages / 2:
+                print(
+                    f"   → Gap 4：最後章節在第 {last_page} 頁（總頁數 {total_pages}），"
+                    "結構不完整，觸發降級"
+                )
+                return []
 
         # ── Gap 3：appear_start 第二輪驗證（並行）──
         # 判斷標題是否在頁面「開頭」出現，影響前一節的 end_page
@@ -158,7 +171,7 @@ Directly return the final JSON structure. Do not output anything else."""
 
 注意：模糊匹配，忽略空格差異。
 
-章節標題：{item['title']}
+章節標題：{item["title"]}
 頁面文字：
 {page.text}
 
@@ -167,14 +180,16 @@ Directly return the final JSON structure. Do not output anything else."""
 
             try:
                 resp = retry_llm_call(
-                    self.llm, [{"role": "user", "content": prompt}],
-                    max_tokens=150, label=f"起始:{item['title'][:15]}"
+                    self.llm,
+                    [{"role": "user", "content": prompt}],
+                    max_tokens=150,
+                    label=f"起始:{item['title'][:15]}",
                 )
                 data = extract_json(resp)
                 if isinstance(data, dict):
                     # 官方存 "yes"/"no" 字串；我們轉為 bool 供後續比較
                     start_begin = data.get("start_begin", "no")
-                    item["appear_start"] = (str(start_begin).lower() == "yes")
+                    item["appear_start"] = str(start_begin).lower() == "yes"
                 else:
                     item["appear_start"] = False
             except Exception:
@@ -243,14 +258,16 @@ Reply in a JSON format:
 }}
 Directly return the final JSON structure. Do not output anything else.
 Section Title:
-{item['title']}
+{item["title"]}
 Document pages:
 {range_text}"""
 
             try:
                 resp = retry_llm_call(
-                    self.llm, [{"role": "user", "content": prompt}],
-                    max_tokens=200, label=f"修復:{item['title'][:15]}"
+                    self.llm,
+                    [{"role": "user", "content": prompt}],
+                    max_tokens=200,
+                    label=f"修復:{item['title'][:15]}",
                 )
                 data = extract_json(resp)
                 if not isinstance(data, dict):
@@ -281,7 +298,7 @@ Document pages:
 
 Note: do fuzzy matching, ignore any space inconsistency in the page_text.
 
-The given section title is {item['title']}.
+The given section title is {item["title"]}.
 The given page_text is {page.text}.
 
 Reply format:
@@ -292,8 +309,10 @@ Reply format:
 Directly return the final JSON structure. Do not output anything else."""
 
                 v_resp = retry_llm_call(
-                    self.llm, [{"role": "user", "content": v_prompt}],
-                    max_tokens=200, label=f"再驗:{item['title'][:15]}"
+                    self.llm,
+                    [{"role": "user", "content": v_prompt}],
+                    max_tokens=200,
+                    label=f"再驗:{item['title'][:15]}",
                 )
                 v_data = extract_json(v_resp)
                 if isinstance(v_data, dict):
@@ -304,7 +323,9 @@ Directly return the final JSON structure. Do not output anything else."""
             except Exception:
                 pass
 
-        incorrect = [(i, v) for i, v in enumerate(verified) if not v.get("verified", True)]
+        incorrect = [
+            (i, v) for i, v in enumerate(verified) if not v.get("verified", True)
+        ]
         with ThreadPoolExecutor(max_workers=self.MAX_WORKERS) as executor:
             list(executor.map(fix_one, incorrect))
 

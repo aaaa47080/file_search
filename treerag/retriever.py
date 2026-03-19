@@ -27,27 +27,30 @@ from utils import extract_json, retry_llm_call
 # 資料結構
 # ════════════════════════════════════════════════════════
 
+
 @dataclass
 class MatchedNode:
     """匹配的節點"""
+
     node_id: str
     doc_id: str
     title: str
     start_page: int
     end_page: int
     filename: str
-    relevance_score: float      # LLM 給的相關性分數 (0~1)
-    content: str = ""           # 取出的原始內容
+    relevance_score: float  # LLM 給的相關性分數 (0~1)
+    content: str = ""  # 取出的原始內容
 
 
 @dataclass
 class RetrievalResult:
     """檢索結果"""
+
     query: str
     answer: str
     matched_nodes: list[MatchedNode]
-    reasoning: str              # LLM 選擇節點的推理說明
-    steps: list[str]            # 簡易軌跡
+    reasoning: str  # LLM 選擇節點的推理說明
+    steps: list[str]  # 簡易軌跡
 
     def render_trace(self) -> str:
         """輸出可讀的檢索軌跡"""
@@ -78,6 +81,7 @@ class RetrievalResult:
 # 主檢索器
 # ════════════════════════════════════════════════════════
 
+
 class SimpleRetriever:
     """
     PageIndex 風格的簡化檢索器
@@ -90,8 +94,8 @@ class SimpleRetriever:
     - ✅ 單次 LLM Call 完成節點選擇（高效）
     """
 
-    MAX_TOP_NODES = 5         # 最多取幾個節點
-    MAX_DOCS = 3              # 多文件時最多選幾個
+    MAX_TOP_NODES = 5  # 最多取幾個節點
+    MAX_DOCS = 3  # 多文件時最多選幾個
 
     def __init__(self, llm_client, fs_index, pdf_docs: dict):
         """
@@ -104,7 +108,9 @@ class SimpleRetriever:
         self.fs = fs_index
         self.pdf_docs = pdf_docs
 
-    def query(self, question: str, verbose: bool = True, target_doc_ids: list[str] = None):
+    def query(
+        self, question: str, verbose: bool = True, target_doc_ids: list[str] = None
+    ):
         """
         主查詢入口 ── PageIndex 風格的簡化流程
 
@@ -124,8 +130,10 @@ class SimpleRetriever:
             # 只建構目標文件的 L0 context
             l0_context = self._build_l0_context(target_doc_ids)
             selected_docs = self._select_docs(question, l0_context)
-            selected_docs = selected_docs[:self.MAX_DOCS]
-            steps.append(f"從 {len(target_doc_ids)} 份文件中選出 {len(selected_docs)} 份：{selected_docs}")
+            selected_docs = selected_docs[: self.MAX_DOCS]
+            steps.append(
+                f"從 {len(target_doc_ids)} 份文件中選出 {len(selected_docs)} 份：{selected_docs}"
+            )
             if verbose:
                 print(f"  [Step 1] 相關文件：{selected_docs}")
         else:
@@ -147,29 +155,49 @@ class SimpleRetriever:
             # 單次 LLM Call 完成節點選擇
             reasoning, node_list = self._select_nodes(question, tree_view)
 
-            for node_data in node_list[:self.MAX_TOP_NODES]:
-                node_id = node_data.get("node_id", "")
+            if verbose and not node_list:
+                print(f"  [Step 2] 警告：LLM 未回傳任何節點")
+            for node_data in node_list[: self.MAX_TOP_NODES]:
+                node_id = node_data.get("node_id", "").strip()
                 score = float(node_data.get("relevance_score", 0.5))
 
                 node = doc_index.get_node(node_id)
                 if not node:
-                    continue
+                    if verbose:
+                        print(f"  [Step 2] ⚠️  找不到節點：{node_id!r}")
+                    # 嘗試 title 模糊匹配
+                    title_hint = node_data.get("title", "") or node_data.get(
+                        "reason", ""
+                    )
+                    node = (
+                        self._find_node_by_title(doc_index, title_hint)
+                        if title_hint
+                        else None
+                    )
+                    if node:
+                        node_id = node.node_id
+                        if verbose:
+                            print(f"  [Step 2]   → title 匹配到：{node_id}")
+                    else:
+                        continue
 
                 # 取出內容
                 content = ""
                 if pdf_doc:
                     content = pdf_doc.get_range_text(node.start_page, node.end_page)
 
-                all_matched.append(MatchedNode(
-                    node_id=node_id,
-                    doc_id=doc_id,
-                    title=node.title,
-                    start_page=node.start_page,
-                    end_page=node.end_page,
-                    filename=filename,
-                    relevance_score=score,
-                    content=content,
-                ))
+                all_matched.append(
+                    MatchedNode(
+                        node_id=node_id,
+                        doc_id=doc_id,
+                        title=node.title,
+                        start_page=node.start_page,
+                        end_page=node.end_page,
+                        filename=filename,
+                        relevance_score=score,
+                        content=content,
+                    )
+                )
 
             steps.append(f"[{doc_id}] 找到 {len(node_list)} 個節點")
             if verbose:
@@ -192,7 +220,7 @@ class SimpleRetriever:
 
         # 組合內容
         context_texts = []
-        for node in all_matched[:self.MAX_TOP_NODES]:
+        for node in all_matched[: self.MAX_TOP_NODES]:
             context_texts.append(
                 f"【{node.filename}｜{node.title}｜第{node.start_page}-{node.end_page}頁】\n"
                 f"{node.content}"
@@ -206,7 +234,7 @@ class SimpleRetriever:
         return RetrievalResult(
             query=question,
             answer=answer,
-            matched_nodes=all_matched[:self.MAX_TOP_NODES],
+            matched_nodes=all_matched[: self.MAX_TOP_NODES],
             reasoning=reasoning,
             steps=steps,
         )
@@ -252,8 +280,10 @@ class SimpleRetriever:
                 selections = data.get("selections", [])
                 # 過濾 score >= 0.5 且 doc_id 存在
                 valid_ids = [
-                    s["doc_id"] for s in selections
-                    if float(s.get("score", 0)) >= 0.5 and s.get("doc_id") in self.fs.entries
+                    s["doc_id"]
+                    for s in selections
+                    if float(s.get("score", 0)) >= 0.5
+                    and s.get("doc_id") in self.fs.entries
                 ]
                 if valid_ids:
                     return valid_ids
@@ -331,6 +361,22 @@ class SimpleRetriever:
 
         # fallback
         return "無法解析，返回空結果", []
+
+    def _find_node_by_title(self, doc_index, title_hint: str):
+        """透過 title 模糊匹配找節點（fallback）"""
+        if not title_hint:
+            return None
+        hint = title_hint.lower().strip()
+        best = None
+        best_score = 0
+        for n in doc_index.root.flat_list():
+            t = n.title.lower()
+            # 計算最長公共子字串長度作為分數
+            score = sum(1 for w in hint.split() if w in t)
+            if score > best_score:
+                best_score = score
+                best = n
+        return best if best_score > 0 else None
 
     # ─────────────────────────────────────────────
     # Step 3: 生成回答
