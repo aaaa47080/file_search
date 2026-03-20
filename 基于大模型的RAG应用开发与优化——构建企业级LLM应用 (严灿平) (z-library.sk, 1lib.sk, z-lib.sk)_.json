@@ -1,0 +1,1680 @@
+{
+  "doc_name": "基于大模型的RAG应用开发与优化——构建企业级LLM应用 (严灿平) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+  "structure": [
+    {
+      "title": "Preface",
+      "start_index": 1,
+      "end_index": 13,
+      "node_id": "0000",
+      "summary": "这部分文档主要介绍了一本关于“基于大语言模型的 RAG 应用开发与优化”的专业书籍内容概览。核心内容包括：\n\n- **全书结构与定位**：全书分为预备篇、基础篇和高级篇，分别对应从入门认知、核心开发到企业级优化与高级范式的学习路径。\n- **预备篇重点**：帮助读者理解大模型与 RAG 的基本概念、典型应用场景、技术架构，以及 RAG 与微调、超长上下文模型之间的关系，并搭建开发环境。\n- **基础篇重点**：围绕 RAG 应用开发的核心流程展开，包括模型与 Prompt、数据加载与分割、数据嵌入与索引、检索与响应生成、查询引擎与对话引擎等基础模块。\n- **高级篇重点**：聚焦企业级 RAG 的进阶能力，如查询转换、后处理、语义路由、SQL 查询、多模态文档处理、查询管道、Data Agent 开发、RAG 评估、性能与效果优化、端到端企业级架构，以及新型 RAG 范式（如 C-RAG、Self-RAG、RAPTOR）。\n- **适用读者**：面向开发者、研究人员、产品经理以及希望掌握 RAG 应用开发的人群，既适合初学者，也适合有一定基础的进阶读者。\n- **前言中的写作背景**：强调 RAG 在智能搜索、问答、客服、数据分析和智能体中的广泛应用，同时指出原型开发与生产级应用之间存在显著差距，书中旨在提供面向“生产就绪”的实践指南。\n- **技术选型说明**：书中以 Python 和 LlamaIndex 为主要开发环境，但强调其中的大部分思想、原理和优化方法具有通用性，可迁移到其他语言和框架。"
+    },
+    {
+      "title": "了解大模型与 RAG",
+      "start_index": 14,
+      "end_index": 14,
+      "nodes": [
+        {
+          "title": "初识大模型",
+          "start_index": 14,
+          "end_index": 14,
+          "nodes": [
+            {
+              "title": "大模型时代：生成式 AI应用的爆发",
+              "start_index": 14,
+              "end_index": 15,
+              "node_id": "0003",
+              "summary": "本部分主要介绍了大模型与生成式 AI 的兴起背景，以及 RAG 在当前 AI 应用中的位置和意义。内容先从 ChatGPT 引发的大模型热潮切入，说明生成式 AI 为什么会迅速爆发，并强调大模型相较于传统决策式 AI 更擅长推理与创造，因此能够支持文本、图像、视频等多种 AIGC 应用。随后，文中讨论了大模型应用的持续演进，指出其价值不仅体现在个人场景，也逐步扩展到企业级应用，并列举了对话机器人、搜索、翻译、写作、阅读辅助、内容创作、设计和代码生成等典型应用方向。整体上，这一部分为后续学习 RAG 的原理、开发与优化奠定了基础。"
+            },
+            {
+              "title": "大模型应用的持续进化",
+              "start_index": 15,
+              "end_index": 17,
+              "node_id": "0004",
+              "summary": "这部分主要介绍了大模型与生成式 AI 应用的基本概念、应用形态及其发展趋势。内容强调：大模型虽然底层技术复杂，但在应用层面表现得非常简洁易用，能够生成文本、图片、音视频等多种内容，因此也被称为生成式 AI 或 AIGC。随后，文中说明了大模型应用从最初的聊天机器人，逐步演进到更丰富的个人端（To C）和企业端（To B）场景，例如搜索、翻译、写作、代码辅助、智能客服、智能营销、企业搜索和 RPA 增强等。最后指出，当前很多大模型应用已经超越简单对话机器人，发展为具备规划、记忆、工具调用和纠错能力的 AI 智能体，而 RAG 既可以作为独立应用，也可以作为构建更复杂 AI Agent 的重要架构范式。"
+            },
+            {
+              "title": "大模型是无所不能的吗",
+              "start_index": 18,
+              "end_index": 22,
+              "node_id": "0005",
+              "summary": "这部分内容主要介绍了大模型并非“无所不能”，重点分析了其在实际应用中的几类核心局限：知识时效性不足、模型内部难以解释的“黑盒”问题、输出结果的不确定性，以及常见的“幻觉”现象。文中进一步解释了幻觉产生的原因，包括训练数据偏差、过度泛化、理解能力有限以及缺乏垂直领域知识，并指出这些问题在企业级应用中尤其严重。最后引出本书主题 RAG，说明 RAG 的出现正是为了缓解大模型在准确性、可靠性和时效性方面的不足，通过结合实时信息检索为模型补充外部知识，从而提升生成结果的质量。"
+            }
+          ],
+          "node_id": "0002",
+          "summary": "本部分主要介绍第1章“了解大模型与 RAG”的背景与核心概念，重点包括：\n\n- 大模型与生成式 AI 自 2023 年以来成为全球科技界最受关注的技术热点。\n- RAG（检索增强生成）作为大模型应用范式和架构，已成为生成式 AI 领域较成熟的应用层解决方案。\n- 本章的目的在于为后续学习 RAG 的开发与优化打基础，先梳理其发展脉络与“前世今生”。\n- 1.1 节“初识大模型”开始介绍大模型时代的到来，以及生成式 AI 应用爆发的背景。\n- 以 ChatGPT 的爆红为代表，说明大模型如何引发全球范围内的“百模大战”“千模大战”，推动 AI 进入 2.0 时代，并引出对 AGI 的想象。\n- 讨论大模型为何会迅速火爆，并暗示其原因与应用层带来的实际价值密切相关。"
+        },
+        {
+          "title": "了解 RAG",
+          "start_index": 22,
+          "end_index": 22,
+          "nodes": [
+            {
+              "title": "为什么需要 RAG",
+              "start_index": 22,
+              "end_index": 23,
+              "node_id": "0007",
+              "summary": "这部分主要介绍了 RAG（检索增强生成）的概念、产生原因和基本应用场景。核心内容包括：\n\n1. **为什么需要 RAG**\n   - 传统大模型存在时效性不足、可靠性不高、准确性有限等问题，尤其容易出现“幻觉”。\n   - RAG 通过把生成式大模型与实时信息检索结合起来，为模型补充外部知识和上下文，从而提升回答的准确性、丰富性和可靠性。\n   - 它特别适合企业级应用，因为可以更高效地利用外部知识，而不必单纯依赖扩大模型参数规模。\n   - 文中还用“学生考试时参考书”的比喻说明：RAG 相当于在回答问题时给模型提供可参考的资料，减少编造答案的情况。\n\n2. **RAG 的作用与优势**\n   - 帮助模型处理训练知识覆盖不到的专业或复杂领域问题。\n   - 让模型能够获取最新信息，弥补静态模型无法反映实时数据的缺陷。\n   - 相比单纯增大模型规模，RAG 更节省训练成本和时间。\n\n3. **一个简单的 RAG 场景**\n   - 以在线产品咨询工具为例，说明如果直接使用通用大模型，模型可能不了解企业最新产品信息，无法准确回答用户问题。\n   - 这个场景引出 RAG 的实际价值：通过检索企业内部或外部资料，让大模型在回答时参考相关内容，从而更适合企业官网、客服问答等应用。"
+            },
+            {
+              "title": "一个简单的 RAG场景",
+              "start_index": 23,
+              "end_index": 25,
+              "node_id": "0008",
+              "summary": "这部分主要介绍了 RAG（检索增强生成）的核心动机、基本思想和最简单的应用场景，并开始引出其技术架构。\n\n主要内容包括：\n- 为什么需要 RAG：  \n  - 大模型知识可能不完整，容易出现幻觉。  \n  - 静态模型无法反映最新信息。  \n  - 通过检索外部知识，可以在不大幅增加模型参数和训练成本的情况下提升回答质量。\n- 用通俗比喻解释 RAG：  \n  - 把大模型比作“优秀学生”，把检索到的外部资料比作“考试时的参考书”，帮助模型在回答时参考相关知识。\n- 一个简单的 RAG 场景：  \n  - 以企业在线产品咨询为例，说明通用大模型无法回答企业私有产品问题。  \n  - 通过从企业知识库检索相关内容，并将其加入 Prompt，让模型基于补充知识生成更准确的答案。\n- 对 RAG 本质的说明：  \n  - 它不仅是简单提示工程或“知识外挂”，实际应用中涉及检索、索引、相关性匹配等多种技术细节。\n- RAG 的基础技术架构：  \n  - 开始介绍经典的 RAG 流程。  \n  - 将 RAG 应用分为两个核心阶段：数据索引（Indexing）和数据查询（Query），并提示后续会展开各阶段的处理流程与优化。"
+            }
+          ],
+          "node_id": "0006",
+          "summary": "本部分主要介绍了 RAG（检索增强生成）的概念、产生背景和必要性。重点说明了大模型虽然在自然语言处理任务中表现优秀，但在时效性、可靠性、准确性方面仍存在不足，尤其容易出现“幻觉”问题，因此需要通过 RAG 将生成式大模型与实时信息检索结合起来，为模型补充外部相关数据和上下文。这样可以让模型依赖实时、个性化的知识来生成更丰富、更准确、更可靠的内容，提升其在企业级应用中的适用性。"
+        },
+        {
+          "title": "RAG应用的技术架构",
+          "start_index": 25,
+          "end_index": 25,
+          "nodes": [
+            {
+              "title": "RAG应用的经典架构与流程",
+              "start_index": 25,
+              "end_index": 28,
+              "node_id": "0010",
+              "summary": "This partial document explains the core architecture and workflow of RAG (Retrieval-Augmented Generation) applications for enterprise LLM systems. It first introduces the classic RAG pipeline, dividing it into two main stages: data indexing and data querying. In the indexing stage, it describes loading knowledge from various sources, splitting documents into chunks, embedding chunks into vectors, and storing/indexing them in vector databases, while also noting that other index types such as knowledge graphs or keyword indexes may be used in advanced systems. In the querying stage, it covers retrieval of relevant chunks and generation of answers by an LLM using the retrieved context and a carefully designed prompt. The document also mentions additional optimization stages such as pre-retrieval processing and post-retrieval processing, which improve retrieval accuracy and output quality. Finally, it begins discussing key challenges in RAG applications, especially retrieval precision and the model’s ability to resist noisy or distracting external information."
+            },
+            {
+              "title": "RAG应用面临的挑战",
+              "start_index": 28,
+              "end_index": 29,
+              "node_id": "0011",
+              "summary": "这部分主要介绍了 RAG 应用中的检索前处理与检索后处理，以及传统 RAG 在实际应用中面临的主要挑战。内容指出，检索前处理包括查询转换、查询扩充和检索路由等，目的是为后续检索和生成做准备；检索后处理则是在检索完成后对结果进行重排序、过滤等优化，以提升上下文质量和大模型输出效果。随后重点分析了 RAG 的五类挑战：检索召回精度不足、大模型对噪声和矛盾信息的抗干扰能力、上下文窗口长度限制、RAG 与微调之间的选择与协同，以及复杂 RAG 流程带来的响应性能问题。整体上，这部分为后续讨论 RAG 架构演进奠定了基础。"
+            },
+            {
+              "title": "RAG应用架构的演进",
+              "start_index": 29,
+              "end_index": 31,
+              "node_id": "0012",
+              "summary": "这部分主要介绍了企业级大模型 RAG 应用开发中常见的关键挑战，以及 RAG 架构的演进脉络。\n\n首先，文中总结了 RAG 应用面临的几个核心问题：大模型自身能力对生成质量的影响、上下文窗口长度限制、RAG 与微调（Fine-tuning）之间如何选择与配合，以及在企业场景中如何兼顾输出质量与响应性能。\n\n接着，文章回顾了 RAG 的发展历程：RAG 概念最早由 Meta 在 2020 年提出，最初用于为大模型引入外部非参数化知识；在 ChatGPT 出现后，RAG 研究迅速升温，重点转向提升大模型可控性、缓解幻觉问题并增强领域任务表现；随着更强模型的出现，RAG 也不断与微调、迭代优化等方法结合，形成更复杂的优化方向。\n\n最后，文中将 RAG 架构演进概括为三个阶段：Naive RAG（朴素/经典 RAG），采用索引、检索、生成的顺序流程；Advanced RAG（高级 RAG），在检索前后加入更多处理增强效果；Modular RAG（模块化 RAG），将流程拆分为模块、功能模块和算法，允许按场景灵活组合，具有更强的扩展性和定制能力。"
+            }
+          ],
+          "node_id": "0009",
+          "summary": "This section introduces the technical architecture of RAG applications, focusing on how external knowledge should be indexed and queried so that retrieved information is truly relevant to the user’s question. It explains the basic idea of a minimal RAG workflow and emphasizes that the right knowledge must be selected, not just any external material. The document then outlines the classic RAG architecture and process, dividing development into two main stages: data indexing and data querying, each containing multiple processing steps. It also notes that real-world enterprise RAG systems often require additional modules and optimizations beyond this basic framework."
+        },
+        {
+          "title": "关于 RAG的两个话题",
+          "start_index": 31,
+          "end_index": 32,
+          "nodes": [
+            {
+              "title": "RAG与微调的选择",
+              "start_index": 32,
+              "end_index": 35,
+              "node_id": "0014",
+              "summary": "这部分主要讨论了大模型增强生成中的两类关键方案：RAG 与微调，以及它们与超长上下文大模型之间的关系。\n\n核心内容包括：\n1. **RAG 与微调的区别与选择**\n   - 先介绍了大模型训练的基本阶段：预训练和微调。\n   - 说明预训练得到的是“基座模型”，它更像补全文档的模型，而不是直接回答问题的助手。\n   - 微调通过少量标注数据和强化学习，让模型适应特定任务、行业知识、语言风格或安全要求。\n   - 对比了 RAG 和微调的优缺点：\n     - RAG 更灵活、技术更简单、无需额外训练成本，但受上下文窗口限制，长 Prompt 成本高，稳定性和准确性可能受影响。\n     - 微调能让模型内化特定知识和输出格式，推理成本更低，但需要数据准备、标注、算力和专业技术，且无法完全避免幻觉。\n   - 给出了适合微调的场景，如稳定的大量领域知识、极高准确率任务、RAG 和提示工程无法满足需求的情况。\n   - 总体上建议多数场景优先考虑 RAG，条件允许时可结合两者使用。\n\n2. **RAG 与超长上下文大模型的关系**\n   - 讨论了随着上下文窗口从 4K/8K 扩展到 128K、200K 甚至 1M，是否还需要 RAG。\n   - 提出即使大模型能处理超长上下文，也不一定适合把所有文档都直接塞给模型，因为会带来效用、性能和成本问题。\n   - 强调企业知识通常实时变化、形式多样，完全依赖超长上下文并不现实。\n   - 对“大海捞针”式检索能力的可靠性也提出了疑问，认为目前外部索引与检索机制仍然有必要。"
+            },
+            {
+              "title": "RAG与具有理解超长上下文能力的大模型",
+              "start_index": 35,
+              "end_index": 37,
+              "node_id": "0015",
+              "summary": "本部分主要讨论了 RAG 与大模型长上下文能力之间的关系与取舍。首先指出，在提示工程和 RAG 仍无法满足指令理解、输出稳定性等业务目标时，RAG 仍然是增强大模型的重要方案。随后重点分析了“超长上下文大模型是否可以替代 RAG”这一争议：虽然模型上下文窗口不断扩大，甚至达到 128K、200K 乃至 1M，但将大量文档直接塞入模型并不一定现实，原因包括成本、性能、知识实时变化、检索可靠性、复杂任务适配性以及安全性等问题。\n\n文中进一步强调，当前大模型在超长上下文中的“针中找针”能力并不稳定，受上下文长度、知识块位置、相关知识块数量等因素影响，难以完全依赖其完成知识密集型任务。因此，RAG 仍然具有不可替代的价值。最后提出更合理的方向是让 RAG 与长上下文大模型相互结合、取长补短：大模型为 RAG 提供更强的基础能力，RAG 则提供灵活、可控的知识检索与应用层优化，两者共同在简洁性与灵活性之间取得平衡。"
+            }
+          ],
+          "node_id": "0013",
+          "summary": "This partial document mainly explains the evolution of RAG application architectures and the relationship between RAG and fine-tuning. It introduces three RAG stages: Naive RAG, which uses a simple sequential node-based process; Advanced RAG, which improves indexing, retrieval, and generation by adding pre-retrieval and post-retrieval processing; and Modular RAG, which breaks RAG into reusable modules and algorithms that can be flexibly combined to build customized workflows with greater extensibility. The document then shifts to a discussion of how to choose between RAG and model fine-tuning, beginning with an overview of large model training stages such as pretraining and fine-tuning, and explaining that base models are typically completion-oriented rather than interactive question-answering systems."
+        }
+      ],
+      "node_id": "0001",
+      "summary": "本部分主要介绍了大模型与生成式 AI 的兴起背景，以及 RAG 在当前 AI 应用中的重要地位。内容首先指出，自 2023 年以来，大模型和生成式 AI 成为全球科技界最受关注的技术，RAG 也因此成为大模型应用中被广泛研究和采用的一种成熟架构。随后引出本章的学习目标：在深入开发和优化 RAG 之前，先了解其发展脉络与基本概念。\n\n接着，文档进入“初识大模型”部分，重点讲述大模型时代的到来及生成式 AI 应用的爆发，尤其以 OpenAI 的 ChatGPT 为代表，说明其迅速走红、引发“百模大战”“千模大战”，并推动 AI 进入 2.0 时代。文中还提到，大模型之所以引发如此广泛的热潮，与其在应用层带来的实际价值密切相关。"
+    },
+    {
+      "title": "RAG应用开发环境搭建",
+      "start_index": 38,
+      "end_index": 38,
+      "nodes": [
+        {
+          "title": "开发 RAG应用的两种方式",
+          "start_index": 38,
+          "end_index": 38,
+          "nodes": [
+            {
+              "title": "使用低代码开发平台",
+              "start_index": 38,
+              "end_index": 40,
+              "node_id": "0018",
+              "summary": "本章主要介绍 RAG 应用开发环境搭建的基础内容，重点包括两种主流开发方式及其优缺点，并为后续实战开发做准备。\n\n主要内容有：\n1. **RAG 应用开发的两种方式**\n   - 使用**低代码开发平台**\n   - 使用**主流大模型应用开发框架**\n\n2. **低代码开发平台的特点**\n   - 优点：上手简单、开发便捷，通常集成数据集/知识库管理、测试、发布等完整工具链，部分支持工作流编排和模型灵活选择。\n   - 缺点：通常依赖在线开发部署，存在安全合规风险；对企业级复杂需求支持不足；灵活性有限；难以覆盖 RAG 与其他 AI 智能体结合的复杂场景；会屏蔽底层技术细节，不利于深入优化和能力提升。\n   - 适用场景：更适合个人、小微企业或通用知识问答类应用。\n\n3. **大模型应用开发框架的特点**\n   - 介绍了主流框架，如 **LangChain、LlamaIndex、AutoGen**。\n   - 优点：组件化、模块化设计成熟，功能强大，文档和社区完善；屏蔽底层细节，提升开发效率；提供大量可复用组件；支持更灵活的 RAG 工作流编排；具备良好的扩展性和第三方集成能力。\n   - 适用场景：更适合需要高灵活性、可扩展性和企业级定制能力的 RAG 应用开发。\n\n整体来看，这一部分是在帮助读者理解：**RAG 应用可以通过低代码平台快速开发，也可以通过框架进行更专业、更灵活的工程化开发**，并引导读者根据自身需求选择合适的开发环境。"
+            },
+            {
+              "title": "使用大模型应用开发框架",
+              "start_index": 40,
+              "end_index": 44,
+              "node_id": "0019",
+              "summary": "本部分主要介绍了 RAG 应用开发环境搭建中的框架选择与基础环境准备，重点包括以下内容：\n\n1. **大模型应用开发框架的使用方式**\n   - 除了低代码平台外，还可以使用主流开源框架来开发 RAG 应用。\n   - 介绍了当前常见的框架：**LangChain、LlamaIndex、AutoGen**。\n   - 总结了这类框架的共同优势：组件化和模块化设计、屏蔽底层细节、预置大量可复用组件、支持灵活扩展、并提供覆盖开发到部署的工程化工具。\n\n2. **LangChain 框架概览**\n   - 说明 LangChain 是功能强大的大模型应用开发框架，覆盖开发、测试、评估和部署全生命周期。\n   - 介绍其主要组成：**LangChain-Core、LangChain-Community、LangChain、Templates、LangServe、LangSmith**，以及后续的 **LangGraph**。\n   - 指出其优点是功能全面、生态丰富，但缺点是学习门槛较高、结构复杂、版本迭代快。\n\n3. **LlamaIndex 框架概览**\n   - 介绍 LlamaIndex 是面向连接客户数据与大模型的开源框架，强调其简单、灵活、强大。\n   - 说明其结构包括：**Core Framework、Integrations、Templates、Eval Datasets**，相关资源主要通过 **LlamaHub** 提供。\n   - 总结其特点：更适合生产级和企业级应用、可扩展可定制、尤其适合 RAG 开发、并支持 **Data Agent** 和 **Query Pipeline** 等能力。\n   - 说明本书后续将以 **LlamaIndex** 作为基础框架，因为它更贴近 RAG 场景且学习门槛更低。\n\n4. **RAG 应用开发环境准备**\n   - 开始进入开发环境搭建部分，说明需要准备常见的基础工具与环境，以支持本地化运行完整的 RAG 应用。\n   - 提到如果希望在一台电脑上完成主程序、向量库、本地大模型等全部开发工作，需要较强的硬件配置。\n   - 给出了硬件建议的开头，包括推荐操作系统、内存要求等。"
+            }
+          ],
+          "node_id": "0017",
+          "summary": "本章主要介绍 RAG 应用开发环境的搭建方法，强调在正式开发前需要先了解常见开发方式、工具与平台，并准备适合自己的开发环境。内容首先概述了开发 RAG 应用的两种主要方式：低代码开发平台和主流大模型应用开发框架。随后重点介绍低代码平台的特点与代表，包括百度 AppBuilder、阿里云百炼、字节跳动 Coze，以及开源的 FastGPT、Dify 等，说明这类平台通常具有使用简单、便捷、可视化配置等优势。"
+        },
+        {
+          "title": "RAG应用开发环境准备",
+          "start_index": 44,
+          "end_index": 44,
+          "nodes": [
+            {
+              "title": "硬件环境建议",
+              "start_index": 44,
+              "end_index": 45,
+              "node_id": "0021",
+              "summary": "这部分内容主要介绍了 RAG 应用开发的框架选择与环境准备。首先对比了 LlamaIndex 与 LangChain，强调 LlamaIndex 更适合 RAG 应用开发，具有更强的模块化支持、可扩展性、定制化能力，以及内置的数据智能体和查询管道等功能，因此本书选择 LlamaIndex 作为基础框架。随后进入 RAG 应用开发环境搭建，说明了本地化开发所需的硬件建议，包括操作系统、内存、GPU、CPU、磁盘和网络等要求。最后介绍了基础大模型的准备方式，主要分为两类：通过 API 访问云端商业大模型，或部署本地开源大模型，并以阿里云通义千问为例简要说明了申请和开通 API 的流程。"
+            },
+            {
+              "title": "基础大模型",
+              "start_index": 45,
+              "end_index": 52,
+              "node_id": "0022",
+              "summary": "这部分主要介绍了构建 RAG 应用所需的基础模型环境，重点包括硬件准备、基础大模型的获取方式以及嵌入模型的使用。\n\n主要内容有：\n\n1. **RAG 应用的硬件与环境要求**\n   - 需要足够的内存、GPU 显卡（如需本地推理）、高速磁盘空间。\n   - 建议使用较新的 Intel CPU 或 Apple M 系列芯片。\n   - 需要高速网络以便下载大模型或访问模型 API。\n\n2. **基础大模型的准备与调用方式**\n   - 基础大模型是 RAG 应用的核心，用于提供推理能力。\n   - 常见方式有两种：\n     - **通过 API 访问云端商业大模型**\n     - **在本地部署开源大模型**\n\n3. **云端商业大模型 API 的申请与使用**\n   - 以阿里云通义千问为例，说明了开通模型服务、创建 API Key、查看文档等流程。\n   - 提到 OpenAI GPT 系列也可通过 Azure 平台开通 API。\n   - 强调不同厂商 API 协议不统一，建议使用 **ONE-API** 这类统一接口平台来屏蔽差异，方便切换模型并实现负载均衡。\n\n4. **使用 Ollama 部署本地开源大模型**\n   - 推荐使用 **Ollama** 作为本地大模型运行与管理工具。\n   - 介绍了安装、查看版本、拉取模型、启动模型、交互测试等步骤。\n   - 说明 Ollama 既支持命令行对话，也支持以 **API 服务模式** 提供接口，便于应用开发调用。\n   - 通过 OpenAI 兼容接口测试 Ollama 服务是否正常。\n\n5. **嵌入模型（Embedding Model）的作用与来源**\n   - 嵌入模型用于将知识块向量化，以支持语义检索，是 RAG 检索能力的关键。\n   - 介绍了两类嵌入模型：\n     - 商业平台提供的嵌入模型\n     - 开源向量模型，如 BGE\n   - 以通义千问嵌入模型为例，列出了可用模型、向量维度、支持语言和请求限制等信息。\n\n总体来看，这一部分是在为后续 RAG 开发搭建模型基础设施，涵盖了大模型 API、本地模型部署以及向量检索所需的嵌入模型。"
+            },
+            {
+              "title": "嵌入模型",
+              "start_index": 52,
+              "end_index": 55,
+              "node_id": "0023",
+              "summary": "这部分主要介绍了 RAG 应用开发环境中的关键基础设施搭建，重点包括嵌入模型与 Python 虚拟环境的准备。\n\n主要内容有：\n1. **嵌入模型的作用与类型**\n   - 说明在 RAG 中，嵌入模型用于将知识块向量化，以支持基于语义相似度的检索。\n   - 强调嵌入向量质量会直接影响检索准确性。\n   - 区分了商业平台提供的嵌入模型和开源嵌入模型。\n\n2. **通过云端 API 使用嵌入模型**\n   - 介绍可直接使用通义千问和 OpenAI 的 API Key 调用其嵌入模型。\n   - 列出了通义千问可用的文本向量模型及其基本参数，如向量维度、单次请求文本数量、字符长度限制和支持语种。\n\n3. **基于 Ollama 部署本地嵌入模型**\n   - 说明 Ollama 不仅能部署本地大模型，也能部署开源嵌入模型。\n   - 给出了拉取中文向量模型并启动服务的示例，以及通过接口测试向量生成的方法。\n\n4. **基于 TEI 部署本地嵌入模型**\n   - 介绍 Hugging Face 的 Text Embeddings Inference（TEI）作为更强大的嵌入模型部署工具。\n   - 说明 TEI 可用于部署嵌入模型，也支持 Rerank 排序模型。\n   - 演示了在本地安装、启动 bge-large-cn-1.5 等模型服务，并通过浏览器访问 API 文档进行测试的方法。\n\n5. **Python 虚拟运行环境准备**\n   - 开始介绍使用 Python 作为核心开发语言，并建议安装 Miniconda 来管理虚拟环境。\n   - 以 MacOS 为例说明 Miniconda 的下载与安装步骤，为后续开发做准备。"
+            },
+            {
+              "title": "Python虚拟运行环境",
+              "start_index": 55,
+              "end_index": 56,
+              "node_id": "0024",
+              "summary": "这部分主要介绍了 RAG 应用开发环境中的 Python 虚拟运行环境搭建方法，重点包括：\n\n1. **推荐使用 Miniconda 作为 Python 虚拟环境工具**  \n   说明了 Python 作为核心开发语言的优势，并建议安装轻量、便于管理环境的 Miniconda。\n\n2. **以 MacOS 为例讲解 Miniconda 的安装流程**  \n   包括访问官网、根据硬件与系统选择合适版本、下载 `.pkg` 或 `.sh` 安装包，并按对应方式完成安装。\n\n3. **验证 Miniconda 与 Python 是否安装成功**  \n   通过命令 `conda --version` 和 `python --version` 检查版本信息，确认环境可用。\n\n4. **创建并激活独立的虚拟运行环境**  \n   使用 `conda create -n rag python=3.12.1` 创建名为 `rag` 的环境，再用 `conda activate rag` 激活，以实现项目间环境隔离，避免库版本冲突。\n\n5. **建议在虚拟环境中安装第三方库**  \n   强调优先使用 `conda install` 来安装依赖。\n\n6. **引出下一节关于 Python IDE 和开发插件的内容**  \n   说明除了虚拟环境外，还需要合适的 IDE 来提升开发效率。"
+            },
+            {
+              "title": "Python IDE 与开发插件",
+              "start_index": 56,
+              "end_index": 58,
+              "node_id": "0025",
+              "summary": "这部分内容主要介绍了 RAG 应用开发环境的搭建与基础工具配置，重点包括以下几方面：\n\n1. **Miniconda 的安装与验证**\n   - 说明了在不同安装包形式下的安装方法（`.pkg` 和 `.sh`）。\n   - 提示安装完成后通过 `conda --version` 和 `python --version` 验证是否安装成功。\n   - 强调使用 Miniconda 创建独立的 Python 虚拟环境，以避免项目间依赖冲突。\n\n2. **创建并激活 RAG 项目的虚拟环境**\n   - 使用 `conda create -n rag python=3.12.1` 创建名为 `rag` 的环境。\n   - 使用 `conda activate rag` 激活环境。\n   - 建议在该环境中安装第三方库，并优先使用 `conda install`。\n\n3. **VS Code 及 Python 开发插件配置**\n   - 介绍了选择 VS Code 作为 Python 开发 IDE 的原因。\n   - 说明了 VS Code 的安装步骤。\n   - 推荐安装的插件包括：\n     - 简体中文语言包\n     - Python 插件\n     - Jupyter 插件\n     - GitHub Copilot\n   - 还说明了在 VS Code 中通过“扩展”面板搜索、安装和管理插件的方法。\n\n4. **向量库的作用与类型**\n   - 解释了向量库在 RAG 中用于持久化存储文本向量，并支持基于相似度的语义检索。\n   - 分类介绍了向量库的几种形式：\n     - 基于内存的嵌入式向量库\n     - 本地管理的向量库\n     - 云端管理的向量库\n   - 提到开发 RAG 应用时需要先考虑向量库的技术选型与环境安装。\n\n5. **Chroma 向量库的安装**\n   - 选择 Chroma 作为开源向量库示例。\n   - 说明通过 `pip install chromadb` 进行安装。\n   - 提到安装后还需要进行功能验证，表明后续内容将继续介绍测试方法。"
+            },
+            {
+              "title": "向量库",
+              "start_index": 58,
+              "end_index": 62,
+              "node_id": "0026",
+              "summary": "这部分主要介绍了 RAG 应用开发环境的搭建，重点包括向量库的选择与安装、PostgreSQL 与 pgvector 的配置，以及 LlamaIndex 框架的安装。\n\n主要内容有：\n- 说明向量库在 RAG 检索阶段的重要作用，并将向量库分为内存型、本地管理型和云端管理型三类。\n- 重点演示两种开源向量库的安装与测试：\n  - Chroma：介绍了 pip 安装方式，以及嵌入式模式和 Client/Server 模式的使用与验证方法。\n  - PostgreSQL + pgvector：介绍了在 MacOS 下通过图形安装和 brew 安装 PostgreSQL 的方法，以及安装 pgvector 扩展、创建向量表、插入和查询向量数据的基本流程。\n- 介绍了 LlamaIndex 框架的基础安装命令，用于后续 RAG 应用开发。\n- 最后总结了本书约定的开发环境，包括大模型、嵌入模型、Python 虚拟环境、IDE 插件、向量库和 LlamaIndex，并说明其他 Python 依赖会按需安装。"
+            },
+            {
+              "title": "LlamaIndex 框架",
+              "start_index": 62,
+              "end_index": 62,
+              "node_id": "0027",
+              "summary": "这部分主要介绍了 RAG 应用开发环境的搭建与确认，包括向量库中测试插入向量数据并通过查询验证是否成功；随后说明了 LlamaIndex 框架的安装方法，强调其将作为主要开发框架使用。最后对本书后续开发环境做了约定，概括了已搭建的基础组件，如大模型、嵌入模型、Python 虚拟环境、IDE 与插件、向量库和 LlamaIndex，并说明其他 Python 库会按需安装，同时指出读者可根据自身条件调整模型或向量库等配置。"
+            }
+          ],
+          "node_id": "0020",
+          "summary": "这部分主要介绍了 RAG 应用开发框架与环境准备的内容，重点包括：\n\n1. **LlamaIndex 框架的特点与优势**\n   - 具有灵活、可扩展、可定制化的特性，支持在现有组件基础上进行派生和扩展。\n   - 相比 LangChain，更适合用于 **RAG 应用开发**，因为其最初就是围绕 RAG 场景设计的，内置了许多模块化的优化组件和算法。\n   - 支持更强大的 **Data Agent** 开发，不仅能做数据查询，还能结合外部工具进行一定的数据操控。\n   - 新版本还提供了 **Query Pipeline**，用于以图结构方式编排 RAG 工作流。\n   - 由于学习和使用门槛更低，书中选择 LlamaIndex 作为基础框架，并说明使用的版本是 **0.10.x**。\n\n2. **RAG 应用开发环境准备**\n   - 介绍开发 RAG 应用所需的基础环境和工具。\n   - 目标是搭建一个可以 **完全本地化运行** 的开发环境。\n\n3. **硬件环境建议**\n   - 如果希望在一台电脑上完成主程序、向量库、本地大模型、数据库和前端等组件的运行，需要较强的硬件配置。\n   - 推荐使用 **MacOS（优先）**、Windows 10 或 Linux。\n   - 内存建议 **不低于 16GB**，并提示如果运行本地大模型，还需要根据模型大小进一步提升配置。"
+        },
+        {
+          "title": "关于本书开发环境的约定",
+          "start_index": 62,
+          "end_index": 63,
+          "node_id": "0028",
+          "summary": "这部分主要介绍了 RAG 应用开发环境的搭建与本书开发环境的约定。内容包括：在 PostgreSQL 中使用 pgvector 创建向量表并插入、查询向量数据以验证向量库是否可用；安装 LlamaIndex 框架作为主要开发工具；以及总结本书所采用的整体开发环境配置，如本地大模型与嵌入模型、Python 与 Miniconda 版本、VS Code、Chroma 向量库和 LlamaIndex 版本等。同时说明这些环境配置并非唯一，可根据实际条件替换部分组件。最后对预备篇内容进行了小结，回顾了大模型与 RAG 的基本概念、技术架构和开发环境准备，为后续正式开发 RAG 应用做铺垫。"
+        }
+      ],
+      "node_id": "0016",
+      "summary": "本章主要介绍 RAG 应用开发环境的搭建方法，强调在正式开发前需要先了解常见开发方式、工具与平台，并准备适合自己的开发环境。内容首先概述了开发 RAG 应用的两种主要方式：低代码开发平台和主流大模型应用开发框架。随后重点介绍低代码平台的特点与代表，包括百度 AppBuilder、阿里云百炼、字节跳动 Coze，以及开源的 FastGPT、Dify 等，说明这类平台通常具有使用简单、便捷、可视化配置等优势。"
+    },
+    {
+      "title": "预备篇小结",
+      "start_index": 63,
+      "end_index": 66,
+      "node_id": "0029",
+      "summary": "This partial document mainly covers the setup and introduction to building enterprise-grade RAG applications with large models. It first lists the development environment configuration, including hardware, operating system, base LLMs, embedding models, Python/Miniconda versions, IDE, vector database, and framework choices, along with backup alternatives. It then summarizes the “preparatory section,” explaining that the book has reviewed the development and current state of large models, introduced the motivation, principles, and architecture of RAG applications, and established the basic concepts and overall understanding needed for RAG. Finally, it begins Chapter 3, which introduces RAG application development, emphasizing how to turn RAG architectures and workflows into production-ready software, and outlines the first practical topic: building a simplest RAG application using three approaches—raw code, LlamaIndex, and LangChain—starting with loading local TXT documents, splitting them, embedding them, and storing them in Chroma."
+    },
+    {
+      "title": "初识 RAG应用开发",
+      "start_index": 66,
+      "end_index": 66,
+      "nodes": [
+        {
+          "title": "开发一个最简单的 RAG应用",
+          "start_index": 66,
+          "end_index": 67,
+          "nodes": [
+            {
+              "title": "使用原生代码开发",
+              "start_index": 67,
+              "end_index": 75,
+              "node_id": "0032",
+              "summary": "The partial document explains the basics of building a RAG application for enterprise LLM use, starting from a fully native Python implementation and then introducing LlamaIndex.\n\nMain points covered:\n- The project folder structure for a RAG demo, including:\n  - `chroma_db` for Chroma vector storage\n  - `data` for local TXT knowledge documents\n  - `src` for Python source code\n- How to build a RAG pipeline without third-party frameworks:\n  - loading and reading TXT documents\n  - splitting documents into chunks\n  - generating embeddings\n  - storing vectors and building an index\n  - retrieving relevant chunks and generating answers\n- A simple document loader function that checks file type and reads TXT content.\n- A text-splitting method based on sentences, with an `overlap` parameter to preserve semantic continuity between chunks.\n- Using Ollama embeddings and ChromaDB to:\n  - embed each chunk\n  - store chunks in a vector database\n  - query the database with semantic search\n- A test procedure to verify that retrieval works before building the chat interface.\n- A simple interactive terminal RAG chat program that:\n  - embeds the user query\n  - retrieves top relevant chunks\n  - builds a prompt with retrieved context\n  - calls a local LLM to generate the answer\n- A discussion of the limitations of this “naive” RAG prototype for real production use, such as:\n  - asynchronous indexing\n  - management tools\n  - document-to-chunk traceability\n  - API integration\n  - multi-user support\n  - UI-based interaction\n  - history storage\n  - answer provenance\n- The motivation for using RAG frameworks like LlamaIndex, leading into a classic 5-line RAG example using `SimpleDirectoryReader` and `VectorStoreIndex`."
+            },
+            {
+              "title": "使用 LlamaIndex 框架开发",
+              "start_index": 75,
+              "end_index": 79,
+              "node_id": "0033",
+              "summary": "该部分主要介绍了如何使用大模型应用开发框架来开发 RAG 应用，并对比了原生实现与框架实现的差异与优势。核心内容包括：\n\n1. **真实生产中的 RAG 问题**\n   - 提出了企业级 RAG 应用在生产环境中常见的挑战，如：\n     - 原始文档与分割后的知识块如何对应与同步更新\n     - 如何与外部系统通过 API 集成\n     - 如何支持多用户并发\n     - 如何通过 UI 页面交互并保存历史记录\n     - 如何对生成结果进行知识溯源\n   - 说明这些问题有些会在后续章节解决，有些需要结合实际业务自行处理。\n\n2. **为什么要使用开发框架**\n   - 通过最简单的原生 RAG 示例说明：虽然能理解底层原理，但代码在鲁棒性、可扩展性和可维护性方面较弱，难以直接用于真实生产。\n   - 引出使用主流框架开发 RAG 的必要性。\n\n3. **LlamaIndex 框架的 RAG 开发示例**\n   - 介绍了官方经典的 5 行代码 RAG 入门示例，展示其通过预置组件快速完成：\n     - 文档加载\n     - 向量索引构建\n     - 查询引擎创建\n     - 问答输出\n   - 进一步给出一个更完整的 LlamaIndex 示例，包含：\n     - 使用本地 Ollama 模型设置大模型与嵌入模型\n     - 加载本地 TXT 文档\n     - 使用 SentenceSplitter 分割文档为 Node\n     - 使用 Chroma 构建向量存储\n     - 构建 VectorStoreIndex\n     - 通过 query_engine 实现交互式问答\n   - 强调框架能自动完成嵌入、索引和检索生成等流程，大幅减少代码量，并提升灵活性与可维护性。\n\n4. **LangChain 框架的 RAG 开发示例**\n   - 作为对比，展示了 LangChain 中实现类似 RAG 流程的代码结构。\n   - 主要涉及：\n     - 模型与嵌入模型配置\n     - 文档加载\n     - 文本切分\n     - 向量库准备\n   - 目的是帮助读者了解不同主流框架在 RAG 开发中的实现方式与能力。"
+            },
+            {
+              "title": "使用 LangChain 框架开发",
+              "start_index": 79,
+              "end_index": 81,
+              "node_id": "0034",
+              "summary": "This partial document explains how to build a RAG application with the LangChain framework and compares it with LlamaIndex. It shows a complete LangChain-based example that loads text files, splits documents, creates embeddings, stores them in Chroma, retrieves relevant context, and builds a RAG chain using LCEL to answer user questions interactively. The text highlights key differences between LangChain and LlamaIndex, especially that LangChain can add documents directly to the vector store and uses “Chain” as a core abstraction for linking retrieval, prompt assembly, model inference, and output parsing. The document then transitions to RAG debugging and tracing, introducing the need to inspect runtime inputs and outputs for troubleshooting and optimization. It begins describing LlamaIndex’s callback-based tracking mechanism, focusing on the LlamaDebugHandler and the global callback_manager in Settings for collecting execution and debug information."
+            }
+          ],
+          "node_id": "0031",
+          "summary": "该部分主要介绍了第3章“初识 RAG 应用开发”的内容，重点包括：\n\n- RAG 应用从需求场景到生产级架构的演进，以及如何将这些架构思想落地为可运行、可部署的软件。\n- 本章目标是帮助读者从技术层面建立对 RAG 应用开发的初步认识，涵盖开发、跟踪、调试与评估等基础能力。\n- 通过三种方式开发一个最简单的 RAG 应用：\n  1. 原生代码实现\n  2. 使用 LlamaIndex 框架\n  3. 使用 LangChain 框架\n- 设计了一个简单的技术场景：从本地 TXT 文档加载知识，进行分割、嵌入，并存入 Chroma 向量库，再结合大模型完成增强生成。\n- 介绍了示例项目的目录结构，包括：\n  - `chroma_db`：向量库存储目录\n  - `data`：本地知识文档目录\n  - `src`：RAG 应用代码目录\n- 在“使用原生代码开发”部分，说明了不借助框架时需要自行实现的核心模块：\n  - 文档加载与读取\n  - 文档分割\n  - 向量嵌入\n  - 向量存储与索引\n  - 检索与生成\n  - 简单查询/对话功能\n- 文中还开始展示了一个读取 TXT 文档的加载器示例代码，用于说明基础实现方式。"
+        },
+        {
+          "title": "如何跟踪与调试 RAG应用",
+          "start_index": 81,
+          "end_index": 81,
+          "nodes": [
+            {
+              "title": "借助 LlamaDebugHandler",
+              "start_index": 81,
+              "end_index": 84,
+              "node_id": "0036",
+              "summary": "这部分主要介绍了 RAG 应用开发中的跟踪与调试方法，重点围绕 LlamaIndex 框架展开。首先说明了在使用 LangChain 的 LCEL 构建 RAG 链时，可以通过简洁的链式表达完成检索、提示组装、大模型调用和输出解析。随后进入 3.2 节，强调由于 LlamaIndex 抽象程度较高，开发中常需要查看真实输入输出、检索效果和模型响应，因此需要借助内部跟踪机制来辅助排错和优化。\n\n文中详细介绍了两种调试方式：一是使用 LlamaIndex 自带的 LlamaDebugHandler，通过 CallbackManager 和 Settings 进行全局或局部配置，在文本分割、节点解析、嵌入、检索、查询、生成等关键事件发生时自动记录调试信息，并可通过相关接口查看事件时间、事件对和完整 trace map；二是借助第三方工程化平台进行跟踪与调试，重点介绍了 Langfuse 这一开源平台，它支持跟踪、评估、提示管理等功能，并且已与 LlamaIndex 集成，可通过 SDK 将应用运行数据发送到平台，在前端界面中直观查看和分析。"
+            },
+            {
+              "title": "借助第三方的跟踪与调试平台",
+              "start_index": 84,
+              "end_index": 87,
+              "node_id": "0037",
+              "summary": "这部分主要介绍了 RAG 应用开发中的跟踪与调试方法，重点包括两类工具：\n\n1. **本地调试与事件追踪**\n   - 通过 `print_trace_map()` 打印完整的事件堆栈和耗时信息。\n   - 用于查看大模型应用内部各步骤的执行过程和性能表现。\n\n2. **借助第三方工程化平台进行跟踪与管理**\n   - 介绍了 **Langfuse** 这一开源平台，它支持跟踪、评估、提示管理等功能，帮助大模型应用更快走向生产。\n   - 说明了 Langfuse 的基本使用流程：\n     - 申请 API Key；\n     - 在基于 LlamaIndex 的应用中通过 `LlamaIndexCallbackHandler` 和 `CallbackManager` 进行集成；\n     - 在程序结束前调用 `flush()` 将缓存的跟踪信息发送到服务器；\n     - 通过 Langfuse 的 UI 页面查看查询过程、检索到的知识块、模型输入输出等详细信息。\n   - 还提到 Langfuse 除了跟踪功能外，还支持 Prompt 管理、性能指标统计、调用成本跟踪、评估数据集管理和在线评估等辅助能力。"
+            }
+          ],
+          "node_id": "0035",
+          "summary": "这部分主要介绍了基于大模型的 RAG 应用开发中，如何利用框架提升开发效率，以及如何进行跟踪与调试。前半部分提到在 LangChain 中可以通过 LCEL 构造 rag_chain，把检索、提示组装、大模型调用和输出解析等步骤串联成简洁的链式流程。后半部分转向 LlamaIndex 框架，说明由于其抽象程度较高，调试时需要借助内部跟踪机制来观察模型真实输入输出、分析检索准确性和模型表现，并重点介绍了使用 LlamaDebugHandler 进行调试的方法，以及通过 Settings 中的 callback_manager 统一管理回调来记录执行步骤、时间戳和输入输出信息。"
+        },
+        {
+          "title": "准备：基于 LlamaIndex 框架的 RAG应用开发核心组件",
+          "start_index": 88,
+          "end_index": 88,
+          "node_id": "0038",
+          "summary": "这部分主要介绍了基于 LlamaIndex 框架进行 RAG 应用开发时的核心组件及其整体定位。文中强调，LlamaIndex 预置了大量封装良好、设计完善的组件，覆盖 RAG 开发流程的不同阶段和不同应用场景，并且这些组件不是孤立存在的，而是通过组合、派生和集成形成一个完整的应用框架。这样既方便开发者快速使用高层 API 构建应用，也支持通过底层组件实现更灵活、更复杂的控制，甚至在现有组件基础上扩展出自定义组件。与此同时，文中也指出 LlamaIndex 的强大功能带来了一定的复杂性和学习门槛，因此后续将按照 RAG 应用的典型流程对核心组件进行分类讲解，帮助读者逐步掌握并最终具备开发端到端 RAG 应用的能力。"
+        }
+      ],
+      "node_id": "0030",
+      "summary": "本章主要介绍如何从零开始理解并开发 RAG 应用，重点是把前面提到的 RAG 架构与工作流思想落地为可运行、可用于生产的工程化软件。内容强调“生产就绪”的 RAG 应用不仅要满足复杂业务需求，还要具备测试、评估和持续优化能力。\n\n章节开头说明了本章的学习目标：从开发、跟踪与调试三个层面建立对 RAG 应用开发的初步认识。随后在 3.1 节中，作者以一个最简单的 RAG 场景为例，分别用三种方式实现：原生代码、LlamaIndex 框架和 LangChain 框架，帮助读者理解不同开发路径的差异与适用性。\n\n文中还给出了这个示例应用的基本技术流程：从本地目录加载 TXT 文档作为知识来源，对文档进行切分、嵌入，并存储到向量数据库 Chroma 中，为后续检索增强生成打下基础。"
+    },
+    {
+      "title": "模型与 Prompt",
+      "start_index": 89,
+      "end_index": 89,
+      "nodes": [
+        {
+          "title": "大模型",
+          "start_index": 89,
+          "end_index": 89,
+          "nodes": [
+            {
+              "title": "大模型在 RAG应用中的作用",
+              "start_index": 90,
+              "end_index": 91,
+              "node_id": "0041",
+              "summary": "本部分主要介绍了大模型在 RAG 应用中的作用，以及 LlamaIndex 中大模型组件的统一接口设计。\n\n主要内容包括：\n1. 大模型在 RAG 流程中的应用阶段：\n   - 数据前期准备：利用大模型进行数据清洗、整理、抽取、生成问答对、去重和结构化。\n   - 加载与索引：生成补充元数据、摘要、表格描述，并判断数据相关性以决定是否索引。\n   - 检索与生成：用于查询路由、查询扩展或重写、答案生成以及多子查询结果合成。\n   - 应用评估：借助大模型生成评估数据集，并对 RAG 结果进行相关性、正确性等多维度评估。\n\n2. 大模型组件的统一接口：\n   - 说明 LlamaIndex 中的大模型既可独立使用，也可作为索引、检索器、查询引擎等模块的参数。\n   - 展示了 BaseLLM 接口的定义，包含 metadata、chat、complete、stream_chat、stream_complete 以及异步接口等方法，用于统一调用不同大模型能力。"
+            },
+            {
+              "title": "大模型组件的统一接口",
+              "start_index": 91,
+              "end_index": 93,
+              "node_id": "0042",
+              "summary": "这部分主要介绍了 LlamaIndex 中“大模型组件”的统一接口设计及其使用方式，核心内容包括：\n\n1. **统一接口定义**\n   - LlamaIndex 为大模型组件定义了标准化的 `BaseLLM` 接口。\n   - 该接口要求模型实现元数据获取、文本补全（`complete`）、对话（`chat`）、流式输出（`stream_*`）以及同步/异步（`async`）等能力。\n   - 这种统一接口使开发者可以用一致的方式调用不同的大模型。\n\n2. **接口实现方式**\n   - 通过 OpenAI 大模型组件的实现示例说明，框架内部会调用官方 SDK 完成实际请求。\n   - 展示了模型调用、参数处理、响应封装等基本流程。\n\n3. **大模型组件的单独使用**\n   - 说明 LlamaIndex 的 LLM 组件不仅能嵌入索引、检索器、查询引擎等模块，也可以独立使用。\n   - 常用于测试模型连通性和验证可用性。\n   - 给出了使用 OpenAI GPT 模型进行 `complete` 和 `chat` 测试的示例。\n\n4. **模型切换的便利性**\n   - 通过简单替换导入和模型配置，可以将 OpenAI 模型切换为本地 Ollama 模型。\n   - 体现了框架抽象带来的灵活性和可移植性。"
+            },
+            {
+              "title": "大模型组件的单独使用",
+              "start_index": 93,
+              "end_index": 94,
+              "node_id": "0043",
+              "summary": "This partial document explains how to use large language model components in the LlamaIndex framework, both independently and as part of larger applications. It first shows how to test an OpenAI GPT model using the `complete` and `chat` interfaces, then demonstrates how to switch to a local Ollama model with minimal code changes, highlighting the framework’s flexibility and model-configuration convenience. It also covers integrated usage, including changing the default LLM through the `Settings` component and injecting a specific LLM into other modules such as indexes and query engines so that downstream operations use the chosen model."
+            },
+            {
+              "title": "大模型组件的集成使用",
+              "start_index": 94,
+              "end_index": 94,
+              "node_id": "0044",
+              "summary": "本部分主要介绍了大模型在 LlamaIndex 中的配置与集成使用方式。重点包括：通过 Settings 组件更改默认使用的大模型，从而实现模型配置化并减少对不同 API 差异的关注；以及在实际开发中，将大模型组件动态插入索引、检索器、查询引擎等其他模块中，由这些模块按需调用模型。文中还说明了如果组件初始化或构造方法包含 llm 参数，通常就可以在该处指定或替换所使用的大模型，并给出了在构造索引时传入指定模型、后续查询时沿用该模型的示例。"
+            },
+            {
+              "title": "了解与设置大模型的参数",
+              "start_index": 95,
+              "end_index": 96,
+              "node_id": "0045",
+              "summary": "这部分主要介绍了在 LlamaIndex 中如何了解和设置大模型参数，以及如何自定义大模型组件。核心内容包括：\n\n1. **大模型参数的分类**\n   - **模型定义参数**：如模型名称、模型文档路径、服务端口等。\n   - **模型生成参数**：如温度（temperature）、上下文窗口大小等。\n\n2. **参数设置的两种方式**\n   - **在大模型初始化时设置**：通过构造模型对象时传入参数，示例包括 Ollama 和 LlamaCPP 的配置方式。\n   - **在 Settings 组件中设置**：可统一设置部分全局参数，如 `context_window` 和 `num_output`，并且后续可被具体模型配置覆盖。\n\n3. **自定义大模型组件**\n   - 说明了如何继承 `CustomLLM` 来实现自己的大模型组件。\n   - 自定义组件可以接入本地模型或自定义 API，并通过实现相应接口完成模型输出。\n   - 文中给出了一个 `MyLLM` 的示例代码框架，展示自定义 LLM 的基本结构。"
+            },
+            {
+              "title": "自定义大模型组件",
+              "start_index": 96,
+              "end_index": 98,
+              "node_id": "0046",
+              "summary": "这部分内容主要讲了 **LlamaIndex 中大模型组件的扩展方式** 以及 **Prompt 的基础概念与模板使用**，核心要点如下：\n\n### 1. 设置和覆盖模型参数\n- 介绍了可以通过 `Settings` 组件统一设置一些全局参数，例如：\n  - `context_window`：上下文窗口大小\n  - `num_output`：输出长度\n- 这些全局设置在后续构造具体模型组件时可以被覆盖。\n\n### 2. 自定义大模型组件\n- 说明了如果现有的大模型接入方式不满足需求，可以通过继承 `CustomLLM` 来实现自己的大模型组件。\n- 自定义组件需要实现关键接口：\n  - `metadata`\n  - `complete`\n  - `stream_complete`\n- 示例展示了如何返回固定文本响应，并通过 `Settings.llm = MyLLM()` 将其替换为全局默认模型。\n\n### 3. 使用 LangChain 中的大模型组件\n- 介绍了 LlamaIndex 对 LangChain 的适配能力。\n- 通过 `LangChainLLM` 适配器，可以直接使用 LangChain 支持的模型，例如百度千帆 `QianfanLLMEndpoint`。\n- 这样可以扩大 LlamaIndex 可接入的大模型范围。\n\n### 4. Prompt 的作用与模板\n- 引入了 Prompt 的概念：RAG 应用与大模型交互的基本输入方式。\n- 强调在 RAG 开发的多个阶段都会用到 Prompt，因此需要理解 Prompt 的构造方式。\n- 介绍了 `PromptTemplate` 的用途：\n  - 用于构造带变量的 Prompt 模板\n  - 运行时通过格式化生成最终 Prompt\n\n整体来看，这一部分是在为后续的 RAG 开发打基础，重点是：\n- 如何配置和替换大模型\n- 如何扩展模型接入方式\n- 如何使用 Prompt 模板与大模型进行交互"
+            },
+            {
+              "title": "使用 LangChain 框架中的大模型组件",
+              "start_index": 98,
+              "end_index": 98,
+              "node_id": "0047",
+              "summary": "这部分内容主要介绍了 **LlamaIndex 与 LangChain 的大模型组件适配**，以及 **Prompt 在 RAG 应用中的作用与模板使用**，核心要点如下：\n\n1. **使用 LangChain 框架中的大模型组件**\n   - LlamaIndex 不仅封装了常见的大模型组件，还提供了对 **LangChain 大模型组件的适配器**。\n   - 通过 `LangChainLLM`，可以把 LangChain 中声明的大模型接入 LlamaIndex。\n   - 文中以 **百度千帆大模型（QianfanLLMEndpoint）** 为例，说明如何将其适配为 LlamaIndex 可用的 LLM。\n   - 这样做的目的，是为了 **扩大可支持的大模型范围**，增强框架兼容性。\n\n2. **Prompt 的概念与重要性**\n   - RAG 应用与大模型之间主要通过 **Prompt** 进行交互。\n   - Prompt 是大模型输出的基础输入。\n   - 因为 RAG 开发的多个阶段都会用到大模型，所以会涉及很多不同类型的 Prompt，因此需要先理解 Prompt 的基本概念。\n\n3. **Prompt 模板的使用**\n   - Prompt 模板是 LlamaIndex、LangChain 等框架中的基础组件。\n   - 它用于构造带有 **参数变量** 的 Prompt。\n   - 这些变量会在运行时通过代码格式化，生成最终发送给模型的实际 Prompt。\n   - 文中还提到会通过一个典型的 RAG 增强生成 Prompt 模板示例来说明其格式化方式。\n\n整体来看，这一部分是在为后续的 RAG 开发打基础，重点讲了 **模型接入方式** 和 **Prompt 模板机制**。"
+            }
+          ],
+          "node_id": "0040",
+          "summary": "本部分主要介绍了 RAG 应用中涉及的两类核心模型：大模型和嵌入模型。大模型负责智能推理与生成，是应用的核心“大脑”；嵌入模型则用于文档向量化和语义检索。文中还强调了在复杂 RAG 流程中可能会组合使用多个模型，并根据任务特点、资源需求等灵活选择。\n\n此外，本部分重点说明了 Prompt 的重要性。Prompt 不仅用于最终生成结果，还广泛应用于摘要生成、查询转换、查询路由、智能体推理、响应评估等多个环节。由于不同模型、不同场景和不同语言环境下对 Prompt 的响应存在差异，因此默认模板并不一定最优，Prompt 的设计与调整是关键技术之一。\n\n最后，章节开头的 4.1 “大模型” 提到，大模型应用开发框架通常会对底层模型 API 进行抽象封装，以便简化调用并支持灵活切换模型。"
+        },
+        {
+          "title": "Prompt",
+          "start_index": 98,
+          "end_index": 98,
+          "nodes": [
+            {
+              "title": "使用 Prompt模板",
+              "start_index": 98,
+              "end_index": 99,
+              "node_id": "0049",
+              "summary": "该部分主要介绍了在 LlamaIndex 中如何使用和适配大模型组件，以及 Prompt 在 RAG 应用中的作用与使用方式。重点包括：\n\n1. **使用 LangChain 框架中的大模型组件**\n   - LlamaIndex 不仅封装了常见大模型，还提供了对 LangChain 大模型组件的适配器。\n   - 通过 `LangChainLLM` 可以把 LangChain 中的大模型接入 LlamaIndex，从而扩展可用模型范围。\n   - 文中以百度千帆大模型为例，说明如何通过适配器完成接入。\n\n2. **Prompt 的概念与作用**\n   - Prompt 是大模型输出的基本输入，也是 RAG 应用中与大模型沟通的核心方式。\n   - 在 RAG 开发的多个阶段都会用到 Prompt，因此需要理解其构造和使用。\n\n3. **Prompt 模板的使用**\n   - 介绍了 PromptTemplate 这一基础组件，用于构造带参数变量的模板。\n   - 通过 `format` 和 `format_messages` 可以将模板实例化：\n     - `format` 生成普通字符串，适合单次问答。\n     - `format_messages` 生成 ChatMessage 形式，适合多轮对话场景。\n   - 以一个基于上下文回答问题的 RAG 示例说明模板格式化过程。\n\n4. **默认 Prompt 模板的修改**\n   - 说明在实际开发中通常不需要手动关注很多 Prompt 细节，因为框架内置了大量默认且经过测试的模板。\n   - 框架还会自动完成模板格式化，例如自动注入上下文和查询问题。\n   - 该部分开始引出在 LlamaIndex 中修改默认 Prompt 模板的方法。"
+            },
+            {
+              "title": "更改默认的 Prompt模板",
+              "start_index": 99,
+              "end_index": 102,
+              "node_id": "0050",
+              "summary": "这部分内容主要讲的是 **LlamaIndex 中 Prompt 模板的使用与定制**，重点围绕 RAG 应用开发中的提示词管理展开。核心内容包括：\n\n1. **PromptTemplate 的基本用法**\n   - 通过 `PromptTemplate` 定义一个问答模板。\n   - 使用 `format()` 将模板渲染成普通字符串，适合一次性问答。\n   - 使用 `format_messages()` 将模板渲染成消息对象，适合多轮对话场景。\n\n2. **修改默认 Prompt 模板**\n   - 在实际开发中，框架通常自带默认 Prompt，很多时候无需手动编写。\n   - 但在某些场景下，比如将英文模板改成中文模板，需要对默认模板进行替换。\n   - LlamaIndex 提供了 `get_prompts()` 和 `update_prompts()` 接口，用于查看和修改组件内部使用的 Prompt。\n   - 以查询引擎为例，可以获取其默认的 `text_qa_template`，并通过 `update_prompts()` 替换为自定义中文模板。\n   - 也可以在初始化组件时直接传入自定义模板，效果与 `update_prompts()` 类似。\n\n3. **修改 Prompt 模板变量**\n   - 模板中的变量名通常不能随意改动，否则会导致运行时绑定失败。\n   - 如果确实需要使用自定义变量名，可以通过 `template_var_mappings` 建立变量映射关系。\n   - 还提到可以通过 `function_mappings` 将模板变量映射到函数，由函数动态生成变量值。\n\n4. **整体目的**\n   - 这一节强调的是：在 RAG 和大模型应用中，Prompt 模板不仅可以使用框架默认配置，还可以根据业务需求进行中文化、个性化和动态化定制，以提升应用效果和适配性。"
+            },
+            {
+              "title": "更改 Prompt模板的变量",
+              "start_index": 102,
+              "end_index": 103,
+              "node_id": "0051",
+              "summary": "该部分主要讲解了在 LlamaIndex 中如何自定义 Prompt 模板，重点包括通过初始化参数修改默认模板，以及使用 `template_var_mappings` 将模板中的变量名映射到自定义变量名，还介绍了通过 `function_mappings` 将模板变量绑定到函数以动态生成变量值。随后内容转入“嵌入模型”章节，说明嵌入模型在 RAG 应用中的作用：将文本知识块转换为向量，用于语义表示、相似语义检索，以及在索引阶段和生成阶段分别承担知识向量化与问题向量检索的任务。"
+            }
+          ],
+          "node_id": "0048",
+          "summary": "这部分文档主要介绍了 **LlamaIndex 与 LangChain 的大模型组件适配**，以及 **Prompt 的基本概念和 Prompt 模板的使用**，核心内容包括：\n\n1. **使用 LangChain 框架中的大模型组件**\n   - LlamaIndex 不仅封装了自身常见的大模型组件，还提供了对 **LangChain 大模型组件的适配器**。\n   - 通过 `LangChainLLM`，可以把 LangChain 中声明的大模型接入 LlamaIndex。\n   - 示例展示了如何使用 **百度千帆大模型**（如 `ERNIE-Bot-4`）并设置为全局 LLM。\n   - 这一部分强调了：借助适配器，可以扩大 LlamaIndex 可使用的大模型范围。\n\n2. **Prompt 的作用**\n   - 说明了 **RAG 应用与大模型之间是通过 Prompt 进行沟通的**。\n   - Prompt 是大模型输出的基础输入。\n   - 因为 RAG 开发的多个阶段都会用到大模型，所以会涉及很多不同类型的 Prompt，因此需要先理解 Prompt 的概念。\n\n3. **Prompt 模板的使用**\n   - 介绍了 **Prompt 模板** 是 LlamaIndex 或 LangChain 中的基础组件。\n   - Prompt 模板用于构造带有参数变量的 Prompt，这些变量会在运行时被格式化填充，生成最终可发送给模型的提示词。\n   - 文中还提到会通过一个典型的 RAG 场景示例来说明 Prompt 模板的格式化方法。\n\n整体来看，这一段是在为后续的 RAG 开发内容做基础铺垫，重点讲了 **模型接入方式** 和 **Prompt 设计/模板化**。"
+        },
+        {
+          "title": "嵌入模型",
+          "start_index": 103,
+          "end_index": 103,
+          "nodes": [
+            {
+              "title": "嵌入模型在 RAG应用中的作用",
+              "start_index": 103,
+              "end_index": 104,
+              "node_id": "0053",
+              "summary": "该部分主要介绍了 RAG 应用中的提示词模板自定义方式，以及嵌入模型在 RAG 中的核心作用和接口设计。\n\n重点内容包括：\n- 通过 `PromptTemplate` 和函数映射机制实现提示词中的自定义逻辑与上下文格式化。\n- 解释嵌入模型如何将文本知识块转换为向量，以便计算机进行语义表示、存储和检索。\n- 说明嵌入模型在 RAG 的两个阶段中的作用：\n  - 索引阶段：把知识块向量化并存入向量库；\n  - 生成阶段：把用户问题向量化并用于检索相关知识块，辅助生成答案。\n- 对比了向量语义检索与传统关键词检索的区别，强调相似度计算方法如余弦相似度、点积和欧几里得距离。\n- 提到可参考 MTEB 等基准测试来评估和选择合适的嵌入模型。\n- 展示了嵌入模型组件的基础接口设计，包括向量类型定义、相似度计算函数，以及 `BaseEmbedding` 中用于获取查询向量的抽象方法。"
+            },
+            {
+              "title": "嵌入模型组件的接口",
+              "start_index": 104,
+              "end_index": 105,
+              "node_id": "0054",
+              "summary": "本部分主要介绍了嵌入模型组件的接口设计与具体实现方式。首先说明了文本嵌入结果的数据结构是向量列表，并给出了相似度计算的三种方式：余弦相似度、点积和欧几里得距离。随后通过 LlamaIndex 的 `BaseEmbedding` 抽象类展示了嵌入模型的核心接口，包括同步和异步的查询文本嵌入、文本嵌入生成方法等，这些抽象方法需要由具体模型实现。最后以 OpenAIEmbedding 为例，说明其如何通过 OpenAI 官方 SDK 调用 `embeddings.create` 接口，将输入文本转换为向量，从而完成嵌入生成。"
+            },
+            {
+              "title": "嵌入模型组件的单独使用",
+              "start_index": 106,
+              "end_index": 108,
+              "node_id": "0055",
+              "summary": "这部分主要介绍了 LlamaIndex 中嵌入模型组件的使用方法，重点包括单独使用、集成使用以及参数设置。\n\n首先，文档说明嵌入模型组件虽然通常会在框架内部自动使用，但也可以单独调用。以 OpenAI 默认嵌入模型为例，展示了如何通过 `OpenAIEmbedding` 获取文本向量，并用 `similarity` 接口比较不同文本向量的相似度，说明语义相近文本的向量相似度更高。\n\n其次，文档介绍了两种本地嵌入模型的替代方案：一种是 Ollama 本地嵌入模型，通过替换为 `OllamaEmbedding` 即可使用；另一种是基于 TEI（Text Embeddings Inference）的本地服务，可以部署 Hugging Face 上的模型，如 `bge-large-zh-v1.5`，再通过 `TextEmbeddingsInference` 接入。这里强调了 LlamaIndex 在切换嵌入模型时的便利性。\n\n接着，文档讲解了嵌入模型在其他模块中的集成使用方式。一方面可以通过 `Settings.embed_model` 修改全局默认嵌入模型；另一方面也可以在构造具体对象时直接传入嵌入模型，例如在创建 `VectorStoreIndex` 时指定 `embed_model`，从而在构建索引时自动完成嵌入。\n\n最后，文档开始介绍嵌入模型的常见参数设置，提到如 `model_name` 和 `embed_batch_size` 等参数，用于指定模型名称和控制批量处理大小。"
+            },
+            {
+              "title": "嵌入模型组件的集成使用",
+              "start_index": 108,
+              "end_index": 108,
+              "node_id": "0056",
+              "summary": "这部分主要介绍了 LlamaIndex 中嵌入模型组件的使用方法与配置方式。内容包括：如何便捷地切换嵌入模型；如何将嵌入模型作为组件集成到其他模块中使用，例如通过 Settings.embed_model 设置默认嵌入模型，或在构造 VectorStoreIndex 时显式传入 embed_model；以及嵌入模型的常见参数说明，如 model_name 和 embed_batch_size。"
+            },
+            {
+              "title": "了解与设置嵌入模型的参数",
+              "start_index": 108,
+              "end_index": 109,
+              "node_id": "0057",
+              "summary": "本部分主要介绍了 LlamaIndex 中嵌入模型（Embedding）的使用与扩展方法，重点包括：\n\n1. **切换嵌入模型的便捷性**  \n   说明在 LlamaIndex 框架下，更换嵌入模型非常方便，可以快速替换不同的 embedding 模型。\n\n2. **嵌入模型组件的集成使用**  \n   讲解嵌入模型不仅可以单独使用，还可以集成到其他模块中，例如：\n   - 通过 `Settings.embed_model` 修改默认嵌入模型；\n   - 在构造索引等模块时直接传入嵌入模型，例如 `VectorStoreIndex`。\n\n3. **嵌入模型参数的了解与设置**  \n   列举了常见参数，如：\n   - `model_name`\n   - `embed_batch_size`\n   - `timeout`\n   - `max_retries`\n   - `dimensions`  \n   同时强调不同模型支持的参数不同，需要参考具体模型文档，并给出参数配置示例。\n\n4. **自定义嵌入模型组件**  \n   说明当 LlamaIndex 未封装某个嵌入模型，或需要接入机构自研模型时，可以通过继承 `BaseEmbedding` 来自定义嵌入模型组件，并实现相应接口以支持模型调用。"
+            },
+            {
+              "title": "自定义嵌入模型组件",
+              "start_index": 109,
+              "end_index": 110,
+              "node_id": "0058",
+              "summary": "这部分主要讲的是 LlamaIndex 中嵌入模型（Embedding Model）的参数配置与自定义扩展方法。\n\n核心内容包括：\n1. **嵌入模型参数说明**：介绍了如 `timeout`、`max_retries`、`dimensions` 等常见参数的含义，并强调不同嵌入模型支持的参数不同，具体要参考模型文档或 LlamaIndex 中对应组件的初始化代码。\n2. **嵌入模型组件的初始化示例**：展示了如何在构造 `OllamaEmbedding` 时传入模型名、批处理大小等参数。\n3. **自定义嵌入模型组件**：说明当 LlamaIndex 未封装某个商业或开源嵌入模型，或者需要接入机构内部专用模型时，可以通过继承 `BaseEmbedding` 来实现自定义嵌入模型。\n4. **自定义实现思路**：给出了示例代码框架，说明需要实现文本向量生成、批量向量生成等接口，并在完成后像内置组件一样使用该模型。\n\n整体上，这一节重点在于帮助读者理解如何配置嵌入模型，以及如何将自有嵌入模型接入 LlamaIndex 框架。"
+            }
+          ],
+          "node_id": "0052",
+          "summary": "该部分主要介绍了 RAG 应用中提示模板的自定义格式化方式，以及嵌入模型在 RAG 中的核心作用。\n\n重点包括：\n- 通过 `PromptTemplate` 和 `function_mappings` 自定义上下文内容的拼接与格式化逻辑。\n- 嵌入模型如何将分割后的知识块转换为向量，以便机器进行语义理解、存储和计算。\n- 向量检索与传统关键词检索的区别：前者基于语义相似度，而非简单字符串匹配。\n- 常见的相似度计算方法，如余弦相似度和点积。\n- 嵌入模型在 RAG 的两个阶段中的应用：\n  - 索引阶段：将知识块向量化并存入向量库；\n  - 生成阶段：将用户问题向量化并检索相关知识块，用于增强生成。\n- 最后提到可以参考 Hugging Face 平台来了解和评估不同嵌入模型。"
+        }
+      ],
+      "node_id": "0039",
+      "summary": "本部分主要介绍了 RAG 应用中的模型与 Prompt 设计。重点包括：RAG 通常会使用两类模型——大模型负责智能推理与生成，嵌入模型负责文档向量化和语义检索；在复杂流程中可能会组合使用多个模型，并根据任务和资源灵活选择。还强调了 Prompt 在大模型应用中的核心作用，不仅用于最终生成结果，也广泛应用于摘要生成、查询转换、查询路由、智能体推理和响应评估等环节。同时指出不同模型、场景和语言环境下 Prompt 效果可能不同，因此默认模板不一定最优，Prompt 的设计与调整是重要基础技术。最后引出 4.1 大模型，说明各类开发框架通常会对底层大模型 API 进行抽象封装，以便简化使用并支持灵活切换模型。"
+    },
+    {
+      "title": "数据加载与分割",
+      "start_index": 111,
+      "end_index": 111,
+      "nodes": [
+        {
+          "title": "理解两个概念：Document 与Node",
+          "start_index": 111,
+          "end_index": 111,
+          "nodes": [
+            {
+              "title": "什么是 Document 与Node",
+              "start_index": 111,
+              "end_index": 113,
+              "node_id": "0061",
+              "summary": "本部分主要介绍了 RAG 应用中“数据加载与分割”这一前置步骤，重点说明如何为大模型增强生成准备知识数据。内容首先列举了常见的数据源类型，包括本地文档、数据库结构化数据、网页资源、云存储文档以及公开网络接口数据，并指出本章将使用 LlamaIndex 框架来完成这些数据的加载与切分。\n\n随后，文档重点解释了 LlamaIndex 中两个核心概念：Document 和 Node。Document 被视为通用的数据容器，用于承载来自不同来源的文本内容及元数据；Node 则可以理解为 Document 分割后的数据块，通常继承 Document 的元数据，用于后续检索和索引处理。文中还说明了二者在 LlamaIndex 中的继承关系，以及 Node 的几种类型，包括文本节点、图片节点、文档节点和索引节点。\n\n最后，通过一个自定义 Document 对象的示例，展示了如何创建 Document 并查看其内部字典结构，以帮助读者更直观地理解 Document 的数据组织方式。"
+            },
+            {
+              "title": "深入理解 Document 与Node",
+              "start_index": 113,
+              "end_index": 114,
+              "node_id": "0062",
+              "summary": "这部分主要介绍了 LlamaIndex 中的 Node 体系及 Document 与 Node 的关系，重点包括：\n\n1. **BaseNode 与四种 Node 类型**\n   - TEXT：对应 `TextNode`，用于存储文本内容和元数据。\n   - IMAGE：对应 `ImageNode`，在文本节点基础上增加图片的 base64 内容、URL 等信息。\n   - DOCUMENT：对应 `Document`，本质上也是一种 `TextNode`，用于表示从不同数据源加载的文档。\n   - INDEX：对应 `IndexNode`，用于引用其他对象，支持递归检索等特殊功能。\n\n2. **Document 和 Node 的本质区别与联系**\n   - 两者本质上都是存储文档数据及元数据的容器。\n   - `Document` 通常表示从数据源读取的原始文档。\n   - `Node` 通常表示从 `Document` 切分出来的数据块。\n\n3. **Document 对象结构示例**\n   - 通过代码示例展示了如何创建 `Document` 并查看其内部字典结构。\n   - 说明 `Document` 与 `TextNode` 的打印结果一致，进一步证明二者本质相同。\n\n4. **Document / Node 的核心属性**\n   - `text`：文本内容。\n   - `metadata`：元数据，用于描述内容的附加信息。\n   - `id_`：唯一标识。\n   - `relationships`：记录前后、父子等关联关系。\n   - `embedding`：文本向量表示，用于向量索引。\n   - `start_char_idx` / `end_char_idx`：记录文本在原始文档中的位置。\n\n5. **元数据 metadata 的重要性**\n   - 引出对 `metadata` 的进一步深入理解，说明它是描述数据的数据，在文档处理和检索中具有重要作用。"
+            },
+            {
+              "title": "深入理解 Node对象的元数据",
+              "start_index": 114,
+              "end_index": 117,
+              "node_id": "0063",
+              "summary": "本部分主要介绍了 RAG 应用中 `Document` / `TextNode` 对象的结构、元数据机制，以及如何生成和控制文档内容的输出方式。核心内容包括：\n\n1. **Document 与 TextNode 的关系**\n   - 说明 `Document` 本质上也是一种 `TextNode`，两者打印结果一致。\n   - 介绍了 `Document` 内部的重要属性：\n     - `text`：文本内容\n     - `metadata`：元数据\n     - `id_`：唯一标识\n     - `relationships`：文档或节点之间的关系\n     - `embedding`：向量表示\n     - `start_char_idx / end_char_idx`：原文中的位置索引\n\n2. **元数据（metadata）的作用与特点**\n   - 元数据被定义为“描述数据的数据”，用于补充文档的上下文信息，如文件名、作者、类别、时间等。\n   - 强调元数据通常是 `dict` 类型，可以包含多种信息。\n   - `Document` 生成的 `Node` 会自动继承源文档的元数据。\n   - 元数据会在向量化和大模型生成时与文本一起输入，以帮助模型更好理解内容。\n\n3. **元数据与文本的组合方式**\n   - 介绍了 `get_content` 方法，用于将元数据和文本内容组合成最终输入。\n   - 讲解了几个关键参数：\n     - `metadata_seperator`：元数据各项之间的分隔符\n     - `metadata_template`：每个 key/value 的格式模板\n     - `text_template`：元数据与正文的组合模板\n     - `excluded_embed_metadata_keys`：嵌入模型中排除的元数据字段\n     - `excluded_llm_metadata_keys`：大模型中排除的元数据字段\n\n4. **MetadataMode 的四种输出模式**\n   - `ALL`：输出全部元数据\n   - `EMBED`：输出给嵌入模型看的元数据\n   - `LLM`：输出给大模型看的元数据\n   - `NONE`：不输出元数据\n\n5. **示例说明元数据过滤效果**\n   - 通过一个包含 `file_name`、`category`、`author` 的 `Document` 示例，展示不同模式下输出内容的差异。\n   - 说明在 `EMBED` 和 `LLM` 模式下，会自动排除指定字段，从而控制哪些元数据参与嵌入或生成。\n\n6. **Document 对象的生成方式**\n   - 提到可以直接通过文本创建 `Document` 对象。\n   - 也可以通过数据连接器加载数据后生成 `Document`。\n   - 给出了用多个文本片段构造 `Document` 数组的示例，说明这种方式适合测试和实验。\n\n整体来看，这一部分重点是在讲：**RAG 中文档对象的内部结构、元数据如何组织与过滤，以及如何灵活生成和使用 Document 对象。**"
+            },
+            {
+              "title": "生成 Document 对象",
+              "start_index": 117,
+              "end_index": 118,
+              "node_id": "0064",
+              "summary": "This partial document explains how metadata is handled in different output modes for documents in a RAG/LLM application, showing that some metadata keys are excluded depending on whether the content is viewed by the embedding model, the LLM, or with no metadata at all. It then introduces ways to create `Document` objects: either directly from text strings or by loading data from sources using connectors such as `SimpleDirectoryReader`. Examples show that loading a PDF can produce many `Document` objects based on pages, while loading a folder of text files produces one `Document` per file. Finally, it begins the next topic by introducing `Node` objects as chunks within a `Document`."
+            },
+            {
+              "title": "生成 Node对象",
+              "start_index": 118,
+              "end_index": 122,
+              "node_id": "0065",
+              "summary": "这一部分主要讲解了 LlamaIndex 中数据加载、分割与对象关系的基础概念，重点包括：\n\n1. **Document 对象的生成方式**\n   - 可以直接通过文本创建 `Document`。\n   - 更常见的是通过**数据连接器**从不同数据源加载数据生成 `Document`，例如使用 `SimpleDirectoryReader` 从 PDF 或目录中读取文件。\n   - 说明了 `Document` 数量不一定等于原始文件数量：例如一个 PDF 可能会按页生成多个 `Document`。\n\n2. **Node 对象的生成方式**\n   - `Node` 通常表示一个 `Document` 中的一个文本块，也可以是图片块。\n   - 可以直接创建 `TextNode`，也可以通过**数据分割器**把 `Document` 切分成多个 `Node`。\n   - 示例展示了使用 `TokenTextSplitter` 按换行符分割文本，生成多个 `Node`。\n\n3. **Node 之间的关系**\n   - 介绍了 `Node` 的五种基础关系：`SOURCE`、`PREVIOUS`、`NEXT`、`PARENT`、`CHILD`。\n   - 这些关系保存在 `relationships` 属性中。\n   - 说明了当 `Document` 被自动切分成多个 `Node` 时，框架会自动建立这些关系，例如源文档关系和前后节点关系。\n\n4. **元数据的生成与继承**\n   - 元数据可以手动设置，也可以由框架自动生成，还可以通过元数据抽取器生成。\n   - 展示了 `Document` 的元数据如何在切分后自动继承到 `Node` 中。\n   - 说明了元数据在数据处理和后续检索中的重要作用。"
+            },
+            {
+              "title": "元数据的生成与抽取",
+              "start_index": 122,
+              "end_index": 126,
+              "node_id": "0066",
+              "summary": "本部分主要介绍了 LlamaIndex 中数据加载后元数据的生成、继承与抽取机制，以及 IndexNode 类型的基本概念。\n\n重点内容包括：\n1. **元数据的设置与自动生成**\n   - 可以手动为 `Document` 对象设置元数据。\n   - 框架也会在加载文档时自动生成基础元数据，如文件路径、文件名、类型、大小、创建时间和修改时间。\n   - 由 `Document` 切分得到的 `Node` 会自动继承 `Document` 的元数据。\n\n2. **元数据抽取器（MetadataExtractor）的作用**\n   - 用于从文本内容中自动提取更复杂、更有语义价值的元数据。\n   - 这些元数据可以包括摘要、标题、可回答的问题、实体信息等。\n   - 其目的在于增强检索和生成效果，为模型提供原始文本之外的辅助信息。\n\n3. **典型元数据抽取器示例**\n   - **SummaryExtractor**：从内容中生成摘要。\n   - **QuestionsAnsweredExtractor**：生成该内容可以回答的假设性问题列表。\n   - **TitleExtractor**：为文档或节点生成标题。\n   - 还说明了这些抽取器通常需要配合大模型，并可通过 `prompt_template` 和 `metadata_mode` 等参数控制抽取方式。\n\n4. **文档级与节点级抽取结果的关系**\n   - 通过将一个 `Document` 切分成多个 `Node` 后再进行标题抽取，可以发现同一文档来源的多个节点会得到相同的标题。\n   - 这说明某些抽取结果是按文档级别生成的，并可根据 `ref_doc_id` 判断节点是否来自同一文档。\n   - 抽取得到的元数据还可以手动写回到 `Node.metadata` 中。\n\n5. **IndexNode 类型的初步介绍**\n   - `IndexNode` 是在 `TextNode` 基础上扩展出来的一种节点类型。\n   - 它不仅包含文本内容，还可以引用其他节点或对象。\n   - 这种引用可以通过 `index_id` 或 `obj` 两种方式实现，用于建立更复杂的索引和对象关联关系。"
+            },
+            {
+              "title": "初步了解 IndexNode 类型",
+              "start_index": 126,
+              "end_index": 127,
+              "node_id": "0067",
+              "summary": "本部分主要介绍了文档元数据抽取与节点处理的基础概念，并引出数据加载模块的作用。内容先通过打印结果说明：同一文档生成的多个 Node 对象具有相同的 ref_doc_id，且抽取出的标题也是文档级别一致的，随后展示如何将抽取器返回的标题元数据写回到各个 Node 的 metadata 中。接着重点讲解了 IndexNode 类型，它是在 TextNode 基础上的扩展，除了基本文本属性外，还可以通过 index_id 或 obj 指向其他 Node、Index、Retriever、QueryEngine 等对象，用于实现递归检索，例如由摘要节点定位完整内容节点，或由一级节点找到二级检索所需的检索器/查询引擎。最后进入 5.2 数据加载部分，说明数据连接器/阅读器/加载器的职责是从不同来源和格式中读取数据，提取 Document 对象及其内容和元数据，为后续嵌入、索引和检索做统一处理。"
+            }
+          ],
+          "node_id": "0060",
+          "summary": "本部分主要介绍了 RAG 应用中“数据加载与分割”的基础阶段，说明在为大模型构建知识增强之前，需要先对多种来源的数据进行读取、预处理，并为后续存储与索引做准备。文中列举了常见的数据源类型，包括本地文档（如 TXT、PDF、Office、Email、图片等）、数据库中的结构化数据、可通过 URL 访问的网页资源、云存储文档以及公开接口获取的网络数据。随后引入了 LlamaIndex 框架中两个核心数据抽象概念：Document 和 Node，并开始解释 Document 作为通用数据容器的作用，为后续的数据处理与切分奠定基础。"
+        },
+        {
+          "title": "数据加载",
+          "start_index": 127,
+          "end_index": 128,
+          "nodes": [
+            {
+              "title": "从本地目录中加载",
+              "start_index": 128,
+              "end_index": 134,
+              "node_id": "0069",
+              "summary": "这部分主要介绍了 LlamaIndex 中“数据加载与分割”的基础内容，重点讲解如何从本地目录和外部数据源加载文档，并控制加载行为。\n\n主要内容包括：\n\n1. **使用 SimpleDirectoryReader 从本地目录加载文档**\n   - 说明这是将本地文件转换为 `Document` 对象的最简单方式。\n   - 介绍它会根据文件扩展名自动识别文档类型并调用相应读取器。\n   - 列举了支持的常见格式，如 CSV、DOCX、PDF、Markdown、图片、音视频、PPT 等。\n\n2. **SimpleDirectoryReader 的常用参数**\n   - 详细列出了参数及作用，例如：\n     - `input_dir`、`input_files`\n     - `exclude`、`exclude_hidden`\n     - `recursive`\n     - `filename_as_id`\n     - `required_exts`\n     - `file_extractor`\n     - `file_metadata`\n     - `raise_on_error`\n     - `fs`\n   - 这些参数用于控制加载范围、文件过滤、元数据生成和底层文件系统等。\n\n3. **不同类型文档的加载效果**\n   - 通过示例展示加载文本、Word、CSV、PDF、Markdown、图片等文件后的结果。\n   - 总结了几个重要现象：\n     - 默认只读取文本内容并写入 `Document.text`\n     - 原始文件与 `Document` 不一定一一对应\n     - PDF 通常按页拆分成多个 `Document`\n     - Markdown 会按标题拆分\n     - 图片默认不会做 OCR，也不会自动转 Base64\n\n4. **通过 file_extractor 控制底层读取行为**\n   - 解释了如何为特定文件类型指定专门的阅读器。\n   - 以图片为例，使用 `ImageReader(keep_image=True)` 保留图片的 Base64 内容。\n   - 提到如果需要识别图片文字，可以启用 OCR 相关参数。\n\n5. **自定义文档阅读器**\n   - 讲解如何继承 `BaseReader` 实现自己的读取器。\n   - 以 `.psql` 文件为例，设计 `PSQLReader`：\n     - 读取文件中的 SQL\n     - 自动执行 SQL\n     - 将查询结果作为 `Document` 内容返回\n   - 展示了自定义读取器如何与 `SimpleDirectoryReader` 配合使用。\n\n6. **自定义元数据生成**\n   - 介绍 `file_metadata` 参数可以自定义文档元数据生成逻辑。\n   - 示例中通过函数为文档添加自定义字段，如类别、作者、文件名等。\n   - 强调如果使用自定义阅读器，也可以直接在 `load_data` 中设置 metadata。\n\n7. **从网络中加载数据的概念引入**\n   - 说明除了本地文件，还可以通过数据连接器从数据库、云服务、网站、SaaS 等外部数据源加载数据。\n   - 提到 LlamaIndex 通过 **LlamaHub** 统一提供这类连接器，也支持用户自行开发并共享连接器。\n\n整体来看，这一部分是在为后续 RAG 应用的数据接入打基础，重点是理解 **如何加载不同类型的数据、如何定制读取逻辑、如何生成元数据，以及如何扩展到网络数据源**。"
+            },
+            {
+              "title": "从网络中加载数据",
+              "start_index": 134,
+              "end_index": 140,
+              "node_id": "0070",
+              "summary": "该部分主要讲解了 LlamaIndex 中的数据加载与数据分割流程，重点包括：\n\n1. **自定义元数据生成**\n   - 介绍如何在加载文档时自定义 `metadata` 的生成逻辑。\n   - 通过 `file_metadata` 参数或在自定义 `load_data` 中设置元数据，使 `Document` 对象携带符合业务需求的信息。\n\n2. **从网络中加载数据**\n   - 说明企业级场景下常见的外部数据源，如数据库、网站、云存储、SaaS 等。\n   - 提到 LlamaHub 提供统一的数据连接器，也支持开发者自定义新的连接器并共享。\n\n3. **Web 网页内容加载**\n   - 介绍 `SimpleWebPageReader`：用于直接抓取网页并转换为文本或 HTML。\n   - 介绍 `BeautifulSoupWebReader`：适合更灵活的网页解析，可针对不同网站自定义提取规则。\n   - 示例中展示了如何提取网页正文和标题，并将标题写入元数据。\n\n4. **数据库数据加载**\n   - 介绍 `DatabaseReader` 的使用方式：通过配置数据库连接信息并执行 SQL 查询，将查询结果转换为 `Document`。\n   - 进一步解释其内部实现思路：借助 `sqlalchemy` 连接数据库、执行查询、遍历结果并封装成文档。\n\n5. **自定义网络数据加载器**\n   - 以阿里云 OSS 为例，说明当框架没有现成连接器时，可以继承 `BaseReader` 自行实现读取器。\n   - 示例展示了如何通过 OSS SDK 读取对象存储中的文件，并支持通配符匹配与元数据附加。\n\n6. **数据分割的引入**\n   - 从加载后的 `Document` 进一步切分为更小粒度的 `Node`。\n   - 解释为什么不能直接用大块 `Document` 做索引与检索：粒度过大会降低召回精度和生成质量。\n   - 强调分割器/解析器在后续索引、检索流程中的基础作用，并引出数据分割器的使用方法。"
+            }
+          ],
+          "node_id": "0068",
+          "summary": "这部分内容主要介绍了 LlamaIndex 中的 **IndexNode** 和 **数据加载** 两个主题。\n\n首先，说明了 **IndexNode** 类型的作用：它可以通过 `index_id` 或 `obj` 指向其他对象，如 Node、Index、Retriever 或 QueryEngine 等。当检索器检索到 IndexNode 后，可以根据其指向的对象继续递归处理，从而实现 **递归检索**。文中提到这种机制常用于两类场景：一是根据摘要节点找到完整内容节点；二是根据一级节点找到二级检索所需的检索器或查询引擎。\n\n其次，进入第 5 章“数据加载与分割”中的 **数据加载** 部分，解释了数据连接器（数据阅读器/数据加载器）的作用：从不同来源、接口、协议和格式中加载数据，并提取为统一的 `Document` 对象，供后续嵌入、索引和检索使用。\n\n接着重点介绍了 **从本地目录加载数据** 的方法，主要使用 `SimpleDirectoryReader`。该组件可以从本地目录读取文档，并根据文件扩展名自动识别类型，支持多种常见格式，如 CSV、Word、Jupyter Notebook、图片、Markdown、音视频、PDF、PPT 等。最后还列出了 `SimpleDirectoryReader` 的常用参数，包括输入目录、指定文件列表、排除文件、是否排除隐藏文件以及编码方式等。"
+        },
+        {
+          "title": "数据分割",
+          "start_index": 140,
+          "end_index": 140,
+          "nodes": [
+            {
+              "title": "如何使用数据分割器",
+              "start_index": 140,
+              "end_index": 142,
+              "node_id": "0072",
+              "summary": "该部分主要介绍了数据加载后的“数据分割”环节，核心内容包括：\n\n1. **AliOSSReader 的作用与能力**\n   - 基于 `BaseReader` 构造了新的 `AliOSSReader`。\n   - 通过阿里云 OSS SDK 读取云端文档。\n   - 支持一次读取多个文档以及使用通配符匹配文档。\n   - 目前主要支持直接读取文本格式数据；像 Excel、图片等复杂格式可先下载到本地再用框架内阅读器处理。\n\n2. **为什么需要数据分割**\n   - 文档加载后会生成 `Document` 对象，但在索引和检索前需要进一步拆分成更小粒度的 `Node` 对象。\n   - `Node` 是后续索引、检索等流程的基本处理单元。\n   - 直接用大块 `Document` 做检索会降低召回精度，因此需要根据场景灵活控制分割粒度。\n   - 这种负责解析和拆分文档的组件通常称为 **Splitter** 或 **Parser**，常见的是 **TextSplitter**。\n\n3. **数据分割器的使用方式**\n   - 数据分割器既可以独立使用，也可以作为其他组件的一部分自动调用。\n   - 输入通常是 `Document` 列表，输出是 `Node` 列表。\n   - 分割后的 `Node` 会继承原 `Document` 的元数据。\n\n4. **独立使用示例**\n   - 以 `SentenceSplitter` 为例，展示了如何直接对文档进行分割。\n   - 说明了 `SentenceSplitter` 是常见的数据分割器，默认参数即可使用。\n\n5. **数据分割器的继承与实现思路**\n   - 所有数据分割器都继承自 `NodeParser`。\n   - `NodeParser` 负责 `get_nodes_from_documents` 的核心流程，包括构造节点关系、继承元数据等。\n   - 具体的文本切分逻辑由内部方法如 `_split_text` 完成。\n\n6. **在其他组件中自动调用分割器**\n   - 数据分割器可以作为转换器传入索引构建流程。\n   - 例如在构建 `VectorStoreIndex` 时，通过 `transformations` 参数传入 `SentenceSplitter`，系统会在建索引前自动完成文档分割。\n\n7. **常见数据分割器与底层方法**\n   - 介绍了常见数据分割器及其内部实现原理。\n   - 提到 LlamaIndex 中文本分割的底层有 4 种基础方法，后续将通过代码示例展示这些方法的效果。"
+            },
+            {
+              "title": "常见的数据分割器",
+              "start_index": 142,
+              "end_index": 156,
+              "node_id": "0073",
+              "summary": "本部分主要介绍了 LlamaIndex 中“数据分割”的核心概念、常见分割器及其工作机制，并引出“数据摄取管道”的概念。重点包括：\n\n1. **数据分割器的使用方式**\n   - 分割器既可以直接调用，也可以作为转换器插入到其他组件中，在构建索引等流程中自动执行 Document 到 Node 的解析与分割。\n\n2. **文本分割的基础方法**\n   - 介绍了 4 种底层文本分割方式：按分隔符、按句子、按正则表达式、按字符。\n   - 说明了它们各自的特点与适用场景，尤其指出字符分割过于粗暴，通常不推荐。\n\n3. **chunk_size 与 chunk_overlap 参数**\n   - 解释了这两个参数的含义、作用和实现细节。\n   - 强调它们是基于 token 数量而不是字符串长度计算的。\n   - 说明 chunk_size 是上限而非精确值，且会考虑元数据大小。\n   - 介绍了分割后通过 merge 机制尽量让文本块接近目标大小的原理。\n\n4. **TokenTextSplitter 的原理与用法**\n   - 说明它按优先级使用分隔符、备用分隔符和字符分割来控制文本块大小。\n   - 展示了其在实际文本中的分割效果。\n\n5. **SentenceSplitter 的原理与用法**\n   - 介绍了它按段落、句子、正则、分隔符、字符等多层策略进行分割。\n   - 通过示例说明不同参数设置会影响是否触发后续分割步骤。\n\n6. **SentenceWindowNodeParser**\n   - 说明它在分割句子的基础上，会为每个 Node 附带上下文窗口信息。\n   - 强调 window 内容默认不用于嵌入，但适合在生成阶段提供更丰富上下文。\n\n7. **HierarchicalNodeParser**\n   - 介绍了多层粒度分割的思想，会生成不同大小的 Node，并通过 relationships 建立父子关系。\n   - 其优势是检索到小粒度节点后，可以回溯到更大上下文的父节点用于生成。\n\n8. **SemanticSplitterNodeParser**\n   - 说明这种分割器基于语义相似度和嵌入模型进行分割，而不是依赖固定规则。\n   - 通过阈值控制句子合并程度，阈值越低，分割出的节点越多。\n   - 指出其优点是语义更连贯，缺点是依赖嵌入模型、速度较慢。\n\n9. **特殊格式文本的分割**\n   - 介绍了针对 Markdown、HTML、JSON、源代码等格式的专用分割器。\n   - 提到这些分割器会根据格式规则自动识别结构，如标题、代码块等。\n   - 还提到可以使用更高层的 SimpleFileNodeParser 统一处理部分格式。\n\n10. **数据摄取管道的引入**\n   - 在章节末尾开始从整体流程角度总结：数据从加载、分割到向量化和存储，构成一条连续的数据处理流水线，即“数据摄取管道”。"
+            }
+          ],
+          "node_id": "0071",
+          "summary": "该部分主要介绍了数据加载后的文档处理流程，重点包括：\n\n1. **AliOSSReader 的实现与功能**\n   - 基于 `BaseReader` 派生构造了新的 `AliOSSReader`。\n   - 通过阿里云官方 OSS SDK 读取云端文档。\n   - 支持一次传入多个文档以及使用通配符匹配文档。\n   - 目前主要支持直接读取文本格式数据；对于 Excel、图片等复杂格式，建议先下载到本地再使用框架内其他阅读器处理。\n\n2. **数据分割（5.3）**\n   - 在数据连接器将不同来源的文档加载并提取为 `Document` 对象后，需要进一步解析和分割，生成更小粒度的 `Node` 对象。\n   - `Node` 将作为后续索引、检索等阶段的基本处理单元。\n   - 这种负责文档解析与切分的组件通常称为 **Splitter** 或 **Parser**，常见的是 **TextSplitter**。\n\n3. **为什么不能直接用 Document 做索引与检索**\n   - 大块文档虽然包含更完整的语义信息，但会降低检索召回的精确性。\n   - 文档过大类似于把所有数据都放在一条记录中，不利于精确匹配和高质量生成。\n   - 因此需要区分 `Document` 和 `Node`，以便根据场景灵活控制分割方式和粒度。\n\n4. **数据分割器的使用方式（5.3.1）**\n   - 数据分割器既可以独立使用，也可以作为其他组件的一部分自动调用。\n   - 这一节开始说明分割器的基本使用方法和输入形式。"
+        },
+        {
+          "title": "数据摄取管道",
+          "start_index": 156,
+          "end_index": 156,
+          "nodes": [
+            {
+              "title": "什么是数据摄取管道",
+              "start_index": 156,
+              "end_index": 158,
+              "node_id": "0075",
+              "summary": "这部分主要介绍了文档分割的特殊解析器以及 LlamaIndex 中的数据摄取管道（IngestionPipeline）。\n\n首先，文本展示了如何针对不同格式的文档进行分割处理，包括 Markdown、HTML、JSON 和源代码文件。通过不同的解析器，如 HTMLNodeParser、JSONNodeParser、CodeSplitter 等，可以将原始文档转换为 Node 对象；同时提到 SimpleFileNodeParser 这一更高层封装组件，可以直接处理 Markdown、HTML 和 JSON 等格式。\n\n接着，内容引入“数据摄取管道”的概念，说明在 RAG 流程中，数据加载、分割、向量化和存储可以被看作一条连续的数据处理流水线。LlamaIndex 提供的 IngestionPipeline 用于将多个转换器串联起来，实现自动化、连续的数据处理，并且支持缓存中间结果以提高效率。\n\n最后，通过一个示例说明如何构造摄取管道：先用 SentenceSplitter 对文档进行文本切分，再用 TitleExtractor 抽取标题并写入节点元数据。文中还将这一过程与手动实现的等价代码进行对比，强调摄取管道本质上是对数据解析、元数据抽取、向量生成等处理步骤的抽象封装，使代码更简洁、更优雅。"
+            },
+            {
+              "title": "用于数据摄取管道的转换器",
+              "start_index": 158,
+              "end_index": 160,
+              "node_id": "0076",
+              "summary": "本部分主要介绍了数据摄取管道（IngestionPipeline）的概念、作用及其在文档处理流程中的应用。核心内容包括：\n\n1. **数据摄取管道的构造与运行**\n   - 通过 `IngestionPipeline` 将多个数据处理步骤串联起来。\n   - 示例中包含两个转换器：`SentenceSplitter` 用于文本分割，`TitleExtractor` 用于标题抽取。\n   - 管道运行后，会把原始文档处理成 `Node` 列表输出。\n\n2. **数据摄取管道的本质**\n   - 数据摄取管道本质上是对一系列数据处理组件的抽象封装。\n   - 它把文档解析、文本切分、元数据抽取、向量生成等步骤组织得更简洁、更优雅。\n   - 文中还给出了手动实现同样流程的等价代码，说明管道只是对这些步骤的统一管理。\n\n3. **转换器（TransformComponent）的接口标准**\n   - 介绍了数据摄取管道中的处理单元——转换器。\n   - 转换器需要实现 `__call__` 接口，输入和输出都为 `Node` 列表。\n   - 这种统一接口使多个转换器可以顺序串接，形成完整的数据处理链。\n\n4. **符合转换器标准的组件类型**\n   - `NodeParser`：负责将 `Document` 分割成 `Node`。\n   - `MetadataExtractor`：负责为 `Node` 补充元数据，如标题、摘要等。\n   - `Embedding Model`：负责为 `Node` 生成文本向量，并写入 `embedding` 字段。\n\n5. **转换器接口的实现方式**\n   - 通过示例说明 `NodeParser` 和 `BaseEmbedding` 如何实现 `__call__` 方法。\n   - `NodeParser` 直接把文档转换为节点。\n   - `BaseEmbedding` 先批量生成文本嵌入，再将结果写回每个节点。\n\n6. **自定义转换器**\n   - 说明用户可以基于 `TransformComponent` 自定义转换器。\n   - 示例中定义了 `TextCleaner`，用于对 `Node` 的文本内容进行简单清理和正则过滤。\n   - 体现了转换器机制的灵活性和可扩展性。"
+            },
+            {
+              "title": "自定义转换器",
+              "start_index": 160,
+              "end_index": 161,
+              "node_id": "0077",
+              "summary": "本部分主要介绍了 LlamaIndex 中的数据转换器与数据摄取管道的使用方法，重点包括：\n\n1. **Node 与转换器接口的关系**\n   - 说明了如何将 `Document` 对象转换为 `Node` 对象。\n   - 以嵌入模型组件为例，展示其如何实现 `__call__` 接口：接收 `Node` 列表，生成文本向量，并写入 `node.embedding` 字段后返回。\n\n2. **自定义转换器的实现**\n   - 介绍了转换器接口非常简单，因此可以自定义实现。\n   - 给出一个 `TextCleaner` 示例，用于对 `Node` 的文本内容进行正则清理，去除不需要的字符。\n   - 演示了如何将自定义转换器插入数据摄取管道，实现数据清洗流程。\n\n3. **数据摄取管道的基本用法**\n   - 说明了如何构造并运行 `IngestionPipeline`，通过 `pipeline.run(documents=docs)` 完成数据处理。\n   - 强调管道会按顺序执行多个转换器，输出处理后的 `Node` 结果。\n\n4. **将处理结果存储到向量库**\n   - 介绍了如何通过配置向量存储参数，让数据摄取管道在处理完成后把 `Node` 存入向量库。\n   - 指出如果需要生成向量，应提供嵌入模型作为转换器。"
+            },
+            {
+              "title": "使用数据摄取管道",
+              "start_index": 161,
+              "end_index": 166,
+              "node_id": "0078",
+              "summary": "这部分主要讲解了 RAG 应用中“数据加载与分割”阶段的进阶用法，重点围绕数据摄取管道（IngestionPipeline）的构建、运行与优化展开。\n\n核心内容包括：\n1. **数据转换器的组合使用**：通过将文本分割器、文本清理器、标题抽取器等转换器串联到数据摄取管道中，实现对文档的自动化处理与清洗。\n2. **数据摄取管道的基本运行方式**：介绍如何构造 pipeline 并调用 `run(documents=docs)` 处理文档，生成新的 Node 列表。\n3. **向量库存储集成**：说明如何在 pipeline 中加入向量存储对象和嵌入模型，使处理后的 Node 不仅能输出，还能直接写入向量数据库，支持后续语义检索。\n4. **并行处理提升性能**：通过设置 `num_workers` 参数启用多进程并行处理，以缩短大量文档或复杂转换器场景下的处理时间，同时提醒并行数并非越大越好，需要结合机器资源和模型并发限制调整。\n5. **文档存储与重复排除**：介绍 pipeline 的文档存储机制，通过保存和加载历史文档信息，利用文档 hash 判断是否重复，从而避免对未变化文档重复处理，提升效率并降低成本。\n6. **阶段总结**：最后对数据加载与分割阶段的关键组件进行归纳，包括数据连接器、数据分割器、元数据抽取、数据摄取管道以及其缓存、持久化和并行能力。"
+            }
+          ],
+          "node_id": "0074",
+          "summary": "本部分主要介绍了文档分割的具体实现方式，以及数据摄取管道的概念。\n\n首先，展示了如何针对不同格式的文件使用不同的解析器进行分割，包括 Markdown、HTML、JSON 和源代码文件。示例中分别使用了 FlatReader 读取文档，再结合 MarkdownNodeParser、HTMLNodeParser、JSONNodeParser 和 CodeSplitter 将文档切分为多个 Node 对象，并打印分割结果。文中还提到，这些特殊文本分割器会依据预设规则自动识别结构信息，例如 Markdown 标题，并将文档拆分成多个数据块；同时指出可以使用更高层的 SimpleFileNodeParser 来统一处理 Markdown、HTML 和 JSON 格式文档。\n\n接着，章节进入“数据摄取管道”部分，解释了什么是数据摄取管道。这里回顾了 RAG 应用中的两个关键步骤：数据加载和数据分割。数据加载负责把不同来源的数据读入内存中的 Document 对象，数据分割则将 Document 进一步拆分为 Node 对象，后续这些 Node 会被向量化并存入向量库。作者用“流水线”或“管道”来形象说明原始数据在整个处理流程中不断被转换和加工，并引出对数据摄取流程进行更清晰组织和表达的需求。"
+        },
+        {
+          "title": "完整认识数据加载阶段",
+          "start_index": 166,
+          "end_index": 166,
+          "node_id": "0079",
+          "summary": "本节总结了 RAG 应用中“数据加载与分割”阶段的核心内容，重点说明了这一阶段的关键组件及其关系：数据连接器（阅读器）负责从不同来源提取文档并生成 Document 对象；数据分割器（解析器）将 Document 进一步切分为更小粒度的 Node 对象；元数据是 Node 的重要组成部分，可手动设置或通过元数据抽取器自动获取；数据摄取管道通过组合多个数据转换器，实现对 Node 的自动化连续处理，其中分割器、元数据抽取器和嵌入模型都可作为管道中的转换器；同时，数据摄取管道还具备缓存、持久化和并行处理等机制，以提升处理效率与可扩展性。"
+        }
+      ],
+      "node_id": "0059",
+      "summary": "本部分主要介绍了 RAG 应用中“数据加载与分割”的基础阶段，说明在为大模型构建知识增强之前，需要先对多种来源的数据进行读取、预处理，并为后续存储与索引做准备。文中列举了常见的数据源类型，包括本地文档（如 TXT、PDF、Office、Email、图片等）、数据库中的结构化数据、可通过 URL 访问的网页资源、云存储文档以及公开接口获取的网络数据。随后引入了 LlamaIndex 框架中两个核心数据抽象概念：Document 和 Node，并开始解释 Document 作为通用数据容器的作用，为后续的数据处理与切分奠定基础。"
+    },
+    {
+      "title": "数据嵌入与索引",
+      "start_index": 167,
+      "end_index": 167,
+      "nodes": [
+        {
+          "title": "理解嵌入与向量",
+          "start_index": 167,
+          "end_index": 168,
+          "nodes": [
+            {
+              "title": "直接用模型生成向量",
+              "start_index": 168,
+              "end_index": 168,
+              "node_id": "0082",
+              "summary": "本部分主要介绍了“数据嵌入与索引”中的向量生成方法，重点包括：\n\n1. **嵌入模型的选择与使用**\n   - 不同嵌入模型在向量性能、维度和成本上存在差异，生成向量前需要选择合适的模型。\n   - 嵌入模型既可以通过远程服务调用，也可以本地部署。\n   - 构建向量存储索引时使用的嵌入模型必须与检索阶段保持一致。\n\n2. **LlamaIndex 中向量生成的特点**\n   - 框架支持多种方式为 Node 内容生成向量。\n   - 在实际 RAG 应用中，向量生成通常由框架自动完成，开发者往往不需要显式操作。\n\n3. **直接使用模型接口生成向量**\n   - 通过嵌入模型的 `get_text_embedding` 或批量接口 `get_text_embedding_batch` 直接生成向量。\n   - 生成后的向量会写入 Node 对象的 `embedding` 字段。\n   - 强调应使用 `node.get_content(...)` 获取内容，而不是直接用 `node.text`，因为前者会自动包含部分元数据。\n\n4. **Node 与向量存储的关系**\n   - `embedding` 是 BaseNode 中的重要属性，是后续构建向量索引所需的数据基础。\n\n5. **引出通过转换器生成向量**\n   - 文末开始过渡到“借助转换器生成向量”的方法，说明嵌入模型组件也可作为数据摄取管道中的转换器使用。"
+            },
+            {
+              "title": "借助转换器生成向量",
+              "start_index": 168,
+              "end_index": 169,
+              "node_id": "0083",
+              "summary": "本部分主要介绍了 RAG 中“数据嵌入与索引”的前半部分内容，重点包括：\n\n1. **嵌入模型的选择与使用**\n   - 说明生成向量需要依赖嵌入模型，不同模型在性能、维度和成本上存在差异。\n   - 强调构建向量索引时使用的嵌入模型必须与检索阶段保持一致。\n   - 提到嵌入模型既可以远程调用，也可以本地部署。\n\n2. **Node 向量生成的两种方式**\n   - **直接调用模型接口生成向量**：通过 `get_text_embedding_batch` 等接口为 Node 内容生成 embedding，并写入 `node.embedding` 字段。\n   - **借助转换器自动生成向量**：由于嵌入模型本身实现了转换器接口，可以直接作为数据摄取管道中的 transformation 使用，自动完成向量生成。\n\n3. **Node 内容获取方式的注意点**\n   - 生成向量时应使用 `node.get_content(metadata_mode=MetadataMode.EMBED)` 获取内容，而不是直接使用 `node.text`。\n   - 原因是 `get_content` 会根据设置自动包含部分元数据，更适合嵌入生成。\n\n4. **向量存储的作用与类型**\n   - 介绍了向量存储（VectorStore）的概念：用于保存向量并构建索引，以支持语义检索。\n   - 类比关系数据库中的索引机制，说明向量检索也需要依赖存储和索引。\n   - 提到向量存储可以是轻量级嵌入式方案（如 FAISS），也可以是本地/云端服务型方案（如 Chroma、Milvus）。\n\n5. **LlamaIndex 对向量存储的支持**\n   - 说明 LlamaIndex 支持多种向量存储类型，并提供统一的基础接口，如增删 Node 向量和语义检索。\n   - 同时指出不同向量存储底层实现差异较大，实际使用时需要参考具体组件文档。"
+            }
+          ],
+          "node_id": "0081",
+          "summary": "本部分主要介绍了第6章“数据嵌入与索引”的核心内容，重点围绕 RAG 应用中的“增强”阶段如何通过检索相关知识块（Node）来构造上下文，并进一步说明为什么需要为这些 Node 建立索引以支持快速检索。文中首先强调了向量存储索引在 RAG 中最常见，它依赖嵌入模型将文本转换为向量，再结合向量数据库实现语义检索；同时也指出向量索引并非万能，在某些场景下还需要其他索引形式。\n\n接着，本节重点解释了“嵌入”和“向量”的概念：嵌入是将文本内容和语义映射为多维浮点数向量，语义相近的文本会对应到数学上相近的向量，因此可用于语义检索而不仅仅是关键词匹配。文中还说明了嵌入模型的选择很重要，不同模型在性能、维度和成本上存在差异，而且构建索引时使用的嵌入模型必须与检索时保持一致。\n\n最后，文中介绍了在 LlamaIndex 中生成 Node 向量的方式，首先展示了直接调用模型接口批量生成向量并写入 Node 的 embedding 字段的方法，同时提醒生成向量时应使用 get_content 方法而不是直接使用 node.text，因为前者会自动包含部分元数据。后续还引出了“借助转换器生成向量”的方式，说明框架中也可以通过数据摄取管道自动完成嵌入生成。"
+        },
+        {
+          "title": "向量存储",
+          "start_index": 169,
+          "end_index": 169,
+          "nodes": [
+            {
+              "title": "简单向量存储",
+              "start_index": 170,
+              "end_index": 172,
+              "node_id": "0085",
+              "summary": "本部分主要介绍了 LlamaIndex 中的数据嵌入与向量索引，重点讲解了简单向量存储（SimpleVectorStore）的使用方法，包括如何将文档切分为 Node、通过嵌入模型生成向量、将向量及其元数据存入向量库，以及如何基于向量相似度进行语义检索。文中还说明了 SimpleVectorStore 只保存向量、节点 ID 和元数据信息，不保存完整原文内容，并介绍了其持久化存储与从磁盘加载的方法。最后引出了第三方向量存储，并以 ChromaVectorStore 作为后续示例。"
+            },
+            {
+              "title": "第三方向量存储",
+              "start_index": 172,
+              "end_index": 175,
+              "node_id": "0086",
+              "summary": "这部分主要介绍了 LlamaIndex 中的向量存储与向量检索机制，重点包括：\n\n1. **SimpleVectorStore 的特点**\n   - 说明它是基于内存的向量存储，只保存 Node 的 id 和向量相似度等信息，不保存完整的 Node 内容。\n   - 介绍了其持久化能力，可以通过 `persist()` 将向量数据保存到本地 `./storage/vector_store.json`，并可用 `from_persist_path()` 重新加载。\n\n2. **第三方向量存储 ChromaVectorStore**\n   - 以 Chroma 向量库为例，说明如何将其接入 LlamaIndex。\n   - 展示了如何创建 Chroma collection，并通过 `add(nodes)` 将已生成向量的 Node 存入向量库。\n   - 强调 `stores_text` 属性的含义：若为 `True`，向量库会同时保存原始文本内容，便于后续直接重建完整 Node；若为 `False`，则需要依赖 id 映射重建。\n\n3. **向量检索**\n   - 说明 `query()` 接口在 SimpleVectorStore 和 ChromaVectorStore 中使用方式一致。\n   - 对比两者检索结果：SimpleVectorStore 返回的结果中 `nodes=None`，而 ChromaVectorStore 能返回完整 Node 内容，因为它存储了原始文本和元数据。\n\n4. **数据持久化方式**\n   - 说明 ChromaVectorStore 的持久化由底层 Chroma 向量库负责。\n   - 区分了两种使用模式：\n     - Client/Server 模式：数据保存在 Server 端。\n     - 嵌入模式：需要通过 `persist_dir` 指定本地持久化目录。\n\n5. **向量存储索引 VectorStoreIndex 的引入**\n   - 在介绍完向量、向量存储和检索后，进一步引出向量存储索引的概念。\n   - 说明索引在 RAG 中的作用是帮助从大量 Node 中快速检索相关内容，并将其作为上下文交给大模型生成答案。\n   - 提到 LlamaIndex 提供了更高层的 `VectorStoreIndex` 来简化向量存储检索与查询流程。"
+            }
+          ],
+          "node_id": "0084",
+          "summary": "该部分主要介绍了 RAG 应用中“向量生成与向量存储”的基础流程与概念。首先说明嵌入模型组件本身可以作为转换器使用，通过 `__call__` 接口直接将文档节点转换为向量，因此在数据摄取管道中只需把嵌入模型加入 `transformations`，即可自动完成向量生成。接着进入“6.2 向量存储”，解释生成向量的目的在于支持查询阶段的语义检索，并指出向量需要被存储并建立索引，这一职责通常由 VectorStore 承担。文中还概述了向量存储的常见形态，包括轻量级嵌入式方案（如 FAISS）以及客户端/服务器模式的本地或云端向量库（如 Chroma、Milvus），并说明 LlamaIndex 支持多种向量存储类型，但由于底层实现差异较大，具体使用时需参考对应组件文档。"
+        },
+        {
+          "title": "向量存储索引",
+          "start_index": 175,
+          "end_index": 175,
+          "nodes": [
+            {
+              "title": "用向量存储构造向量存储索引对象",
+              "start_index": 176,
+              "end_index": 177,
+              "node_id": "0088",
+              "summary": "本部分主要介绍了如何构造和使用向量存储索引对象（VectorStoreIndex），以及它在 RAG 检索生成流程中的作用。\n\n主要内容包括：\n\n1. **基于向量存储构造索引对象**\n   - 在已经完成文档加载、文本切分、生成嵌入向量并存入向量库之后，可以直接通过 `VectorStoreIndex.from_vector_store(vector_store)` 从已有向量库构造索引对象。\n   - 这样无需重新处理原始文档，就能快速建立可用于检索的索引。\n\n2. **完整流程示例**\n   - 文档被构造成 `Document` 对象。\n   - 通过 `SentenceSplitter` 将文档切分为 `Node`。\n   - 使用嵌入模型生成向量。\n   - 将带向量的 `Node` 存入向量库。\n   - 再基于向量库创建 `VectorStoreIndex`。\n   - 最后通过 `query_engine = index.as_query_engine()` 发起查询并获得回答。\n\n3. **QueryEngine 的作用**\n   - 虽然未详细展开，但文中说明 `QueryEngine` 本质上是借助 `VectorStoreIndex` 实现语义检索。\n   - 它先检索相关知识，再将检索结果作为上下文交给大模型生成最终响应。\n\n4. **VectorStoreIndex 的工作机制推测**\n   - 通过向量存储执行语义检索。\n   - 根据检索结果恢复或重建相关 `Node`。\n   - 将这些 `Node` 的内容组织成大模型输入上下文。\n   - 同时指出真实实现还会涉及对不同向量库的适配、检索结果重建等细节。\n\n5. **从 Node 列表构造索引的引出**\n   - 文末开始引入另一种更简化的方式：直接由 `Node` 列表构造向量存储索引对象。\n   - 这种方式可以把“将 Node 存入向量库”的步骤交给索引对象自动完成，为后续内容做铺垫。"
+            },
+            {
+              "title": "用 Node列表构造向量存储索引对象",
+              "start_index": 177,
+              "end_index": 180,
+              "node_id": "0089",
+              "summary": "这部分内容主要讲解了 LlamaIndex 中 `VectorStoreIndex` 向量存储索引对象的构造方式及其自动化能力，重点包括：\n\n1. **VectorStoreIndex 的作用**\n   - 它通过底层向量存储实现语义检索。\n   - 查询时先检索相关 `Node`，再将这些内容作为上下文交给大模型生成回答。\n   - 说明了从原始文档到索引、再到查询生成的整体流程。\n\n2. **用 Node 列表构造索引**\n   - 可以直接用 `Node` 列表创建 `VectorStoreIndex(nodes)`。\n   - 构造过程中会自动完成：\n     - 为没有向量的 `Node` 生成嵌入向量；\n     - 将向量存入向量库；\n     - 返回可用于查询的索引对象。\n   - 这简化了手动嵌入和存储的步骤。\n\n3. **默认组件与自定义底层向量存储**\n   - 通过打印索引对象内部属性，可以看到默认使用的嵌入模型和向量存储类型。\n   - 如果不显式指定，默认会使用 `SimpleVectorStore`。\n   - 也可以通过 `StorageContext` 指定其他向量库，例如 `ChromaVectorStore`，从而替换底层存储实现。\n\n4. **用 Document 直接构造索引**\n   - 更进一步，连 `Node` 的生成也可以自动完成。\n   - 可以直接使用 `VectorStoreIndex.from_documents(docs)` 从文档构造索引。\n   - 这是最高层的封装方式，代码最简洁，适合快速搭建 RAG 应用。\n\n整体来看，这一部分强调了 `VectorStoreIndex` 从低层到高层的三种构造方式：**Node 列表构造、Document 直接构造，以及底层向量存储可配置化**，展示了框架如何帮助开发者大幅简化索引构建流程。"
+            },
+            {
+              "title": "用文档直接构造向量存储索引对象",
+              "start_index": 180,
+              "end_index": 183,
+              "node_id": "0090",
+              "summary": "本部分主要讲解了 LlamaIndex 中向量存储索引对象的构造与定制方式，重点包括：\n\n1. **切换底层向量存储**\n   - 通过 `storage_context` 参数可以将默认向量存储切换为其他实现，例如 Chroma 向量库。\n   - 说明了索引对象的底层存储类型可以灵活替换。\n\n2. **用文档直接构造索引**\n   - 介绍了 `VectorStoreIndex.from_documents(docs)` 这种高层接口。\n   - 只需传入 `Document` 列表，就能自动完成文档分割、向量生成和向量存储，极大简化流程。\n   - 构造完成后可直接通过 `as_query_engine()` 进行查询。\n\n3. **个性化配置构造过程**\n   - 虽然 `from_documents` 很简洁，但仍可通过参数进行定制：\n     - 使用全局 `Settings` 配置模型（大模型和嵌入模型）。\n     - 通过 `storage_context` 指定底层向量存储。\n     - 通过 `transformations` 指定文本分割器和元数据抽取器。\n\n4. **转换器的使用与验证**\n   - 示例中使用了 `SentenceWindowNodeParser` 和 `TitleExtractor`。\n   - 通过查询向量库中的 Node，可以验证生成的元数据中包含 `document_title` 和 `window`，证明转换器生效。\n\n5. **深入理解索引构造流程**\n   - 对比了三种构造向量存储索引的方法：\n     - 用向量存储构造\n     - 用 Node 列表构造\n     - 用文档直接构造\n   - 说明它们本质相同，只是框架替用户自动完成的工作量不同。\n   - 简要分析了 `from_documents` 的内部逻辑：先确定 `storage_context`，再获取转换器，最后运行转换器生成 Node 并完成索引构建。"
+            },
+            {
+              "title": "深入理解向量存储索引对象",
+              "start_index": 183,
+              "end_index": 186,
+              "node_id": "0091",
+              "summary": "这部分主要讲解了 RAG 应用中向量存储索引对象 VectorStoreIndex 的构建原理与内部工作流程，并进一步引出其他索引类型。\n\n核心内容包括：\n- 通过一个示例说明 TitleExtractor 和 SentenceWindowNodeParser 等转换器会在 Node 元数据中生成 document_title 和 window 信息，验证了转换器的作用。\n- 详细分析了 VectorStoreIndex 的三种构造方式：\n  1. 直接用向量存储构造；\n  2. 用 Node 列表构造；\n  3. 直接用 Document 构造。\n- 重点拆解了 from_documents 方法的内部逻辑：\n  - 接收或创建 storage_context；\n  - 接收或使用默认 transformations；\n  - 调用 run_transformations 将 Document 转换为 Node；\n  - 再回到基于 Node 列表的方式构造索引。\n- 进一步追踪方法二的实现，说明 build_index_from_nodes 和 _add_nodes_to_index 的关键步骤：\n  - 对 Node 批量生成 embedding；\n  - 将向量写入 vector_store。\n- 指出方法一和方法二本质上是统一的，只是框架替用户完成了不同程度的隐藏工作。\n- 总结了 VectorStoreIndex 的定位：它是依赖向量库的高层索引封装，用于向量检索。\n- 最后引出“更多索引类型”，开始介绍文档摘要索引，为后续内容铺垫。"
+            }
+          ],
+          "node_id": "0087",
+          "summary": "这部分主要介绍了 ChromaVectorStore 与向量存储索引的相关概念和机制。首先说明了为什么在 ChromaVectorStore 的检索结果中可以完整返回 Node 对象：因为新增 Node 时会将其完整内容和元数据一起存入向量库，查询时能够重建整个 Node。接着讲解了数据持久化存储方式，指出 ChromaVectorStore 的持久化由底层 Chroma 向量库负责；在 Client/Server 模式下数据保存在 Server 端，在嵌入模式下则需要通过 persist_dir 指定本地持久化目录。最后引入“向量存储索引”这一概念，解释索引在 RAG 中的作用是通过向量快速语义检索相关 Node，并将其作为上下文交给大模型，同时提到 LlamaIndex 在底层向量存储与检索能力之上封装了更高层的 VectorStoreIndex 组件。"
+        },
+        {
+          "title": "更多索引类型",
+          "start_index": 186,
+          "end_index": 186,
+          "nodes": [
+            {
+              "title": "文档摘要索引",
+              "start_index": 186,
+              "end_index": 188,
+              "node_id": "0093",
+              "summary": "本部分主要介绍了第 6 章中“数据嵌入与索引”的扩展内容，重点围绕除向量存储索引之外的其他索引类型及其用途展开。\n\n主要内容包括：\n\n1. **更多索引类型的必要性**\n   - 说明虽然 **VectorStoreIndex** 是 RAG 应用中最重要的索引类型，但在实际场景中常常需要结合其他索引来增强检索能力。\n\n2. **文档摘要索引（DocumentSummaryIndex）**\n   - 介绍了文档摘要索引的基本原理：先利用大模型对传入的 Node 列表生成摘要 Node，再将摘要向量化并存入向量库。\n   - 这种索引支持在**摘要层面进行检索**，并能映射回原始 Document 和基础 Node。\n   - 强调它与向量存储索引的区别：它不直接对基础 Node 做语义检索，而是通过摘要进行检索。\n   - 给出了使用 `from_documents` 构造索引的示例，以及如何通过 `get_document_summary` 查看某个文档的摘要。\n   - 还说明了可以通过 `storage_context`、`summary_query`、`llm`、`transformations` 等参数自定义底层向量库、摘要生成提示词和模型。\n\n3. **对象索引（ObjectIndex）**\n   - 引入对象索引的概念：它不仅可以索引文本，还可以对**任意 Python 对象**进行索引。\n   - 适用于需要对大量结构化对象建立索引，并在检索时按条件直接返回对象的场景。\n   - 文中开始举例说明其应用，尤其提到 **Text-to-SQL** 等场景中对结构化数据检索的需求。"
+            },
+            {
+              "title": "对象索引",
+              "start_index": 188,
+              "end_index": 191,
+              "node_id": "0094",
+              "summary": "该部分主要介绍了第 6 章“数据嵌入与索引”中的两类索引能力及其使用方法：\n\n1. **摘要索引的参数定制**\n   - 说明了在构建文档摘要索引时，可以通过 `storage_context` 指定底层向量存储。\n   - 还可以通过 `summary_query` 修改摘要生成的 Prompt，或更换用于摘要生成的大模型等参数。\n   - 给出了示例代码，展示如何用中文 Prompt 生成文档摘要，并验证新设置是否生效。\n\n2. **对象索引（ObjectIndex）**\n   - 介绍了对象索引的概念：它不仅能对文本，还能对任意 Python 对象进行索引。\n   - 重点说明了它的应用场景：\n     - **Text-to-SQL** 中按需检索数据库 schema，避免上下文过长。\n     - **AI Agent** 中从大量工具里检索相关工具供智能体使用。\n   - 通过示例展示了如何将字典、列表、元组、字符串等普通对象转换为 Node，再构造 `ObjectIndex` 并进行检索。\n   - 解释了对象索引的内部机制：\n     - 底层依赖 `VectorStoreIndex` 等向量索引完成嵌入与检索。\n     - 需要 `ObjectNodeMapping` 保存普通对象与 Node 之间的映射关系。\n     - `SimpleObjectNodeMapping` 通过将对象转成字符串并计算 hash 来实现映射与反查。\n   - 最后提到 LlamaIndex 也提供了更简洁的 `ObjectIndex.from_objects()` 用法。\n\n3. **知识图谱索引的引入**\n   - 文末开始过渡到“知识图谱索引”，说明知识图谱作为一种图结构语义知识库，常用于搜索、问答、推荐等场景。"
+            },
+            {
+              "title": "知识图谱索引",
+              "start_index": 191,
+              "end_index": 197,
+              "node_id": "0095",
+              "summary": "This partial document explains several LlamaIndex index types used in RAG applications, focusing on how they are built and how they work.\n\nMain points covered:\n- **Object Index**\n  - Shows that object indexes can be built more simply by directly using ordinary objects.\n  - Demonstrates that the same result can be achieved by specifying a lower-level index type such as `VectorStoreIndex` during construction.\n\n- **Knowledge Graph Index**\n  - Introduces knowledge graphs as a graph-based way to organize semantic knowledge using entities and relationships.\n  - Explains graph basics: nodes, edges, and graph databases.\n  - Describes graph databases such as Neo4j and their advantages for highly connected data.\n  - Presents `PropertyGraphStore` as the storage abstraction used by LlamaIndex for knowledge graph indexing.\n  - Shows the workflow of building a knowledge graph index from documents:\n    - load documents,\n    - extract entities and relationships with an LLM,\n    - store triplets in the graph store,\n    - persist and reload the index,\n    - query it through a query engine.\n  - Compares knowledge graph indexing with vector indexing, highlighting differences in storage type, index type, and processing logic.\n  - Notes that the extracted triplets are used as the core units for retrieval and generation.\n  - Mentions that in production, graph databases like Neo4j are more suitable than in-memory storage.\n\n- **Tree Index**\n  - Introduces tree indexing as a hierarchical structure built from nodes.\n  - Explains that LLMs are used to summarize lower-level nodes into parent nodes recursively.\n  - Notes that retrieval can return different levels of the tree, such as root nodes or leaf nodes, depending on the query and retrieval mode.\n  - Begins a simple example of constructing a tree index from sentence-split nodes."
+            },
+            {
+              "title": "树索引",
+              "start_index": 197,
+              "end_index": 198,
+              "node_id": "0096",
+              "summary": "这部分主要介绍了 RAG 应用中的几种索引方式，重点包括知识图谱索引、树索引以及关键词表索引的引入与作用。\n\n首先，文本说明了知识图谱索引的意义：它让 RAG 在底层存储层面能够支持以知识图谱形式存在的结构化知识，从而扩展了知识图谱在生成式 AI 中的应用场景。同时指出，在实际生产环境中，知识图谱通常不会只依赖内存中的简单存储，而是会使用更成熟、可管理的图数据库，例如 Neo4j。\n\n接着，重点讲解了树索引的构建与检索机制。树索引通过大模型对输入的节点进行摘要和汇总，逐层生成父节点，并递归形成一棵索引树；当叶子节点数量超过阈值时才会继续构造上级节点。检索时可以根据不同模式返回根节点或叶子节点。文中还通过示例展示了如何用 SentenceSplitter 切分文档、构造 TreeIndex，以及索引结构中保存的父子节点映射关系，说明树索引本质上是一个便于检索的层级结构。\n\n最后，文本开始引出关键词表索引，作为一种更简单、直观的索引形式，为后续内容做铺垫。"
+            },
+            {
+              "title": "关键词表索引",
+              "start_index": 198,
+              "end_index": 200,
+              "node_id": "0097",
+              "summary": "这一部分主要介绍了两种用于 RAG 检索的索引结构：树索引和关键词表索引。\n\n首先，树索引通过 `TreeIndex(nodes, num_children=2)` 构造，索引内部不仅保存根节点和叶子节点，还维护父子节点映射关系 `node_id_to_children_ids`，从而形成一棵可用于检索的树。检索时默认会根据输入问题查找相关叶子节点，但也可以灵活配置检索方式，例如使用向量相似度、使用大模型判断、检索根节点还是叶子节点，以及返回多少个节点等。\n\n其次，关键词表索引是一种更直观的索引方式，它从每个节点内容中提取关键词，并建立“关键词到节点集合”的映射关系。检索时先从问题中提取关键词，再根据关键词在索引中找到相关节点并排序，最后返回最相关的节点用于生成回答。文中还介绍了三种关键词提取方法：使用大模型智能提取的 `KeywordTableIndex`、基于正则表达式的 `SimpleKeywordTableIndex`（目前主要适用于英文）、以及基于 RAKE 的 `RAKEKeywordTableIndex`。最后通过示例展示了如何构造关键词表索引并进行查询。"
+            }
+          ],
+          "node_id": "0092",
+          "summary": "本部分主要介绍第6章“数据嵌入与索引”中的“更多索引类型”。内容强调虽然向量存储索引（VectorStoreIndex）是RAG应用中最重要的索引类型，但在实际应用中常常需要结合其他索引类型来增强检索能力。随后引出几种常见索引类型及其基本用法，并开始介绍“文档摘要索引”，说明其核心思路是利用大模型对传入的 Node 列表生成文档摘要，从而支持后续检索。"
+        }
+      ],
+      "node_id": "0080",
+      "summary": "本部分主要介绍了 RAG 应用中的“数据嵌入与索引”主题，重点包括：在数据加载和分割后，如何为生成的知识块（Node）构建索引，以支持快速检索并增强大模型生成效果；向量存储索引作为最常见的索引方式，依赖嵌入模型和向量存储来实现语义检索；同时指出向量索引并非适用于所有场景，因此本章还会介绍其他索引形式。随后解释了“嵌入”和“向量”的概念，说明嵌入会将文本转换为包含语义信息的多维浮点向量，并强调语义相近的文本在向量空间中也会更接近，这使得向量能够用于基于语义而非关键词的检索。"
+    },
+    {
+      "title": "检索、响应生成与 RAG引擎",
+      "start_index": 201,
+      "end_index": 202,
+      "nodes": [
+        {
+          "title": "检索器",
+          "start_index": 202,
+          "end_index": 202,
+          "nodes": [
+            {
+              "title": "快速构造检索器",
+              "start_index": 202,
+              "end_index": 203,
+              "node_id": "0100",
+              "summary": "本部分主要介绍了 RAG 中“检索器（Retriever）”的作用、构造方式以及检索模式与参数的基本概念。\n\n核心内容包括：\n- 检索器是大模型响应生成的基础组件，负责根据用户输入检索最相关的知识上下文，并以 Node 列表形式返回结果。\n- 说明了如何快速构造检索器，重点介绍通过索引组件的 `as_retriever` 方法直接生成检索器，并通过 `retrieve` 方法完成检索。\n- 介绍了检索器的常见配置参数，如 `retriever_mode` 和 `similarity_top_k`，以及查询引擎在构造时可能自动隐式创建检索器。\n- 说明了也可以通过底层 API 直接实例化具体检索器类型，如 `VectorIndexRetriever`、`SummaryIndexLLMRetriever`，但这种方式要求了解索引类型与检索器类型的对应关系。\n- 最后引出“检索模式与检索参数”的概念，强调不同索引类型可能支持不同检索模式，这些模式在流程、模型使用、效果和性能上各有差异，需要根据应用需求和数据特点进行选择。"
+            },
+            {
+              "title": "理解检索模式与检索参数",
+              "start_index": 203,
+              "end_index": 208,
+              "node_id": "0101",
+              "summary": "这部分内容主要讲解了 LlamaIndex 中“检索器”的构造方式、不同索引类型支持的检索模式，以及递归检索的初步概念，核心要点包括：\n\n1. **检索器的构造方式**\n   - 可以通过底层 API 直接构造检索器，也可以使用 `as_retriever` 方法。\n   - 文中建议优先使用 `as_retriever`，因为它更方便，不需要事先明确知道具体检索器类名。\n   - 直接构造检索器时，需要了解索引类型与检索模式对应的具体检索器类型。\n\n2. **检索模式与检索参数**\n   - 不同索引类型可能支持不同的检索模式。\n   - 检索模式会影响检索流程、所用模型、效果和性能。\n   - 某些索引还支持特殊参数，理解这些参数有助于更有效地使用索引。\n\n3. **不同索引类型支持的检索模式**\n   - **向量存储索引（VectorStoreIndex）**：主要支持基于语义相似度的向量检索，常用参数包括 `similarity_top_k`、`filters`、`vector_store_query_mode`。\n   - **文档摘要索引（DocumentSummaryIndex）**：支持\n     - `llm` 模式：用大模型判断摘要相关性；\n     - `embedding` 模式：用向量相似度判断相关性。\n   - **树索引（TreeIndex）**：支持多种模式，如\n     - `select_leaf`\n     - `select_leaf_embedding`\n     - `all_leaf`\n     - `root`\n   - **关键词表索引（KeywordTableIndex）**：支持\n     - `default`：LLM 提取关键词；\n     - `simple`：正则提取；\n     - `rake`：使用 RAKE 算法。\n   - **对象索引（ObjectIndex）**：其检索模式依赖于底层使用的索引类型。\n   - **知识图谱索引（PropertyGraphIndex）**：支持\n     - Text-to-Cypher\n     - Vector Search\n     - Keywords Search\n     并可通过多个子检索器组合实现。\n\n4. **知识图谱索引的子检索器机制**\n   - 介绍了如何为知识图谱索引配置多个子检索器。\n   - 示例中使用了同义词检索器和向量上下文检索器，并将它们组合成 `PGRetriever`。\n   - 也可以在查询引擎中直接指定子检索器。\n\n5. **递归检索的初步认识**\n   - 文末引出一个重要概念：检索器在返回相关 Node 后，可能还会继续进行递归检索。\n   - 这说明检索过程并不一定只停留在第一轮召回，还可能进一步扩展上下文。"
+            },
+            {
+              "title": "初步认识递归检索",
+              "start_index": 208,
+              "end_index": 210,
+              "node_id": "0102",
+              "summary": "该部分主要介绍了第 7 章中 RAG 引擎的两个核心环节：检索与响应生成。\n\n首先，文中给出了一个知识图谱检索的示例，展示如何构造多个子检索器并组合成一个 `PGRetriever`，或者直接在查询引擎中指定多个子检索器。示例中包括基于同义词的检索器 `LLMSynonymRetriever` 和基于向量上下文的检索器 `VectorContextRetriever`，说明了知识图谱索引可以通过多种检索策略协同工作。\n\n接着，文中初步介绍了递归检索机制。LlamaIndex 在检索到相关 Node 后，还可能继续对 `IndexNode` 进行二次检索，这种递归检索会根据 `IndexNode` 指向的对象类型不同而采取不同操作：如果指向普通 Node，则直接返回；如果指向查询引擎，则调用查询引擎生成结果并封装为 Node；如果指向检索器，则继续执行检索。这样可以实现“钻取式”的多层检索。\n\n最后，文中开始介绍响应生成器 `Synthesizer`。它的作用是在检索得到上下文后，负责将问题与上下文转化为最终回答。这里强调了响应生成并不只是简单地把上下文拼接给大模型，而是存在多种生成模式，不同模式在上下文使用方式、Prompt 模板和迭代流程上都有差异。`Synthesizer` 的作用就是抽象这些不同的响应生成流程，并以统一接口提供给上层 RAG 引擎使用。"
+            }
+          ],
+          "node_id": "0099",
+          "summary": "本部分主要介绍了第 7 章中“检索、响应生成与 RAG 引擎”的基础概念，重点讲解检索器（Retriever）的作用与构造方式。内容说明检索器是大模型响应生成的基础组件，负责根据用户输入检索最相关的知识上下文，并以 Node 列表形式返回结果；没有检索器就没有增强生成（RAG）的基础。\n\n同时，本节介绍了如何基于已有索引组件快速构造检索器，尤其是通过 `as_retriever` 方法从向量索引直接生成检索器，并通过 `retrieve` 方法完成一次检索。文中还提到检索器的常见配置参数，如 `retriever_mode` 和 `similarity_top_k`，用于控制检索模式和返回最相似结果的数量。此外，还提及查询引擎 `as_query_engine()` 会隐式自动构造检索器。\n\n最后，本节强调了 `retrieve` 方法是检索器的核心接口，其返回的是带有相关性评分（Score）的 `Node` 列表，实际类型为 `NodeWithScore`，这些结果会进一步送入响应生成器用于生成最终回答。"
+        },
+        {
+          "title": "响应生成器",
+          "start_index": 210,
+          "end_index": 211,
+          "nodes": [
+            {
+              "title": "构造响应生成器",
+              "start_index": 211,
+              "end_index": 212,
+              "node_id": "0104",
+              "summary": "这部分主要介绍了 RAG 应用中的“响应生成器”及其构造方式和工作模式。\n\n核心内容包括：\n- 响应生成器在 RAG 流程中的位置：它通常在检索完成后运行，用于基于检索到的 Node 生成最终答案；在一些新的 RAG 范式中，还可能出现迭代和循环，导致多次调用响应生成器。\n- 响应生成器的构造方式：\n  - 显式构造：先单独创建 response_synthesizer，再在查询引擎或其他 RAG 引擎中使用。\n  - 隐式构造：在构造查询引擎时自动创建默认的检索器和响应生成器，也可以通过参数指定响应生成模式。\n- 代码示例展示了如何使用 get_response_synthesizer 创建响应生成器，以及如何在 as_query_engine 或 RetrieverQueryEngine 中传入该对象。\n- 响应生成模式（response_mode）的作用：它是统一控制不同答案生成策略的上层接口，不同模式对应不同的上下文组织和输出方式，有助于优化 RAG 的回答质量。\n- 重点讲解了 refine 模式：\n  - 先用第一个 Node 的上下文生成初始答案；\n  - 再结合后续 Node 的上下文和已有答案逐步细化；\n  - 这个过程会循环直到处理完所有 Node；\n  - 如果某个 Node 内容过长导致上下文窗口溢出，还会对其进行拆分后继续处理。"
+            },
+            {
+              "title": "响应生成模式",
+              "start_index": 212,
+              "end_index": 221,
+              "node_id": "0105",
+              "summary": "这部分内容主要介绍了 RAG 引擎中的“响应生成器”及其不同的响应生成模式，并说明了相关参数的配置方法。核心内容包括：\n\n1. **查询引擎的隐式构造**\n   - 说明在构造 RAG 查询引擎时，可以自动生成默认的检索器和响应生成器。\n   - 通过 `as_query_engine()` 等方法可直接指定如 `streaming`、`verbose`、`response_mode` 等参数。\n\n2. **响应生成模式（response_mode）详解**\n   - 解释了 `response_mode` 的作用：控制模型如何利用检索到的上下文生成答案。\n   - 重点介绍了多种内置模式及其适用场景。\n\n3. **refine 模式**\n   - 采用迭代式生成：先基于第一个 Node 生成初始答案，再结合后续 Node 逐步细化。\n   - 特点是答案更详细，但需要多次大模型调用，耗时和 token 成本较高。\n   - 通过示例展示了其调用过程和 Prompt 变化。\n\n4. **compact 模式**\n   - 先将多个 Node 合并成更大的上下文块，再使用 refine 方式生成答案。\n   - 通常比 refine 调用次数更少，效率更高，但答案可能不如 refine 详细。\n   - 说明了它是系统默认模式。\n\n5. **tree_summarize 模式**\n   - 适合总结性问题。\n   - 通过“合并—并行总结—再合并”的树状递归方式，最终得到唯一答案。\n   - 展示了其多轮调用和逐步汇总的特点。\n\n6. **其他响应生成模式**\n   - **simple_summarize**：合并上下文后截断超长内容，再调用一次模型。\n   - **accumulate**：对每个 Node 分别生成答案，再直接拼接结果。\n   - **compact_accumulate**：先合并上下文，再执行 accumulate。\n   - **no_text**：不生成真实答案，仅返回检索到的 Node 信息。\n   - **generation**：不带上下文，直接让模型回答问题。\n\n7. **响应生成器参数**\n   - 介绍了构造响应生成器时常用的参数：\n     - `llm`：指定使用的大模型；\n     - 各类 Prompt 模板参数，如 `text_qa_template`、`refine_template`、`summary_template`、`simple_template`。\n   - 还给出了自定义 Prompt 模板的示例，说明如何为不同模式定制提示词。\n\n整体来看，这一部分重点讲解了 **RAG 中答案生成阶段的不同策略、它们的工作机制、优缺点，以及如何通过参数和模板进行定制**。"
+            },
+            {
+              "title": "响应生成器的参数",
+              "start_index": 221,
+              "end_index": 223,
+              "node_id": "0106",
+              "summary": "This section explains key parameters for configuring a response synthesizer in a RAG system and how to build a custom synthesizer.\n\nMain points covered:\n- **Response synthesizer parameters** when using `get_response_synthesizer`, including:\n  - `llm`: the model used for generation, which can be set directly or taken from global settings.\n  - `*_template`: prompt templates used to construct prompts for different response modes, such as:\n    - `text_qa_template`\n    - `refine_template`\n    - `summary_template`\n    - `simple_template`\n  - An example of customizing a `summary_template` by adding an extra parameter like `language_name`.\n  - `streaming`: enabling streaming output for token-by-token generation, with examples of handling streamed text.\n  - `output_cls`: specifying a structured output type so the response follows a defined schema.\n  - `structured_answer_filtering`: filtering irrelevant node answers in `refine` or `compact` modes.\n\n- **Custom response synthesizer implementation**:\n  - Shows that users can create their own synthesizer by inheriting from `BaseSynthesizer`.\n  - Mentions implementing required interfaces and adding custom logic to support new RAG workflows.\n  - Begins an example of a `FunnySynthesizer` that answers in a humorous Chinese style."
+            },
+            {
+              "title": "实现自定义的响应生成器",
+              "start_index": 223,
+              "end_index": 225,
+              "node_id": "0107",
+              "summary": "The partial document explains how to customize response generation in a RAG system and introduces query engines as the next layer built on retrieval and response synthesis. It covers:\n\n- Response generation options and a parameter for filtering irrelevant node answers in certain modes.\n- How to implement a custom response synthesizer by inheriting from `BaseSynthesizer`.\n- An example of a custom “FunnySynthesizer” that answers in Chinese with a humorous style, including synchronous and asynchronous response methods.\n- How to use the custom synthesizer in a RAG pipeline.\n- An introduction to RAG query engines, describing them as natural-language interfaces for one-shot responses used in search, Q&A, and data analysis.\n- Two ways to build built-in query engines: via high-level APIs or lower-level API composition."
+            }
+          ],
+          "node_id": "0103",
+          "summary": "这部分主要介绍了 RAG 系统中的“响应生成器（Synthesizer）”及其作用与构造方式。核心内容包括：\n\n- 在检索器返回与问题相关的上下文 Node 列表后，系统进入响应生成阶段。\n- LlamaIndex 中的响应生成组件称为 Synthesizer，它不仅仅是把问题和上下文简单拼接后交给大模型，而是支持多种响应生成模式。\n- 之所以需要多种模式，是因为在实际 RAG 应用中，单次推理往往无法满足质量或任务需求，不同模式在上下文使用方式、Prompt 模板和迭代流程上都有差异。\n- Synthesizer 的作用是抽象这些不同的响应生成流程，并通过统一接口供上层 RAG 引擎调用。\n- 文中还说明了响应生成器与输入问题、检索结果、Prompt 模板、大模型以及流式输出、输出格式等控制参数之间的关系。\n- 响应生成器通常在检索完成后运行，但在一些新的 RAG 范式中，可能会被多次调用。\n- 接着介绍了响应生成器的两种构造方式：显式构造和隐式构造。\n- 重点示例展示了如何使用 `get_response_synthesizer` 并指定 `response_mode` 来创建响应生成器，以及如何通过 `synthesize` 方法直接测试。\n- 最后说明该响应生成器也可以被传入查询引擎或 `as_query_engine` 等接口中，用于后续构建完整的 RAG 引擎。"
+        },
+        {
+          "title": "RAG引擎：查询引擎",
+          "start_index": 225,
+          "end_index": 225,
+          "nodes": [
+            {
+              "title": "构造内置类型的查询引擎的两种方法",
+              "start_index": 225,
+              "end_index": 227,
+              "node_id": "0109",
+              "summary": "这部分主要介绍了 RAG 中“响应生成器”和“查询引擎”的构建与使用方法。首先给出了一个自定义响应生成器的示例，展示如何将检索到的文本块拼接成上下文，并调用大模型生成响应，其中还提到可以实现一种“幽默型”响应生成器。随后进入 7.3 节，系统说明查询引擎（Query Engine）的概念：它是通过自然语言查询获得一次性响应的 RAG 引擎，适用于搜索、问答和数据分析等场景。\n\n接着重点讲解了构造内置查询引擎的两种方式：一种是使用高层 API 通过 `vector_index.as_query_engine()` 快速创建，代码简洁，适合快速验证；另一种是使用底层 API 分步骤显式构造，包括先创建检索器 `VectorIndexRetriever`，再创建响应生成器 `get_response_synthesizer`，最后用 `RetrieverQueryEngine` 组合成查询引擎。这种方式虽然更复杂，但可配置性更强，例如可以替换为自定义响应生成器或开启流式输出。\n\n最后还提到可以借助 Langfuse 等平台观察查询引擎的内部运行过程，重点查看输入大模型的 Prompt 和检索到的 Node 内容，以便分析检索准确性和生成质量，并为后续优化提供依据。"
+            },
+            {
+              "title": "深入理解查询引擎的内部结构和运行原理",
+              "start_index": 228,
+              "end_index": 229,
+              "node_id": "0110",
+              "summary": "这部分主要讲解了查询引擎的内部结构与运行原理，重点围绕 `as_query_engine` 这个高层 API 展开分析。文中说明，`as_query_engine` 本质上是通过组合底层组件来构造查询引擎，其核心依赖包括检索器 `retriever` 和大模型 `llm`：前者负责基于索引召回与问题相关的上下文节点，后者负责结合 Prompt 模板生成最终答案。\n\n此外，文中进一步拆解了 `RetrieverQueryEngine` 的关键组成部分，介绍了向量索引检索器 `VectorIndexRetriever`、响应生成器 `Synthesizer` 以及节点后处理器 `NodePostProcessor` 的作用，分别对应检索、生成和检索结果优化等环节。最后指出，如果不使用高层 API，也可以通过底层 API 组合这些组件来手动构建查询引擎。"
+            },
+            {
+              "title": "自定义查询引擎",
+              "start_index": 230,
+              "end_index": 232,
+              "node_id": "0111",
+              "summary": "这部分内容主要讲了 RAG 系统中“查询引擎”和“对话引擎”的自定义与构造方法，重点包括：\n\n1. **自定义查询引擎的必要性**\n   - 内置查询引擎不一定能满足复杂业务需求。\n   - 当需要结合本地微调大模型、向量索引，或实现更复杂的 RAG 工作流（如 C-RAG、Self-RAG）时，可以自定义查询引擎。\n\n2. **如何实现自定义查询引擎**\n   - 通过继承 `CustomQueryEngine` 类，并实现 `custom_query` 接口。\n   - 自定义查询引擎通常由两个核心组件构成：\n     - **检索器（Retriever）**\n     - **响应生成器（Response Synthesizer）**\n   - 示例中展示了先检索相关节点，再将节点和问题交给响应生成器生成答案的流程。\n\n3. **使用底层大模型组件实现更灵活的响应生成**\n   - 如果需要完全控制答案生成过程，也可以不使用响应生成器，而是直接调用大模型组件。\n   - 流程包括：\n     - 检索 Node\n     - 拼接上下文\n     - 构造 Prompt\n     - 调用 LLM 生成响应\n   - 这种方式更适合个性化、复杂的业务逻辑。\n\n4. **RAG 引擎中的对话引擎（Chat Engine）**\n   - 对话引擎适用于需要多轮连续对话、保留上下文的场景。\n   - 与只处理独立问题的查询引擎不同，对话引擎需要处理历史对话记录、上下文理解和连续回答。\n\n5. **对话引擎面临的主要挑战**\n   - 历史对话记录的保存、加载与传递。\n   - 如何基于上下文进行知识召回。\n   - 召回知识后如何组织响应生成。\n\n6. **对话引擎的构造方式**\n   - 对话引擎本质上是查询引擎的有状态版本。\n   - 其构造方式与查询引擎类似，也可以通过索引快速构造，或通过底层 API 组合构造。\n\n总体来说，这一部分主要介绍了如何根据业务需求自定义查询引擎，以及 RAG 场景下对话引擎的作用、挑战和构造思路。"
+            }
+          ],
+          "node_id": "0108",
+          "summary": "This section introduces a custom response synthesizer for RAG, showing an async method that combines retrieved text chunks into a context string and calls an LLM to generate a response. It then presents an example of a “funny” response generator built with this custom synthesizer. After that, the document transitions to RAG engines, focusing on the query engine as a natural-language interface for one-time responses in search, Q&A, and data analysis scenarios. Finally, it explains that built-in query engines can be constructed in two ways: using a high-level API for quick setup or using lower-level APIs for more flexible composition."
+        },
+        {
+          "title": "RAG引擎：对话引擎",
+          "start_index": 232,
+          "end_index": 232,
+          "nodes": [
+            {
+              "title": "对话引擎的两种构造方法",
+              "start_index": 232,
+              "end_index": 235,
+              "node_id": "0113",
+              "summary": "本部分主要介绍了 RAG 引擎中的响应生成与对话引擎（Chat Engine）构造方式及其内部原理，重点包括：\n\n1. **响应生成流程**\n   - 说明了如何利用底层大模型组件完成响应生成。\n   - 流程包括：检索 Node、构造上下文、组装 Prompt、调用大模型生成回答。\n   - 强调在实际应用中可以根据业务需求定制个性化的响应生成逻辑。\n\n2. **RAG 引擎中的对话引擎**\n   - 介绍了对话引擎是查询引擎的有状态版本，适用于需要多轮连续对话、保留上下文的场景。\n   - 指出多轮对话面临的核心挑战：\n     - 历史对话记录的保存、加载与携带；\n     - 如何基于上下文进行知识召回；\n     - 召回知识后如何生成合适的回答。\n\n3. **对话引擎的两种构造方法**\n   - **基于索引快速构造**：通过 `as_chat_engine(chat_mode=\"condense_question\")` 一行代码快速创建对话引擎。\n   - **基于底层 API 组合构造**：通过更细粒度的组件组合实现更精确控制，例如：\n     - 查询引擎；\n     - 重写问题的 Prompt 模板；\n     - 历史对话记录；\n     - 记忆能力等。\n\n4. **condense_question 模式的工作机制**\n   - 该模式会读取历史对话，将当前用户问题重写为一个语义更完整的独立问题。\n   - 重写后的问题再输入查询引擎，从而提高上下文理解和回答准确性。\n   - 文中通过示例说明了如何将“它的主要场景是什么？”重写为更明确的问题。\n\n5. **对话引擎内部结构与运行原理**\n   - 深入解释了 `as_chat_engine` 的内部实现思路：\n     - 先构造查询引擎；\n     - 再根据不同 `chat_mode` 构造对话引擎。\n   - 对于 `REACT`、`OPENAI`、`BEST` 等模式，会将查询引擎封装为工具，再交给 `AgentRunner` 处理。\n   - 说明对话引擎本质上是在查询引擎基础上增加了会话状态和记忆能力。"
+            },
+            {
+              "title": "深入理解对话引擎的内部结构和运行原理",
+              "start_index": 235,
+              "end_index": 238,
+              "node_id": "0114",
+              "summary": "This partial document explains how LlamaIndex chat engines are built and how different chat modes work in a RAG application. It focuses on:\n\n- How a chat engine is internally constructed from a query engine or retriever.\n- Why question rewriting is needed in conversational retrieval, using an example where a vague follow-up question is rewritten into a more complete query.\n- The internal implementation of `as_chat_engine`, showing how different `chat_mode` values map to different engine types.\n- The roles of key components in chat engines:\n  - LLM for answering, rewriting questions, or planning tool use\n  - Query Engine or Retriever for fetching relevant context\n  - Memory for preserving conversation history and state\n- The main chat modes supported by LlamaIndex, including:\n  - `simple`\n  - `condense_question`\n  - `context`\n  - `condense_plus_context`\n  - `react`\n  - `openai`\n  - `best`\n- The characteristics of the `simple` mode, which talks directly to the LLM without retrieval or indexing."
+            },
+            {
+              "title": "理解不同的对话模式",
+              "start_index": 238,
+              "end_index": 249,
+              "node_id": "0115",
+              "summary": "本部分主要介绍了 LlamaIndex 中对话引擎的不同工作模式及其适用场景，并进一步引出 RAG 应用中的结构化输出需求。\n\n核心内容包括：\n\n1. **对话引擎中的 Memory 组件作用**\n   - 说明对话服务具有“状态”，需要通过 Memory 记录和维护历史对话信息，这是对话引擎区别于普通查询引擎的重要特征。\n\n2. **不同对话模式与引擎类型**\n   - 总结了 LlamaIndex 支持的多种 chat_mode，包括：\n     - `simple`\n     - `condense_question`\n     - `context`\n     - `condense_plus_context`\n     - `react`\n     - `openai`\n     - `best`\n   - 并说明它们分别对应的引擎类型及依赖组件，如 LLM、QueryEngine、Retriever、Tool 等。\n\n3. **simple 对话模式**\n   - 直接与大模型对话，不依赖索引、检索器或查询引擎。\n   - 适合纯聊天，不适合知识检索型问答。\n\n4. **condense_question 对话模式**\n   - 先结合历史对话将当前问题重写为语义完整的独立问题，再通过查询引擎回答。\n   - 优点是能提升连续对话中的检索相关性。\n   - 缺点是会增加大模型调用次数。\n\n5. **context 对话模式**\n   - 先检索相关上下文，再将上下文注入 system prompt 中让大模型回答。\n   - 优点是流程简单、速度较快。\n   - 缺点是在连续对话中容易因问题语义不完整而检索偏差。\n\n6. **condense_plus_context 对话模式**\n   - 结合了前两种模式：先重写问题，再检索上下文，最后生成回答。\n   - 兼顾了问题语义补全和上下文召回精度，但牺牲了一部分响应生成灵活性。\n\n7. **Agent 对话模式**\n   - 将 `react`、`openai`、`best` 归为 Agent 模式。\n   - 本质是把查询引擎作为工具交给 Agent，由 Agent 根据问题和历史对话自主规划并调用工具。\n   - 介绍了其推理、工具调用、再推理的完整流程。\n   - 优点是能力强、可扩展到多工具和复杂任务。\n   - 缺点是流程复杂、延迟较高、依赖模型推理能力。\n\n8. **结构化输出**\n   - 引出 RAG 应用中对结构化输出的需求，例如：\n     - TreeIndex 检索时需要输出特定格式；\n     - 响应生成时需要 JSON 便于下游处理。\n   - 提到两种常见解析方式：\n     - 使用 `output_cls`\n     - 使用输出解析器（output parser）\n\n整体来看，这一部分重点讲解了 **RAG 场景下不同对话引擎模式的实现机制、优缺点与适用场景**，并过渡到 **大模型结构化输出在 RAG 流程中的重要性**。"
+            }
+          ],
+          "node_id": "0112",
+          "summary": "本部分主要介绍了 RAG 引擎中的响应生成与对话引擎。\n\n核心内容包括：\n- 如何基于底层大模型组件完成响应生成流程，例如检索节点、构造上下文、组装 Prompt，再调用模型生成答案。\n- 在实际应用中，可以根据业务需求自定义个性化的响应生成逻辑。\n- 进入 7.4 节后，重点讲解 RAG 引擎中的对话引擎（Chat Engine），说明它适用于需要多轮连续对话、并利用历史上下文来回答问题的场景。\n- 指出多轮对话型 RAG 面临的主要挑战，包括历史对话记录的保存与携带、基于上下文的知识召回，以及召回知识后的答案生成方式。\n- 说明对话引擎本质上是查询引擎的有状态版本，并且可以像查询引擎一样，通过索引快速构造或通过底层 API 组合构造。\n"
+        },
+        {
+          "title": "结构化输出",
+          "start_index": 249,
+          "end_index": 250,
+          "nodes": [
+            {
+              "title": "使用 output_cls 参数",
+              "start_index": 250,
+              "end_index": 251,
+              "node_id": "0117",
+              "summary": "这部分内容主要讲的是 **在 LlamaIndex 的查询引擎中实现结构化输出**，重点介绍了两种方法：\n\n1. **使用 `output_cls` 参数**\n   - 在 `as_query_engine()` 中直接指定一个自定义的 Pydantic 模型类，例如 `Phone`。\n   - 查询引擎在生成回答时会自动加入结构化输出指令。\n   - 大模型输出后会被转换成对应的 Pydantic 对象返回，而不是普通文本。\n   - 如果输出不符合模型字段要求，类型校验会失败并抛出异常。\n   - 这种方式依赖大模型的指令遵从能力，必要时可能需要更换模型或 Prompt 模板。\n\n2. **使用输出解析器（output parser）**\n   - LlamaIndex 可以与其他框架的输出解析器集成，例如 LangChain 的解析器。\n   - 通过定义响应格式（如手机名称、CPU 等字段），对大模型输出进行解析和结构化。\n   - 这一部分开始展示如何借助解析器限制和规范模型响应。\n\n整体来看，这一节的核心主题是：**如何让 RAG 查询引擎返回结构化结果，而不仅仅是自然语言文本**。"
+            },
+            {
+              "title": "使用输出解析器",
+              "start_index": 251,
+              "end_index": 253,
+              "node_id": "0118",
+              "summary": "这部分主要讲解了如何在 RAG 应用中实现大模型的结构化输出，以及基础篇的整体总结。\n\n首先，文中说明了通过在查询引擎参数中指定 `output_cls`，可以让系统在生成响应时自动向 system prompt 中插入结构化输出指令，要求大模型按指定的 Pydantic 类型格式输出，并在输出后自动转换为对应对象返回。如果模型输出不符合类型校验，则会转换失败并抛出异常，因此这种方式很依赖大模型的指令遵从能力，必要时可能需要更换模型或 Prompt 模板。\n\n接着，介绍了另一种结构化输出方法：使用输出解析器。LlamaIndex 可以集成其他框架的 output parser，这里以 LangChain 的 `StructuredOutputParser` 为例，通过定义响应字段（如手机名称、处理器、内存、特性等），构造输出解析器，再将其传入 `OpenAI` 模型中，从而在不额外修改其他逻辑的情况下限制模型输出格式。文中还展示了可以通过 `format` 接口查看解析器如何在 Prompt 后附加结构化输出要求。\n\n最后，这一部分给出了“基础篇小结”，回顾了整章内容：从一个初级 RAG 示例入门，理解 RAG 的基本原理；通过原生代码、LangChain 和 LlamaIndex 三种方式认识开发框架的作用；进一步学习了基于 LlamaIndex 的经典 RAG 组件、API 和组装测试过程；并重点掌握了查询引擎与对话引擎这两类典型 RAG 引擎的构造及其检索、响应生成和对话模式。整体上，这部分强调读者已经具备开发经典甚至较复杂 RAG 应用的能力。"
+            }
+          ],
+          "node_id": "0116",
+          "summary": "这部分内容主要讲了 RAG 应用中两块能力：**Agent 对话模式**和**结构化输出**。\n\n### 1. Agent 对话模式的工作流程与特点\n- 介绍了 Agent 对话引擎在完成工具调用后的推理过程：大模型在拿到工具返回结果后，会再次推理并直接输出答案。\n- 强调了 Agent 模式的核心能力是：\n  - **自我规划**\n  - **调用和组合工具**\n- 说明 Agent 可以接入多种工具，例如：\n  - 在不同知识库中检索信息\n  - 执行更复杂的任务，如发送电子邮件\n- 同时指出其缺点：\n  - 流程复杂\n  - 延迟较长\n  - 强依赖大模型推理能力，存在不确定性\n\n### 2. 结构化输出在 RAG 中的作用\n- 说明在 RAG 的很多阶段都需要大模型输出**结构化结果**，以便下游应用处理。\n- 举例说明结构化输出的典型场景：\n  - 使用 TreeIndex 检索时，需要输出类似 `ANSWER:（数字）` 的格式\n  - 响应生成时，希望输出 JSON 对象供程序解析\n\n### 3. 结构化输出的两种常见实现方式\n- **使用 `output_cls` 参数**\n- **使用输出解析器**\n\n### 4. `output_cls` 参数的使用方法\n- 重点介绍了通过 `as_query_engine` 时传入 `output_cls` 来实现结构化输出。\n- 示例中定义了一个 `Phone` 的 Pydantic 模型，包含：\n  - `cpu`\n  - `memory`\n  - `storage`\n  - `screen`\n- 然后在查询引擎中指定 `output_cls=Phone`，使查询结果直接返回结构化的 Pydantic 对象。\n- 说明这种方式可以在不额外调用大模型的情况下，直接获得结构化结果。\n\n总体来说，这一部分主要围绕 **Agent 的工具调用能力与局限性**，以及 **RAG 中如何让大模型输出可被程序直接使用的结构化数据** 展开。"
+        }
+      ],
+      "node_id": "0098",
+      "summary": "该部分主要介绍了第7章“检索、响应生成与 RAG 引擎”的核心内容，重点说明 RAG 应用在完成数据准备与索引后，进入真正的使用阶段，即通过“检索 + 响应生成”构建完整的 RAG 引擎，以减少大模型幻觉并实现增强生成。文中将 RAG 引擎分为两类基础形态：查询引擎和对话引擎，前者用于单轮自然语言问答，后者用于多轮、有上下文记忆的连续交互。\n\n随后，内容引出构建 RAG 引擎所依赖的两个基础组件：检索器和响应生成器，并重点展开了检索器的作用。检索器负责根据用户输入检索最相关的知识上下文，并以 Node 列表形式返回，是增强生成的前提。文中还介绍了检索器的快速构造方式，说明可以通过已有索引组件直接使用 `as_retriever` 创建检索器，并通过 `retrieve` 方法执行检索，返回带相关性评分的结果，为后续响应生成提供输入。"
+    },
+    {
+      "title": "基础篇小结",
+      "start_index": 253,
+      "end_index": 255,
+      "node_id": "0119",
+      "summary": "这部分内容是对“基础篇”的总结，主要回顾了基于大模型的 RAG 应用开发的核心学习路径：先通过一个初级 RAG 实例理解基本技术原理，再通过原生代码、LangChain 和 LlamaIndex 三种方式认识开发框架的作用；随后基于 LlamaIndex 学习了经典 RAG 应用的主要开发阶段，包括组件、API 的使用、组装与测试，并理解部分关键组件的内部原理；最后重点讲解了面向实际应用的两类典型 RAG 引擎——查询引擎和对话引擎，以及它们对应的检索、响应生成和对话模式。整体上，这一部分说明读者已经具备开发经典甚至一定复杂度 RAG 应用的能力，并由此过渡到后续的高级篇。"
+    },
+    {
+      "title": "RAG引擎高级开发",
+      "start_index": 256,
+      "end_index": 256,
+      "nodes": [
+        {
+          "title": "检索前查询转换",
+          "start_index": 256,
+          "end_index": 257,
+          "nodes": [
+            {
+              "title": "简单查询转换",
+              "start_index": 257,
+              "end_index": 258,
+              "node_id": "0122",
+              "summary": "该部分主要介绍了 RAG 中的“查询转换”技术及其应用场景，重点包括：\n\n1. **查询转换的作用与意义**\n   - 通过对用户原始问题进行重写、扩展或生成相关查询，帮助检索到更相关的知识。\n   - 可以从不同角度补充问题信息，从而生成更全面、更深入的答案。\n   - 在实际系统中，查询转换既可以只做一次，也可以在生成结果后根据质量评估进行多轮迭代优化。\n\n2. **简单查询转换方法**\n   - 利用大模型和 Prompt 对输入查询进行改写，生成多个相关问题。\n   - 给出了基于 LlamaIndex 和 OpenAI 的示例代码，展示如何把一个问题重写成多个查询。\n   - 同时指出这种方法由于缺少上下文和额外约束，可能带来较大不确定性，甚至偏离真实意图，因此不太建议直接用于在线查询阶段。\n\n3. **简单查询转换的适用场景**\n   - 更适合用于数据准备和加载阶段，而不是直接面向用户查询。\n   - 例如：\n     - 用原始知识生成相似问题，增强语义覆盖。\n     - 用于元数据抽取，生成假设性查询问题以辅助嵌入。\n\n4. **HyDE 查询转换**\n   - 介绍了 HyDE（Hypothetical Document Embeddings，假设性文档嵌入）方法。\n   - 核心思路是：先根据问题生成一段假设性的回答/文档，再对这段内容进行嵌入和检索，必要时也可结合原始问题一起检索。\n   - 说明这种方法在很多场景下效果较好，并给出了使用 LlamaIndex 中 HyDE 查询转换器的示例。\n\n整体来看，这一部分围绕“如何通过查询转换提升 RAG 检索效果”展开，重点讲解了简单重写和 HyDE 两种方法，以及它们的优缺点和适用场景。"
+            },
+            {
+              "title": "HyDE查询转换",
+              "start_index": 258,
+              "end_index": 260,
+              "node_id": "0123",
+              "summary": "该部分主要介绍了 RAG 引擎中的高级查询转换技术，重点包括：\n\n1. **查询转换的用途与局限**\n   - 说明在数据准备和加载阶段可以利用查询转换来增强知识表示。\n   - 提到这种方法如果在缺少上下文和额外指令时使用，可能会带来较大不确定性，因此不建议直接用于查询前处理。\n\n2. **两种典型应用场景**\n   - **生成相似问题**：基于原始知识（尤其是问答类知识）生成语义相近的问题，用于丰富语义。\n   - **元数据抽取**：通过原始知识生成假设性查询问题，用于嵌入和检索。\n\n3. **HyDE 查询转换**\n   - 介绍 HyDE（Hypothetical Document Embeddings，假设性文档嵌入）的基本原理：先根据输入问题生成一个假设性答案，再对该答案进行嵌入并用于检索。\n   - 给出基于 LlamaIndex 的实现示例，包括自定义中文 Prompt、使用 `HyDEQueryTransform` 和 `PromptTemplate`。\n   - 说明 HyDE 转换后的结果不会直接返回新的查询字符串，而是放入 `query_bundle` 的 `custom_embedding_strs` 中供检索使用。\n\n4. **TransformQueryEngine 的封装使用**\n   - 介绍如何用 `TransformQueryEngine` 将 HyDE 能力透明地加到已有查询引擎上，减少手动管理转换流程的复杂度。\n   - 通过城市信息查询引擎示例对比普通查询与 HyDE 查询，说明 HyDE 能提升召回相关性和答案质量。\n\n5. **多步查询转换**\n   - 引出针对复杂问题的多步查询思路：从初始问题出发，经过多轮转换、检索和推理，逐步逼近完整答案。\n   - 强调每一步转换都依赖前一步的推理结果，以提高复杂问题的回答效果。"
+            },
+            {
+              "title": "多步查询转换",
+              "start_index": 260,
+              "end_index": 263,
+              "node_id": "0124",
+              "summary": "这部分内容主要讲的是 **RAG 引擎中的高级查询转换技术**，重点围绕如何通过“改写问题”来提升检索质量和最终回答效果。主要内容包括：\n\n1. **HyDE 查询转换的效果对比**\n   - 介绍了在不使用 HyDE 和使用 HyDE 后的检索输出差异。\n   - 说明 HyDE 会先生成一个“假设性答案”，再用它去检索知识，从而提高召回内容的相关性。\n   - 结果是：检索到的信息更贴近问题，答案质量更高。\n\n2. **多步查询转换（Multi-step Query Transformation）**\n   - 针对复杂问题，单次检索往往无法完整回答，因此引入多步查询转换。\n   - 核心思想是：从原始问题出发，逐步拆解成多个子问题，每一步都基于前一步推理继续推进，直到能回答原问题。\n   - 文中用“城市信息查询引擎”举例，展示如何通过 `StepDecomposeQueryTransform` 和 `MultiStepQueryEngine` 实现这一过程。\n   - 强调这种方法特别适合原问题不是直接事实查询、而是需要多处知识拼接的场景。\n\n3. **子问题查询转换（Sub-question Query Transformation）**\n   - 通过生成多个更具体的子问题，帮助理解和回答复杂问题。\n   - 与多步查询转换相比，它更强调“面向工具”的拆解：根据可用工具，把问题拆成每个工具都能回答的子问题。\n   - 这种方法常用于 Agent 风格的系统，也可用于非 Agent 场景中的受约束子问题生成。\n\n4. **代码示例与实现方式**\n   - 给出了使用 LlamaIndex 的相关代码示例，包括：\n     - 自定义 Prompt\n     - 查询转换器配置\n     - 多步查询引擎构造\n     - 子问题生成器的使用\n   - 说明这些高级查询转换能力可以直接封装进查询引擎中使用。\n\n总体来说，这一部分的核心主题是：**通过 HyDE、多步拆解和子问题生成等查询转换方法，提升 RAG 系统在复杂问题上的检索准确性和回答完整性。**"
+            },
+            {
+              "title": "子问题查询转换",
+              "start_index": 263,
+              "end_index": 268,
+              "node_id": "0125",
+              "summary": "This partial document mainly covers advanced RAG query processing techniques in LlamaIndex.\n\nKey points include:\n- **Sub-question query transformation**: breaking a complex user question into multiple smaller, more specific sub-questions to improve understanding and answer quality.\n- **Tool-constrained question generation**: using available tool metadata to guide sub-question generation so each sub-question can be answered by a specific tool or data source.\n- **Implementation examples**: code showing how to use `OpenAIQuestionGenerator`, `LLMQuestionGenerator`, `PromptTemplate`, `ToolMetadata`, and `QueryBundle` to generate sub-questions.\n- **Flexible use of “fake” tools**: tool metadata can be used even without real tools, simply to constrain and steer sub-question generation.\n- **Sub-question query engine**: a higher-level query engine that decomposes a complex query, sends sub-questions to different query engines/tools, and combines the results into a final answer.\n- **Comparison with Agent workflows**: sub-question query engines are similar to agents in tool use and task decomposition, but sub-question planning is done in one shot rather than dynamically step by step.\n- **Introduction to node postprocessors**: after retrieval, nodes may need filtering, keyword selection, or reranking before being passed to the response generator.\n- **Role of postprocessors in the query pipeline**: they sit between the retriever and the response synthesizer and provide a modular way to refine retrieved nodes."
+            }
+          ],
+          "node_id": "0121",
+          "summary": "本部分主要介绍了第 8 章“RAG 引擎高级开发”的主题背景与核心内容，重点围绕模块化 RAG 时代的高级开发技术展开。首先说明了随着 RAG 在生产环境中的不断演进，新的组件、算法和优化范式不断涌现，这些技术提升了 RAG 的适应能力和生成精度，对知识密集型 AI 应用具有重要意义。\n\n章节开头重点讲解了“检索前查询转换”这一关键阶段，也称为查询重写或查询分析。文中解释了查询转换的作用：在检索前将用户输入的问题改写为更适合检索的形式，以提升召回质量和答案完整性。主要列举了几种常见类型，包括：\n- 将问题转换为更利于嵌入和检索的表达；\n- 对问题进行语义扩展，以获得更全面准确的答案；\n- 将复杂问题拆分为多个子问题分别检索；\n- 将问题拆解为可多步完成的子查询。\n\n随后通过“GPT-4 模型”相关示例说明，单一问题往往无法充分表达用户意图，因此通过生成多个相关查询可以从不同角度覆盖知识点，提升检索效果和回答深度。文中还提到查询转换既可以是一次性的，也可以在新型 RAG 范式中结合结果评估进行多轮迭代优化。\n\n最后，部分内容进入“简单查询转换”的实现示例，展示了如何借助大模型和 PromptTemplate 编写一个查询重写函数，将原始问题生成多个相关查询，用于后续检索。"
+        },
+        {
+          "title": "检索后处理器",
+          "start_index": 268,
+          "end_index": 268,
+          "nodes": [
+            {
+              "title": "使用节点后处理器",
+              "start_index": 268,
+              "end_index": 269,
+              "node_id": "0127",
+              "summary": "本部分主要介绍了 RAG 引擎中的高级开发内容，重点包括：\n\n1. **子问题查询引擎与 Agent 的关系**\n   - 说明子问题查询引擎的工作方式与 Agent 类似，都是将任务拆分并调用工具完成。\n   - 对比两者差异：子问题查询引擎的任务规划通常一次性由大模型完成，而 Agent 的规划是动态进行的，更灵活但不确定性更高。\n\n2. **检索后处理器（Node Postprocessor）**\n   - 介绍在检索器输出与响应生成器输入之间，常常需要进行额外处理，如关键词筛选、结果重排序等。\n   - 说明 LlamaIndex 提供了节点后处理器这一模块化机制，用于对检索出的 Node 进行转换、过滤或重排序。\n\n3. **节点后处理器的使用方式**\n   - 可以独立使用后处理器，对检索结果调用 `postprocess_nodes` 进行处理。\n   - 也可以在构造查询引擎时插入多个节点后处理器，让查询引擎自动调用。\n\n4. **自定义节点后处理器**\n   - 说明可以继承 `BaseNodePostprocessor` 并实现 `_postprocess_nodes` 接口来自定义处理逻辑。\n   - 举例提到可用正则表达式对检索到的 Node 内容进行过滤。"
+            },
+            {
+              "title": "实现自定义的节点后处理器",
+              "start_index": 269,
+              "end_index": 270,
+              "node_id": "0128",
+              "summary": "This excerpt explains advanced RAG query processing with node postprocessors. It covers:\n\n- How node postprocessors can be used independently by calling `postprocess_nodes` on retrieved `NodeWithScore` results.\n- How to integrate node postprocessors into a query engine so they are automatically applied during retrieval.\n- How to create a custom node postprocessor by subclassing `BaseNodePostprocessor` and implementing `_postprocess_nodes`, with an example that filters nodes using a regular expression.\n- An introduction to common built-in node postprocessors, especially `SimilarityPostprocessor`, which filters retrieved nodes based on a similarity score threshold to keep only highly relevant context."
+            },
+            {
+              "title": "常见的预定义的节点后处理器",
+              "start_index": 270,
+              "end_index": 275,
+              "node_id": "0129",
+              "summary": "这部分内容主要讲解了 RAG 引擎中“节点后处理器（Node Postprocessor）”的高级用法，以及如何通过后处理提升检索结果质量和回答效果。重点包括：\n\n1. **自定义节点后处理器**\n   - 通过继承 `BaseNodePostprocessor` 自定义过滤逻辑。\n   - 示例中使用正则表达式过滤掉包含特定文本的 Node。\n   - 说明了如何在构造查询引擎时通过 `node_postprocessors` 参数插入该处理器，使其在检索后自动生效。\n\n2. **常见预定义节点后处理器**\n   - **相似度过滤处理器（SimilarityPostprocessor）**：按相似度阈值过滤检索结果，只保留高相关 Node。\n   - **关键词过滤处理器（KeywordNodePostprocessor）**：根据必需关键词或排除关键词筛选 Node，并说明其底层使用 `spacy`，中文场景需指定语言参数。\n   - **元数据替换处理器（MetadataReplacementPostProcessor）**：将 Node 的文本替换为元数据中的窗口内容，常与 `SentenceWindowNodeParser` 配合使用，以补充上下文、提升回答完整性。\n   - **固定时间排序处理器（FixedRecencyPostprocessor）**：根据时间元数据字段对 Node 按时间倒序排序，返回最新内容。\n\n3. **Rerank 节点后处理器的重要性**\n   - 介绍了重排序（Rerank）在 RAG 优化中的核心作用：对检索出的 Node 重新排序，使更相关的内容排在前面。\n   - 解释了为什么即使已有向量检索，仍然需要 Rerank：因为可能存在多索引、多来源检索、混合检索，以及向量排序偏差等问题。\n   - 提到重排序通常依赖独立的 Rerank 模型，并开始介绍 **Cohere Rerank** 这一常用商业模型及其使用背景。"
+            },
+            {
+              "title": "Rerank节点后处理器",
+              "start_index": 275,
+              "end_index": 281,
+              "node_id": "0130",
+              "summary": "This section focuses on RAG application optimization through node post-processing and semantic routing. It first explains the Rerank node postprocessor, why reranking is needed even after vector retrieval, and how it improves relevance by reordering retrieved nodes so the most relevant content is prioritized for generation. It then introduces two reranking approaches: using the commercial Cohere Rerank model and using the open-source bge-reranker-large model deployed via TEI. The document includes example code showing how to test reranking, compare results before and after reranking, and implement a custom LlamaIndex node postprocessor for the BGE reranker, which can also be plugged directly into a query engine.\n\nThe next topic begins semantic routing. It describes scenarios where multiple query engines or knowledge bases exist, and a router is used to infer user intent and direct the query to the appropriate retrieval/generation pipeline, providing a unified user experience across different backend systems."
+            }
+          ],
+          "node_id": "0126",
+          "summary": "本部分主要介绍了 RAG 引擎高级开发中的两个重点内容：一是子问题查询引擎与 Agent 的工作模式对比，说明两者都通过工具分解任务并选择合适工具完成目标，但子问题查询引擎的规划是一次性生成，而 Agent 更偏向动态推理与逐步执行，因此更灵活但不确定性更高；二是检索后处理器（Node Postprocessor）的概念与作用，说明在检索器输出到响应生成器输入之间，常需要对检索结果进行筛选、转换或重排序，LlamaIndex 提供了节点后处理器这一模块化机制，用于在查询引擎中对检索到的 Node 进行进一步处理。"
+        },
+        {
+          "title": "语义路由",
+          "start_index": 281,
+          "end_index": 281,
+          "nodes": [
+            {
+              "title": "了解语义路由",
+              "start_index": 281,
+              "end_index": 282,
+              "node_id": "0132",
+              "summary": "This excerpt covers advanced RAG application development, focusing first on using custom reranking during query engine construction to reorder retrieved nodes and improve result quality, with output similar to Cohere Rerank. It then introduces semantic routing in modular RAG systems, explaining how a router can infer user intent and direct queries to different retrieval/generation pipelines based on the question. The text describes common routing scenarios, such as selecting among knowledge sources, indexes, response types, or multiple query engines, and outlines the basic components of a routing module: a selector powered by an LLM and a set of candidate tools or engines."
+            },
+            {
+              "title": "带有路由功能的查询引擎",
+              "start_index": 283,
+              "end_index": 285,
+              "node_id": "0133",
+              "summary": "本部分主要讲解了在 RAG 应用中如何使用“路由”机制来动态选择不同的查询引擎或检索器，以便根据用户问题自动匹配最合适的知识源或响应方式。\n\n核心内容包括：\n- 构造多个独立的查询引擎，分别对应不同的数据源（如 xiaomai.txt 和 yiyan.txt）。\n- 将这些查询引擎封装为工具（QueryEngineTool），再交给 RouterQueryEngine，通过选择器（LLMSingleSelector）根据问题语义自动路由到合适的引擎。\n- 说明路由不仅可以用于不同数据源，也可以用于同一数据源上的不同查询策略，例如一个用于事实细节问答，另一个用于总结类回答。\n- 进一步介绍了“带有路由功能的检索器”，即把 Retriever 封装成 RetrieverTool，再由 RouterRetriever 进行选择，实现直接在检索层面进行路由。\n\n整体上，这一节强调了通过路由机制提升 RAG 系统的灵活性，使系统能够按问题类型、知识来源或响应模式进行智能分发与处理。"
+            },
+            {
+              "title": "带有路由功能的检索器",
+              "start_index": 285,
+              "end_index": 286,
+              "node_id": "0134",
+              "summary": "This partial document explains advanced RAG engine development, focusing on routing-based query and retrieval mechanisms in enterprise LLM applications. It first shows how to build a RouterQueryEngine that uses an LLM-based selector to route a user query to different query engines, such as one for question answering and another for summarization. It then introduces RouterRetriever, which routes among multiple retrievers instead of query engines, using examples with separate vector indexes for different topics and RetrieverTool wrappers; the text emphasizes that this router is only for retrieval and returns nodes rather than directly answering questions. Finally, it covers using an independent selector to choose among multiple options defined with ToolMetadata, illustrating how the model can decide between real-time web search and LLM-based knowledge/query generation."
+            },
+            {
+              "title": "使用独立的选择器",
+              "start_index": 286,
+              "end_index": 287,
+              "node_id": "0135",
+              "summary": "该部分主要介绍了 RAG 引擎中的高级路由与选择机制，重点包括：\n\n1. **RouterRetriever 的作用与限制**\n   - RouterRetriever 本质上是一个检索器，只负责根据语义智能选择合适的检索器进行检索。\n   - 它不能直接回答问题，只能返回检索到的多个 Node。\n\n2. **独立选择器的使用**\n   - 介绍了如何使用独立的选择器在多个候选项中做决策。\n   - 候选项可以用普通字符串表示，也可以用 `ToolMetadata` 定义工具信息。\n   - 示例展示了让大模型在“实时信息查询”和“非实时知识查询/内容创作”之间进行选择。\n\n3. **可多选的路由查询引擎**\n   - 说明了在某些场景下，可以将同一个查询同时路由到多个查询引擎。\n   - 这种方式会结合多个索引的优势，先分别生成结果，再由大模型汇总成最终答案。\n   - 示例构造了三种索引：**向量索引、关键词索引、摘要索引**，并将它们组合成可多选的路由查询引擎。"
+            },
+            {
+              "title": "可多选的路由查询引擎",
+              "start_index": 287,
+              "end_index": 289,
+              "node_id": "0136",
+              "summary": "本部分主要介绍了 RAG 应用中的高级查询路由能力，重点包括：\n\n1. **单选路由查询引擎的示例**  \n   通过 `LLMSingleSelector` 根据用户问题在多个候选工具中选择最合适的一个查询引擎，并展示了模型如何对查询进行路由判断。\n\n2. **可多选的路由查询引擎**  \n   说明了在某些场景下，一个查询可能需要同时调用多个查询引擎，以结合不同索引的优势获得更好的回答。  \n   文中构造了三种索引：\n   - 向量索引\n   - 关键词索引\n   - 摘要索引  \n   并分别封装成查询工具，再用 `LLMMultiSelector` 和 `RouterQueryEngine` 实现多路由选择与结果汇总。\n\n3. **多引擎协作的效果**  \n   通过“小麦手机”的不同问题示例，展示了路由引擎会根据问题内容选择不同的引擎组合，从而实现更精准的检索与生成。\n\n4. **SQL 查询引擎的引入**  \n   从非结构化/半结构化数据查询过渡到结构化数据查询，指出企业场景中大量数据存储在关系数据库中，更适合直接使用 SQL 查询，而不是向量化处理。\n\n5. **Text-to-SQL 与数据库查询引擎**  \n   介绍了如何借助大模型将自然语言转换为 SQL，实现面向数据库的自然语言查询能力，并以本地 Postgres 数据库和订单表 `orders` 为例说明 SQL 查询引擎的构建背景。"
+            }
+          ],
+          "node_id": "0131",
+          "summary": "This section discusses query result reranking in a RAG pipeline and introduces semantic routing. It explains how to use a custom reranker when building a query engine, including setting `similarity_top_k` and applying `node_postprocessors`, and notes that the reranked output should be similar to Cohere Rerank results. It then begins section 8.3 on semantic routing, describing a scenario where multiple knowledge bases and query engines are used for different domains and index types, and a router is needed to detect user intent before retrieval so the system can provide a unified user experience while directing queries to the appropriate backend workflow."
+        },
+        {
+          "title": "SQL查询引擎",
+          "start_index": 289,
+          "end_index": 290,
+          "nodes": [
+            {
+              "title": "使用 NLSQLTableQueryEngine 组件",
+              "start_index": 290,
+              "end_index": 292,
+              "node_id": "0138",
+              "summary": "这部分内容主要讲的是 **RAG 引擎高级开发中，如何用大模型实现数据库查询能力**，重点围绕 SQL 查询引擎展开。\n\n### 主要内容概述\n\n1. **使用 `NLSQLTableQueryEngine` 构造自然语言 SQL 查询引擎**\n   - 介绍了如何通过 LlamaIndex 的 `NLSQLTableQueryEngine` 直接构建一个订单信息查询引擎。\n   - 示例中使用了：\n     - `SQLDatabase` 连接数据库\n     - 指定要查询的表（如 `customers`、`orders`）\n     - 配置大模型 `OpenAI(gpt-3.5-turbo)`\n   - 用户可以直接用自然语言提问，例如“**一共有多少个订单**”，系统会自动转换并执行 SQL 查询。\n\n2. **自然语言到 SQL 的工作原理**\n   - 解释了该查询引擎的核心机制：\n     - 将用户问题、数据库表结构、表描述等信息拼接成 Prompt\n     - 交给大模型生成 SQL 语句\n     - 执行 SQL 后，再对结果进行总结并返回自然语言答案\n   - 本质上是一个 **Text-to-SQL** 的流程。\n\n3. **这种方法的局限性**\n   - 对于小型数据库，这种方式很方便。\n   - 但在大型数据库中，如果把很多表都加入上下文：\n     - Prompt 会变得很长\n     - 可能导致大模型上下文窗口溢出\n     - 影响查询效果和稳定性\n   - 原因在于生成 SQL 时需要把表的 Schema 信息放入 Prompt 中。\n\n4. **基于实时表检索的查询引擎引出**\n   - 文本最后开始引出下一节内容：**基于实时表检索的查询引擎**。\n   - 说明为了应对大型数据库场景，需要更智能地选择相关表，而不是把所有表都塞进上下文。\n\n### 总结\n这一部分主要介绍了：\n- 如何用 `NLSQLTableQueryEngine` 实现自然语言查询数据库；\n- 其背后的 Text-to-SQL 原理；\n- 以及在大规模数据库场景下由于上下文过长而带来的限制；\n- 从而引出后续“实时表检索”方案。"
+            },
+            {
+              "title": "基于实时表检索的查询引擎",
+              "start_index": 292,
+              "end_index": 294,
+              "node_id": "0139",
+              "summary": "本部分主要讲解了在 RAG 引擎中如何构建更高效的基于关系数据库的自然语言查询能力，重点包括：\n\n1. **基于实时表检索的查询引擎**\n   - 说明了直接把所有数据库表的 Schema 信息都塞进 Prompt 的问题。\n   - 指出这种做法会导致上下文窗口溢出、干扰大模型判断、token 成本过高。\n   - 提出更合理的方案：**先根据用户问题检索相关表，再基于这些表的 Schema 做 Text-to-SQL**。\n\n2. **SQLTableRetrieverQueryEngine 的使用**\n   - 介绍了框架中的 `SQLTableRetrieverQueryEngine` 组件。\n   - 通过 `object_index` 参数，在查询时动态检索相关的 `SQLTableSchema` 对象。\n   - 示例展示了如何连接 PostgreSQL 数据库、定义表、构造 `SQLTableNodeMapping`、`SQLTableSchema` 和 `ObjectIndex`，再创建查询引擎。\n\n3. **基于向量检索的表 Schema 选择**\n   - 说明 `ObjectIndex` 底层通过向量存储索引实现语义检索。\n   - 查询时只选择与问题最相关的表，从而减少无关信息输入。\n\n4. **检索结果验证**\n   - 提到可以直接调用 retriever 方法查看检索到的表 Schema。\n   - 通过示例说明，当问题是“所有订单总金额是多少？”时，检索结果会指向 `orders` 表，验证了检索的正确性。\n\n5. **章节过渡到 SQL 检索器**\n   - 最后引出下一节“使用 SQL 检索器”，说明前面的两种方式都是通过上层组件构建数据库查询引擎，后续将进一步介绍更具体的检索方式。"
+            },
+            {
+              "title": "使用 SQL检索器",
+              "start_index": 294,
+              "end_index": 295,
+              "node_id": "0140",
+              "summary": "本部分主要讲解了 RAG 引擎中面向关系数据库的高级查询构造方式，以及多模态文档处理的引入背景。\n\n核心内容包括：\n1. 通过 `ObjectIndex.from_objects` 构造检索对象索引，将 SQL 表结构映射到向量检索索引中，实现语义检索。\n2. 使用 `SQLTableRetrieverQueryEngine` 时，不再直接传入多个 `SQLTableSchema`，而是传入检索器 `obj_index.as_retriever(...)`，并通过示例说明如何根据自然语言问题检索到正确的表（如 `orders` 表）。\n3. 介绍如何先调用 retriever 查看检索到的 Schema 信息，以验证检索结果是否正确。\n4. 进一步说明如何使用 `NLSQLRetriever` 作为 SQL 检索器，并结合 `RetrieverQueryEngine.from_args` 构造标准检索式 SQL 查询引擎，使其输出效果与前面的 SQL 查询引擎一致。\n5. 开始进入“多模态文档处理”章节，指出现实中的文档常包含图片、文本、表格混排等复杂内容，传统文本化处理方式不足，需要借助 PDF 解析工具、多模态大模型和递归检索等技术来处理这类半结构化或非结构化文档。"
+            }
+          ],
+          "node_id": "0137",
+          "summary": "This section introduces SQL query engines for RAG applications, explaining that while earlier query or chat engines mainly retrieve knowledge from semi-structured or unstructured data, enterprise applications often need to query structured data stored in relational databases. It motivates using large models to enable Text-to-SQL so natural language can be converted into SQL queries.\n\nThe document then begins a practical example using a local Postgres database with an orders table containing fields such as order ID, region, customer, product, and price. It shows how to build a simple database query engine and introduces the NLSQLTableQueryEngine component as the most straightforward way to create such an engine."
+        },
+        {
+          "title": "多模态文档处理",
+          "start_index": 295,
+          "end_index": 295,
+          "nodes": [
+            {
+              "title": "多模态文档处理架构",
+              "start_index": 295,
+              "end_index": 297,
+              "node_id": "0142",
+              "summary": "This partial document mainly covers advanced RAG engine development in LlamaIndex, focusing on two topics:\n\n1. **Building a SQL query engine with a retriever**\n   - Shows how to use `NLSQLRetriever` instead of a dedicated SQL query engine.\n   - Demonstrates wrapping the SQL retriever with `RetrieverQueryEngine`.\n   - Notes that the output should match the earlier SQL query engine example.\n\n2. **Multimodal document processing**\n   - Explains why complex documents like PDFs containing text, tables, and images require special handling beyond normal text chunking and embedding.\n   - Presents a general multimodal processing architecture:\n     - Extract text, tables, and images separately from PDFs.\n     - Use different indexing and retrieval strategies for each content type.\n     - Use recursive retrieval to fetch original tables or images after retrieving summaries.\n     - Generate final answers with an LLM, or a multimodal model if images are involved.\n   - Introduces key technologies used in this workflow:\n     - **Document parsing/extraction tools** such as LlamaParse, Unstructured, and Open-Parse.\n     - **Multimodal vision models** such as Qwen-VL, GPT-4V, and LLaVA, often combined with OCR.\n     - **Recursive retrieval** using `IndexNode` in LlamaIndex.\n   - Begins a subsection on using **LlamaParse** to parse complex documents, especially PDFs."
+            },
+            {
+              "title": "使用 LlamaParse 解析文档",
+              "start_index": 297,
+              "end_index": 303,
+              "node_id": "0143",
+              "summary": "This partial document explains advanced RAG document processing for complex PDFs, focusing on tools and methods for better parsing and retrieval. It introduces several document parsing options, including LlamaParse, Unstructured, and Open-Parse, and also discusses using multimodal vision models and OCR for extracting text from images. The main section then demonstrates how to use LlamaParse in practice: obtaining an API key, installing the SDK, parsing a Chinese PDF financial report into Markdown-formatted Document objects, and integrating the parsed output into a standard LlamaIndex workflow with node splitting, vector indexing, and query engines. It shows that while simple text queries can work well, factual questions about table data may fail because the retrieved context does not include the correct table information. This leads to the conclusion that complex PDF tables need semantic enhancement and more careful retrieval, motivating the table-processing techniques introduced next."
+            },
+            {
+              "title": "多模态文档中的表格处理",
+              "start_index": 303,
+              "end_index": 306,
+              "node_id": "0144",
+              "summary": "This section explains why simple PDF parsing can fail on complex documents, especially when table information is not accurately retrieved, leading to wrong factual answers. It then introduces a better table-handling approach in RAG using LlamaIndex’s MarkdownElementNodeParser, which enhances table semantics by generating summaries, titles, and descriptions for tables with an LLM, converting them into IndexNodes linked to the original table nodes. The document outlines the workflow: parse PDF into nodes, specially process table nodes, separate base text nodes and index nodes, build a vector index, and recursively retrieve table content during querying. It shows that this method improves retrieval precision and answer quality for financial table questions. Finally, it begins a new topic on basic applications of multimodal large models, introducing Qwen-VL for image understanding, OCR, and visual reasoning, and starts with the task of converting images into natural language text."
+            },
+            {
+              "title": "多模态大模型的基础应用",
+              "start_index": 306,
+              "end_index": 311,
+              "node_id": "0145",
+              "summary": "本部分主要介绍了 RAG 引擎中与多模态能力相关的高级开发内容，重点包括图片理解、结构化信息抽取以及图片向量化检索三方面。\n\n首先，文中提到在表格解析过程中，系统会借助大模型生成表格摘要，并将其作为 IndexNode 中的辅助信息。这些摘要虽然不是原始文档内容，但能在检索阶段帮助更准确地召回表格所在节点，在生成阶段也能帮助模型更好理解表格，从而提升回答准确率。\n\n接着，章节进入“多模态大模型的基础应用”，以阿里巴巴的 Qwen-VL 为例，说明如何处理图片：\n1. **从图片到自然语言文本**：通过 LlamaIndex 对 Qwen-VL 的封装，可以输入本地图片或网络图片，让模型输出图片内容描述。示例代码展示了如何配置 API Key、加载图片、构造多模态对话并获取结果，强调了模型在 OCR 和视觉理解方面的能力。\n2. **从图片到结构化对象**：除了生成自然语言描述，还可以让模型按指定格式输出结构化结果。文中通过定义一个 `Phone` 的 Pydantic 对象，并结合 `MultiModalLLMCompletionProgram` 和输出解析器，让模型把图片内容转换为结构化 Python 对象，便于后续程序处理。\n3. **直接嵌入图片**：介绍了使用 Chroma 向量库和 OpenCLIP 多模态嵌入函数，将图片直接映射到向量空间，实现图片检索。示例展示了如何创建多模态 collection、批量添加图片并通过文本查询检索相关图片，为构建图片搜索和多模态问答系统提供基础。\n\n整体来看，这一部分围绕“图片如何被大模型理解、结构化和检索”展开，展示了多模态大模型与向量数据库结合在 RAG 系统中的实际应用方式。"
+            },
+            {
+              "title": "多模态文档中的图片处理",
+              "start_index": 312,
+              "end_index": 317,
+              "node_id": "0146",
+              "summary": "本部分主要介绍了如何构建一个支持多模态文档查询的 RAG 引擎，重点是处理 PDF 中的图片信息并将其纳入检索流程。核心思路是：先用 LlamaParse 深度解析 PDF，提取文本和图片；再用 Qwen-VL 这类多模态大模型对图片进行理解和文字描述；最后把文本和图片生成的描述都转换为 Node，统一进行向量嵌入、索引和查询。\n\n主要内容包括：\n- 使用 LlamaParse 将 PDF 解析为 JSON 结构，并提取页面文本与图片。\n- 将 PDF 中的文本构造成 TextNode，作为检索索引的一部分。\n- 将提取出的图片保存到本地后，调用多模态大模型生成图片描述文本，再构造成 TextNode。\n- 将文本节点和图片描述节点一起放入 VectorStoreIndex，构建查询引擎。\n- 通过测试查询验证：系统可以对文档中的图片内容进行问答，检索到的上下文来自图片的文字描述。\n- 最后指出，这种方法还可以进一步扩展到表格等更多文档形态，以支持更完整的多模态 RAG 能力。\n\n此外，文末还引出了下一节内容：查询管道（Query Pipeline）与基于 Graph 的 RAG 工作流编排。"
+            }
+          ],
+          "node_id": "0141",
+          "summary": "This section explains how to build a SQL query engine using `NLSQLRetriever` together with `RetrieverQueryEngine`, showing that it can produce the same result as the standard SQL query engine. It then introduces multimodal document processing, focusing on the challenges of handling complex documents such as PDFs that mix images, text, and tables. The text outlines why these documents require special parsing, splitting, and vectorization methods, and begins describing a general architecture for multimodal PDF processing that may involve third-party PDF parsers, multimodal large models, and recursive retrieval techniques."
+        },
+        {
+          "title": "查询管道：编排基于 Graph的RAG工作流",
+          "start_index": 317,
+          "end_index": 318,
+          "nodes": [
+            {
+              "title": "理解查询管道",
+              "start_index": 318,
+              "end_index": 319,
+              "node_id": "0148",
+              "summary": "本部分主要介绍了 LlamaIndex 中的查询管道（Query Pipeline）概念及其在 RAG 工作流编排中的作用。内容说明了查询管道是一种声明式 API，可以将大模型、Prompt 模板、检索器、合成器等模块以图结构方式连接起来，构建从简单链式流程到复杂 DAG 的查询引擎工作流。文中还解释了图、节点、边、有向无环图等基本概念，并强调这种可视化编排方式的优势，包括减少代码量、提升可读性以及便于与低代码/无代码方案集成。最后，部分内容开始引出查询管道的两种使用方式，尤其是简单顺序链的构造方式。"
+            },
+            {
+              "title": "查询管道支持的两种使用方式",
+              "start_index": 319,
+              "end_index": 322,
+              "node_id": "0149",
+              "summary": "This partial document explains how LlamaIndex’s QueryPipeline is used to build modular RAG workflows, especially for enterprise-level LLM applications. It first introduces the idea of representing a RAG application as a graph of nodes and edges, where each module handles a specific step and connections define data flow. The text emphasizes that this modular, flexible orchestration is needed because modern RAG systems are no longer simple sequential pipelines; they often require query transformation, routing, retrieval, reranking, and different response-generation strategies.\n\nIt then describes two usage patterns supported by QueryPipeline:\n\n1. Simple sequential chain: modules are connected in a linear order, where each module’s output becomes the next module’s input. An example shows a prompt template feeding into an LLM.\n2. DAG-based workflow: for more complex RAG applications, modules can be arranged into a directed acyclic graph. An example builds a query engine using components such as input, prompt template, LLM, retriever, and summarizer, connected through add_modules and add_link.\n\nFinally, the document begins to explain the internal principle of QueryPipeline, describing it as a declarative orchestration layer that coordinates components rather than performing the actual processing itself, acting like a “conductor” that manages how modules interact and execute."
+            },
+            {
+              "title": "深入理解查询管道的内部原理",
+              "start_index": 322,
+              "end_index": 324,
+              "node_id": "0150",
+              "summary": "这部分内容主要讲解了 LlamaIndex 中“查询管道（Query Pipeline）”的高级开发原理与自定义扩展方法。\n\n核心内容包括：\n\n1. **查询管道的工作机制**\n   - 查询管道本质上是一个声明式的编排 API，本身不直接执行具体业务逻辑，而是像“指挥家”一样协调各个组件按预设工作流运行。\n   - 管道中的组件会被统一转换为 `QueryComponent` 类型，并通过统一的 `run_component` 接口执行。\n   - 查询管道内部会维护一个 **DAG（有向无环图）**，用来保存组件节点及其连接关系，并根据这张图来驱动整个查询流程。\n   - 底层使用了 **NetworkX** 来支持图结构的构建与操作。\n   - 查询管道本身也可以作为 `QueryComponent` 被嵌套到其他查询管道中，实现更复杂的组合式工作流。\n\n2. **查询管道的运行流程**\n   - 在编排阶段，开发者将不同功能组件加入管道，这些组件会被转换为统一类型并记录到 DAG 中。\n   - 在运行阶段，管道根据 DAG 找到入口节点，按连接关系自动执行各节点，直到到达末节点或发生异常。\n   - 这种设计使查询管道具备很强的灵活性，适合构建模块化、复杂的 RAG 工作流。\n\n3. **可插入查询管道的组件类型**\n   - 文中列出了可用于查询管道的基础组件类型及其输入输出，例如：\n     - `LLM`\n     - `PromptTemplate`\n     - `BaseQueryTransform`\n     - `BaseRetriever`\n     - `BaseNodePostprocessor`\n     - `BaseSynthesizer`\n     - `BaseOutputParser`\n     - `BaseQueryEngine`\n     - `QueryComponent`\n   - 这些组件覆盖了 RAG 应用的多个阶段。\n   - 还特别说明：没有单独的路由组件，因为路由功能已集成在检索器或查询引擎中。\n\n4. **自定义查询组件的实现方式**\n   - 如果内置组件不能满足需求，可以自定义查询组件并插入查询管道。\n   - LlamaIndex 提供两种方式：\n     - 继承 `CustomQueryComponent` 来实现自定义组件；\n     - 使用 `FnComponent` 直接构造组件。\n   - 对于继承方式，文中开始介绍必须实现的接口，包括：\n     - `_input_keys`：定义输入参数；\n     - `_output_keys`：定义输出参数；\n   - 这部分为后续实现自定义查询组件打下基础。"
+            },
+            {
+              "title": "实现并插入自定义的查询组件",
+              "start_index": 324,
+              "end_index": 329,
+              "node_id": "0151",
+              "summary": "这一部分主要讲解了 LlamaIndex 中查询管道（Query Pipeline）的高级扩展方式，重点包括：\n\n1. **查询管道中的基础组件类型**\n   - 列出了 RAG 查询流程中常见的组件及其输入输出关系，如 LLM、PromptTemplate、Retriever、NodePostprocessor、Synthesizer、OutputParser、QueryEngine、QueryComponent 等。\n   - 说明了这些组件在查询链路中的作用，以及它们各自处理的数据类型。\n   - 特别指出：**没有单独的路由组件**，因为路由功能通常已经集成在检索器或查询引擎中。\n\n2. **自定义查询组件的实现方法**\n   - 介绍了当现有组件无法满足需求时，如何开发自定义查询组件并插入查询管道。\n   - 提供了两种方式：\n     - 继承 `CustomQueryComponent`\n     - 使用 `FnComponent` 快速包装函数\n\n3. **继承 `CustomQueryComponent` 的实现细节**\n   - 需要实现三个核心接口：\n     - `_input_keys`：定义输入参数名\n     - `_output_keys`：定义输出参数名\n     - `_run_component`：定义组件的核心运行逻辑\n   - 还提到可选的 `_validate_component_inputs` 用于输入校验。\n   - 通过一个实际例子展示了如何实现自定义 `output_parser`：\n     - 将模型输出结构化为 `Phone` 类型\n     - 使用 `LLMTextCompletionProgram` 辅助完成结构化抽取\n   - 说明了如何把这个自定义组件加入 `QueryPipeline`，并通过 `add_link` 与上游模块连接起来。\n\n4. **在查询管道中插入自定义组件**\n   - 演示了如何将自定义 `output_parser` 模块加入已有 DAG 查询管道。\n   - 强调新增组件后必须正确配置连接关系，否则无法参与流程运行。\n   - 通过运行示例说明该组件会接收上游 `summarizer` 的输出，并最终生成结构化的 `Phone` 结果。\n\n5. **使用 `FnComponent` 构造轻量级组件**\n   - 介绍了另一种更简洁的方式：把普通函数包装成查询组件。\n   - 示例中定义了 `addExtaInfo(phone)` 函数，用于给结构化手机信息补充额外描述并输出字符串。\n   - 通过 `FnComponent(fn=..., output_key=...)` 将函数快速变成管道中的一个后处理组件。\n   - 这种方式适合逻辑简单、快速集成的场景。\n\n总体来说，这一部分围绕 **RAG 引擎中查询管道的组件化设计、自定义扩展机制，以及如何通过自定义组件和函数组件增强查询结果处理能力** 展开。"
+            }
+          ],
+          "node_id": "0147",
+          "summary": "这部分主要介绍了如何通过多模态大模型处理 PDF 文档中的图片内容，并结合 Langfuse 观察答案生成过程与引用上下文，从而实现对文档图片的问答查询；同时引出并重点讲解了 LlamaIndex 中的“查询管道（Query Pipeline）”概念。文中说明查询管道是一种声明式 API，可将大模型、Prompt 模板、检索器、合成器等组件以图（Graph）的方式连接起来，构建从简单链式流程到复杂 DAG 的 RAG 工作流。最后还解释了图和有向无环图的基本概念，并强调这种可视化编排方式的优势，包括减少代码量、提升可读性，以及更方便与低代码/无代码平台集成。"
+        }
+      ],
+      "node_id": "0120",
+      "summary": "这部分内容主要介绍了第8章“RAG引擎高级开发”的主题背景与核心方向，强调随着RAG在实际生产中的不断演进，出现了更多组件、算法和优化范式，使RAG系统具备更强的适应能力和生成能力。本章重点聚焦模块化RAG时代的高级开发阶段与相关技术应用。\n\n其中，8.1节详细讲解了“检索前查询转换”，也称查询重写、查询分析等，说明它是大模型应用中的重要前置步骤，目的是将用户输入的问题转换为更适合检索和生成的形式。文中列举了几种常见方式：将问题改写为更利于嵌入检索的表达、对问题进行语义扩展、将复杂问题拆分为多个子问题，以及将问题分解为可多步完成的子查询。最后通过一个问答/搜索场景说明，单一问题往往不能充分表达用户意图，因此需要查询转换来提升检索覆盖度和答案质量。"
+    },
+    {
+      "title": "开发 Data Agent",
+      "start_index": 330,
+      "end_index": 330,
+      "nodes": [
+        {
+          "title": "初步认识 Data Agent",
+          "start_index": 331,
+          "end_index": 332,
+          "node_id": "0153",
+          "summary": "This partial document introduces Data Agent in the context of RAG-based enterprise LLM applications. It explains that, compared with standard RAG systems focused on data retrieval and question answering, Data Agent adds self-planning, reasoning, tool use, and the ability to perform more complex data read/write operations. The text highlights the main capabilities of Data Agent, including task-step planning, external API/tool invocation, and memory support.\n\nIt then describes the key enhancements over RAG: an Agent component for iterative reasoning and planning, and Tool-related components for defining and using tools. The document mentions the ReAct reasoning-action paradigm and explains how LlamaIndex supports different Agent types such as OpenAIAgent and ReActAgent, along with tool abstractions like FunctionTool, BaseTool, ToolMetadata, QueryEngineTool, SlackToolSpec, and external tools from LlamaHub.\n\nFinally, the section begins introducing how to construct and use Agent tools, noting that tools can wrap local custom functions or query engines so they can be called by an Agent according to its invocation protocol."
+        },
+        {
+          "title": "构造与使用 Agent的工具",
+          "start_index": 332,
+          "end_index": 333,
+          "nodes": [
+            {
+              "title": "深入了解工具类型",
+              "start_index": 333,
+              "end_index": 334,
+              "node_id": "0155",
+              "summary": "本部分主要介绍了 LlamaIndex 中用于 Agent 的“工具（Tool）”机制及其类型，重点包括：\n\n- **工具的基础抽象 BaseTool**\n  - 说明了工具必须具备的核心属性与接口，尤其是：\n    - `metadata`：包含工具名称、描述、接口规范、是否直接返回等信息，用于帮助大模型理解工具用途并选择合适工具。\n    - `call()`：工具执行的核心调用接口。\n\n- **LlamaIndex 支持的主要工具类型**\n  - **FunctionTool**：将本地函数直接封装为工具，最简单且灵活，适合实现无状态逻辑。\n  - **QueryEngineTool**：将已构建好的查询引擎封装成工具，供 Agent 调用。\n  - **RetrieverTool**：将检索器封装为工具，可结合节点后处理器，根据输入检索相关节点并输出内容。\n  - **QueryPlanTool**：基于查询引擎和执行计划完成任务并输出结果。\n  - **OnDemandLoaderTool**：按需加载文档、构建索引，并根据问题进行查询。\n\n- **函数工具的使用示例**\n  - 展示了如何用 `FunctionTool.from_defaults()` 将一个简单的加法函数 `add(a, b)` 转换为工具。\n  - 还演示了通过 `tool_add.call(a=1, b=3)` 直接调用工具，并返回 `ToolOutput` 类型结果。\n\n整体来看，这一部分主要是在讲：**如何把函数、检索器、查询引擎等能力封装成 Agent 可调用的工具，以及工具元数据和调用接口在其中的重要作用。**"
+            },
+            {
+              "title": "函数工具",
+              "start_index": 334,
+              "end_index": 335,
+              "node_id": "0156",
+              "summary": "本部分主要介绍了 LlamaIndex 中用于构建 Data Agent 的几类工具及其使用方式，重点包括：\n\n1. **工具类型概览**\n   - 介绍了几种常见工具：**FunctionTool、QueryEngineTool、RetrieverTool、QueryPlanTool、OnDemandLoaderTool**。\n   - 分别说明了它们的用途，例如函数封装、查询引擎发布为工具、检索器封装、查询计划执行、按需加载数据并查询等。\n\n2. **函数工具（FunctionTool）**\n   - 说明函数工具是最简单但最灵活的工具类型，可将任意无状态逻辑封装成工具。\n   - 通过一个加法函数示例展示了如何用 `FunctionTool.from_defaults()` 创建工具。\n   - 演示了工具调用方式以及返回结果 `ToolOutput` 的结构。\n   - 解释了 `ToolOutput` 中包含的关键信息，如 `content`、`tool_name`、`raw_input`、`raw_output`、`is_error` 等。\n   - 总结了函数工具的本质：把自定义函数打包成 Tool 对象，并以标准形式输出结果。\n\n3. **查询引擎工具（QueryEngineTool）**\n   - 通过已有的查询引擎构造工具，并将其用于 Agent 中。\n   - 给出了基于索引创建查询引擎，再用 `QueryEngineTool.from_defaults()` 封装成工具的示例。\n   - 展示了如何调用该工具进行问题查询。\n   - 进一步指出 **Agent 本身也可以作为查询引擎**，因此也能被包装成工具供其他 Agent 调用，实现 Agent 之间的互相协作。"
+            },
+            {
+              "title": "查询引擎工具",
+              "start_index": 335,
+              "end_index": 335,
+              "node_id": "0157",
+              "summary": "该部分主要介绍了 LlamaIndex 中工具（Tool）的输出形式与查询引擎工具的使用方法，重点包括：\n\n1. **函数工具的输出结构**\n   - 工具调用后返回的是 **ToolOutput** 类型。\n   - 输出对象包含多个字段：\n     - `content`：函数调用返回的主要内容\n     - `tool_name`：工具名称\n     - `raw_input`：工具输入参数\n     - `raw_output`：工具输出结果\n   - 说明函数工具本质上是将自定义函数封装成 Tool 对象，并在调用时把请求转换为函数调用，再以标准化的 ToolOutput 形式返回结果。\n\n2. **查询引擎工具（QueryEngineTool）**\n   - 通过一个已有的查询引擎示例，演示如何构造查询引擎工具。\n   - 使用 `QueryEngineTool.from_defaults()` 将查询引擎包装成工具，并设置：\n     - `name`：工具名称\n     - `description`：工具用途说明\n     - `return_direct`：是否直接返回结果\n   - 示例中构造了一个用于“小麦手机信息查询”的工具，并通过查询问题测试其调用效果。\n\n3. **Agent 也可作为工具**\n   - 文中指出，LlamaIndex 中的 **Agent 本身也继承自 QueryEngine 组件**。\n   - 因此 Agent 也可以被包装成工具，供其他 Agent 调用。\n   - 这意味着可以实现 **Agent 之间的互相调用与协作**。"
+            },
+            {
+              "title": "检索工具",
+              "start_index": 336,
+              "end_index": 337,
+              "node_id": "0158",
+              "summary": "本部分主要介绍了 Data Agent 开发中的两类工具：**检索工具**和**查询计划工具**。\n\n- **检索工具**：说明在什么场景下需要把检索器封装成工具使用，尤其是配合“带路由功能的检索器”或简单 Agent 时，让大模型根据问题选择合适的检索器。文中给出了将 `retriever` 包装成 `RetrieverTool` 的示例，并展示工具调用后返回检索结果的内容。\n\n- **查询计划工具**：介绍一种更高层的工具，它可以接收多个子工具，并按照预先给定的**执行计划**来完成任务。该工具既可以让大模型生成计划后执行，也可以由开发者手动设计复杂计划以减少不确定性。文中通过两个查询引擎工具构造查询计划工具的示例，说明如何按计划调用多个子工具完成查询。"
+            },
+            {
+              "title": "查询计划工具",
+              "start_index": 337,
+              "end_index": 339,
+              "node_id": "0159",
+              "summary": "该部分主要介绍了两类面向 Data Agent 的高级工具能力：\n\n1. **查询计划工具（Query Plan Tool）**\n   - 它是建立在其他查询工具之上的上层调度工具。\n   - 输入的是一组子工具和一个**执行计划**，执行计划定义了任务的调用顺序及依赖关系。\n   - 该工具可以配合大模型，让 Agent 先生成计划再执行；也可以由人工预先设计复杂计划，以减少大模型在多工具间自主规划带来的不确定性。\n   - 文中通过示例展示了如何构造两个子查询工具（分别查询不同型号手机信息），再创建一个包含多个节点的执行计划，按顺序完成“查询 A、查询 B、最后对比”的任务。\n\n2. **按需加载工具（On-demand Loading Tool）**\n   - 这种工具会在被调用时，自动完成从数据加载、构建索引、构建查询引擎到查询输出的完整流程。\n   - 它适用于少量、临时、需要即时加载的数据场景。\n   - 同时指出其局限：如果实时加载和索引的数据量过大，会导致响应延迟明显。\n   - 文中以从 Web 网页按需加载数据为例，说明其基本使用思路。"
+            },
+            {
+              "title": "按需加载工具",
+              "start_index": 339,
+              "end_index": 340,
+              "node_id": "0160",
+              "summary": "本部分主要介绍了 RAG/Agent 开发中的两项能力：\n\n1. **按需加载工具（OnDemandLoaderTool）**\n   - 说明了按需加载工具的工作方式：在调用时自动读取数据、构建索引、生成查询引擎并返回查询结果。\n   - 强调了它适用于**少量、临时按需加载**的数据场景，因为实时构建查询引擎会带来较高延迟。\n   - 通过一个从 Web 网页加载数据的示例，展示了如何自定义网页解析器、创建数据加载器，并用 `OnDemandLoaderTool.from_defaults` 构造工具。\n   - 说明调用该工具时需要同时提供**数据源 URL** 和 **查询问题**。\n\n2. **基于函数调用功能直接开发 Agent**\n   - 介绍了大模型的 **Function Calling** 能力，即模型可根据输入判断是否需要调用函数，并返回函数名和参数等调用信息。\n   - 指出可以把函数视为工具，从而利用模型自身的函数调用能力直接构建简单 Agent。\n   - 提到将使用 OpenAI 的函数调用能力来实现一个基础 Agent，为后续示例做铺垫。"
+            }
+          ],
+          "node_id": "0154",
+          "summary": "本部分主要介绍了第 9 章中 Data Agent 的基础组件，重点围绕 Agent 类型与工具体系展开。内容包括当前框架支持的两类 Agent：OpenAIAgent 和 ReActAgent；以及多种与工具相关的组件，如 FunctionTool、BaseTool、ToolMetadata、QueryEngineTool、SlackToolSpec 和工具库等。\n\n随后，文档说明了 Agent 可使用的工具来源，涵盖本地函数、查询引擎、查询管道、检索器、其他 Agent、企业内部接口和第三方 API，并强调 LlamaIndex 提供了将这些组件“工具化”的能力。\n\n最后，部分内容深入介绍了工具的基础抽象 BaseTool，重点解释了 metadata 和 call() 两个核心要素：metadata 用于描述工具名称、功能和接口规范，帮助大模型理解和选择工具；call() 则是工具执行的核心接口。"
+        },
+        {
+          "title": "基于函数调用功能直接开发 Agent",
+          "start_index": 340,
+          "end_index": 344,
+          "node_id": "0161",
+          "summary": "本部分主要介绍了如何开发 Data Agent，重点包括以下内容：\n\n1. **按需加载工具的构造与使用**\n   - 通过 `BeautifulSoupWebReader` 构造网页数据加载器。\n   - 使用 `OnDemandLoaderTool.from_defaults` 将数据加载器封装成按需加载工具。\n   - 演示了调用工具时需要同时传入数据源 URL 和查询问题。\n\n2. **基于函数调用（Function Calling）直接开发 Agent**\n   - 说明大模型可以根据输入自动判断是否需要调用函数，并返回函数调用信息。\n   - 介绍了利用这一能力直接构建简单 Agent 的思路，无需额外复杂组件。\n\n3. **准备示例工具**\n   - 定义了三个模拟工具：\n     - 查询天气\n     - 发送邮件\n     - 查询客户信息\n   - 并将这些函数封装为 `FunctionTool` 供 Agent 使用。\n\n4. **实现一个基于 OpenAI 函数调用的 Agent**\n   - 通过自定义 `MyOpenAIAgent` 类实现 Agent。\n   - Agent 会接收用户输入、传入工具列表给大模型、解析模型返回的 tool calls，并执行对应函数。\n   - 执行工具后再将结果交给模型生成最终回复。\n\n5. **Agent 的连续对话能力**\n   - 展示了如何通过循环输入实现与 Agent 的持续交互。\n   - 说明 Agent 能根据上下文和工具输出完成任务。\n\n6. **引出框架化 Agent 开发**\n   - 进一步说明可以使用 LlamaIndex 等框架组件快速封装 Agent。\n   - 提到框架中的两类 Agent：基于函数调用的 `OpenAIAgent` 和基于 ReAct 推理范式的 `ReActAgent`。"
+        },
+        {
+          "title": "用框架组件开发 Agent",
+          "start_index": 344,
+          "end_index": 344,
+          "nodes": [
+            {
+              "title": "使用 OpenAIAgent",
+              "start_index": 344,
+              "end_index": 345,
+              "node_id": "0163",
+              "summary": "这一部分主要讲的是 **如何开发 Data Agent，以及如何用 LlamaIndex 框架中的 Agent 组件来简化开发**。核心内容包括：\n\n1. **Agent 工具调用效果验证**\n   - 通过一个循环输入的测试代码，展示 Agent 接收用户消息、调用工具并返回结果的过程。\n   - 说明 Agent 能够正确推理是否需要使用工具，并成功执行工具调用，最终输出与工具结果一致。\n\n2. **使用框架组件开发 Agent**\n   - 介绍了 LlamaIndex 中封装好的 Agent 组件，可以把工具和大模型快速组合成可调用的 Agent。\n   - 说明框架中的 Agent 主要分为两类：\n     - **OpenAIAgent**：基于函数调用能力，适用于支持 function calling 的模型。\n     - **ReActAgent**：基于 ReAct 推理范式，适用于不支持函数调用的模型。\n\n3. **OpenAIAgent 的使用**\n   - 对比了前面直接使用 OpenAI API 开发 Agent 的方式，指出使用 LlamaIndex 的 OpenAIAgent 后代码会更简洁。\n   - 给出了创建 OpenAIAgent 的示例代码，使用 `from_tools` 将多个工具和 LLM 绑定起来。\n   - 提到可以通过 `verbose=True` 查看 Agent 内部执行过程，包括是否调用工具、工具输入输出以及最终回答。\n\n4. **ReActAgent 的引入**\n   - 说明如果模型不支持函数调用，就可以使用基于 ReAct 推理机制的 Agent 来实现类似能力。\n   - 这一部分为后续使用不同类型 Agent 开发应用做铺垫。"
+            },
+            {
+              "title": "使用 ReActAgent",
+              "start_index": 345,
+              "end_index": 347,
+              "node_id": "0164",
+              "summary": "这部分主要介绍了在 LlamaIndex 中开发 Data Agent 的几种方式及其区别：\n\n1. **使用 OpenAIAgent 开发 Agent**\n   - 通过框架封装的 `OpenAIAgent` 可以很简洁地创建 Agent。\n   - 结合 `verbose=True` 可以查看 Agent 的内部执行跟踪信息，包括是否调用工具、工具输入输出以及最终回答。\n   - 这种方式与直接使用函数调用开发 Agent 的效果一致，但代码更简洁。\n\n2. **使用 ReActAgent 开发 Agent**\n   - 当大模型不支持函数调用时，可以使用基于 **ReAct 推理范式** 的 `ReActAgent`。\n   - ReAct 结合了思维链（CoT）和行动规划，让模型通过“思考—行动—观察”的循环来决定是否调用工具并逐步完成任务。\n   - 文中给出了 ReActAgent 的基本代码写法，并说明其推理过程与 OpenAIAgent 不同，依赖提示模板而非原生函数调用能力。\n\n3. **ReAct 推理模板与执行流程**\n   - 介绍了 ReActAgent 所依赖的 Prompt 模板结构，包括：\n     - 工具列表\n     - 思考（Thought）\n     - 行动（Action）\n     - 行动输入（Action Input）\n     - 观察（Observation）\n   - 模型会按照这个格式循环执行，直到完成任务并输出结果。\n\n4. **使用底层 API 开发 Agent**\n   - 说明 LlamaIndex 中 Agent 的基础架构由 `AgentRunner` 和 `AgentWorker` 组成。\n   - `AgentRunner` 负责整体协调、任务管理、状态保存和结果聚合。\n   - `AgentWorker` 负责具体执行每一步任务，但不保存状态。\n   - 这一部分为后续更底层、更灵活的 Agent 开发方式做铺垫。"
+            },
+            {
+              "title": "使用底层 API开发 Agent",
+              "start_index": 347,
+              "end_index": 349,
+              "node_id": "0165",
+              "summary": "该部分主要讲解了如何基于 LlamaIndex 开发 Data Agent，重点包括：\n\n1. **通过 Prompt 模板驱动 Agent 推理流程**  \n   介绍了让大模型按照“思考—行动—观察”的方式逐步规划并执行任务的提示模板，使其能够通过调用工具完成问题回答。\n\n2. **使用底层 API 开发 Agent**  \n   说明了 LlamaIndex 中 Agent 的核心结构：  \n   - **AgentRunner**：顶层协调器，负责任务构造、状态保存、步骤调度与结果聚合。  \n   - **AgentWorker**：真正执行每一步任务的工作器，不保存状态，只负责执行。  \n   并展示了如何组合这两个组件构建一个 OpenAI Agent。\n\n3. **开发带工具检索能力的 Agent**  \n   讨论了当工具集过大时可能导致推理错误的问题，因此引入**工具检索**机制：  \n   - 先对工具构建对象索引（ObjectIndex）  \n   - 再在运行时根据任务语义检索相关工具  \n   这样可以缩小候选工具范围，降低复杂度和不确定性。\n\n4. **工具检索的实际应用示例**  \n   通过“天气查询、邮件发送、客户信息查询”等工具示例，说明如何把工具检索器传给 Agent，而不是直接传入全部工具，从而实现更智能、更稳健的工具选择。"
+            },
+            {
+              "title": "开发带有工具检索功能的 Agent",
+              "start_index": 349,
+              "end_index": 350,
+              "node_id": "0166",
+              "summary": "本部分主要讲解了如何为 Agent 增加“工具检索”能力，以提升工具选择的准确性和稳定性。核心观点是：当 Agent 可用工具过多时，容易出现推理复杂、工具选择错误甚至调用混乱的问题，因此可以先根据任务语义对工具进行检索和过滤，再让 Agent 在候选工具中选择，从而缩小工具范围、降低推理难度。\n\n文中以 LlamaIndex 为例，介绍了通过 ObjectIndex 为工具对象建立索引，并在运行时使用 tool_retriever 动态检索相关工具的实现方式。示例中准备了天气查询、发送邮件、客户信息查询三个工具，先构建对象索引，再将工具检索器传给 OpenAIAgent，而不是直接传入全部工具。随后通过 agent_worker.get_tools() 测试检索效果，展示了不同输入任务会检索出不同的相关工具，例如“发送电子邮件”会优先检索到 send_email，“查询北京明天的天气”会优先检索到 search_weather，说明工具检索机制有效。\n\n最后还通过实际调用 Agent 查询客户信息的例子，验证了 Agent 能够正确检索并调用 query_customer 工具完成任务。文末开始引出下一节“带有上下文检索功能的 Agent”，说明在工具数量不多但工具使用仍需进一步优化的场景下，还可以继续通过上下文检索增强 Agent 能力。"
+            },
+            {
+              "title": "开发带有上下文检索功能的 Agent",
+              "start_index": 350,
+              "end_index": 352,
+              "node_id": "0167",
+              "summary": "本部分主要讲解了如何开发和优化 Data Agent，重点包括两类增强能力：\n\n1. **基于工具检索的 Agent**\n   - 通过对象索引对多个工具进行检索，帮助 Agent 从候选工具中筛选出更合适的工具。\n   - 说明了工具检索的实际效果：当输入不同任务时，检索结果会变化，Agent 能据此选择正确工具并完成调用。\n   - 通过示例展示了 Agent 成功调用 `query_customer` 等工具完成查询任务。\n\n2. **带有上下文检索功能的 Agent**\n   - 针对工具数量不多但功能相似、仅靠工具描述难以区分的场景，引入独立的上下文检索器。\n   - 上下文检索器用于提供与用户问题相关的补充知识，帮助大模型更准确理解输入并选择正确工具。\n   - 示例中通过财务缩写解释的上下文，辅助 Agent 正确识别问题含义并完成工具调用。\n\n3. **更细粒度控制 Agent 运行的引入**\n   - 指出虽然 Agent 能快速完成复杂查询，但由于封装较高，运行过程透明度和可控性不足。\n   - 提出需要像“分步调试”一样更细粒度地观察、纠正和介入 Agent 的执行过程，为后续内容铺垫。"
+            }
+          ],
+          "node_id": "0162",
+          "summary": "本部分主要介绍了在第9章“开发 Data Agent”中，如何通过代码循环接收用户输入并调用 agent.chat() 实现交互式对话，以及通过输出结果验证 Agent 已正确完成工具调用与推理任务。随后进入“用框架组件开发Agent”的内容，说明可以利用 LlamaIndex 封装好的 Agent 组件快速构建可调用的智能体，并指出其主要分为两类：基于函数调用能力的 OpenAIAgent，以及基于 ReAct 推理范式的 ReActAgent。最后开始引出 9.4.1“小节：使用 OpenAIAgent”，承接前文原生 OpenAI API 开发 Agent 的方式，准备进一步说明如何借助 LlamaIndex 框架来实现。"
+        },
+        {
+          "title": "更细粒度地控制 Agent的运行",
+          "start_index": 352,
+          "end_index": 353,
+          "nodes": [
+            {
+              "title": "分步可控地运行 Agent",
+              "start_index": 353,
+              "end_index": 355,
+              "node_id": "0169",
+              "summary": "This partial document explains how to control and inspect the execution of an Agent in a step-by-step way, and how to add human intervention during execution.\n\nMain points covered:\n- **Step-by-step Agent execution**\n  - The Agent’s internal workflow is coordinated by **AgentRunner** and **AgentWorker**.\n  - `AgentRunner` creates a task and repeatedly calls `run_step`.\n  - `AgentWorker` performs each step and signals completion with `is_last=True`.\n  - Example code shows how to:\n    - create a task with `agent.create_task(...)`\n    - repeatedly call `agent.run_step(task.task_id)` until `is_last` becomes `True`\n    - call `agent.finalize_response(task.task_id)` to get the final answer\n\n- **Observing the Agent’s internal reasoning**\n  - The text describes the execution trace:\n    1. The worker decides to use a tool.\n    2. The tool is called and returns output.\n    3. The worker determines it can answer the question.\n    4. The runner stops when `is_last=True` and finalizes the response.\n  - It also mentions a method `get_completed_steps(task.task_id)` to inspect all completed steps in detail.\n\n- **Adding human interaction during Agent execution**\n  - The document introduces the idea of inserting human control into the Agent’s running process.\n  - It gives an example of building multiple **city information query tools** and using them to create an Agent.\n  - The Agent is constructed with `OpenAIAgentWorker.from_tools(...)` and wrapped by `AgentRunner`.\n  - This section sets up the mechanism for human-in-the-loop control, where a person can guide or modify steps during execution."
+            },
+            {
+              "title": "在 Agent运行中增加人类交互",
+              "start_index": 355,
+              "end_index": 357,
+              "node_id": "0170",
+              "summary": "这一部分主要讲解了如何在 Agent 运行过程中加入人类交互，以实现更可控的分步执行。文中通过一个城市信息查询的示例，先构造多个城市查询工具，再基于这些工具创建 Agent，并使用循环方式逐步运行任务。在执行过程中，用户可以随时输入反馈信息，对任务步骤进行补充、修改或取消，从而让 Agent 根据人工指令动态调整后续行为。示例展示了当初始问题为“北京的人口是多少”时，用户进一步要求“与上海的人口做对比”，Agent 随即调整任务并重新查询相关信息，最终输出对比结果。该部分强调了这种交互式运行方式带来的透明性、可控性，以及对任务观察、人工反馈、任务调整和取消等能力的支持，同时指出这种机制也便于定制不同推理范式的 AgentWorker。"
+            }
+          ],
+          "node_id": "0168",
+          "summary": "这部分内容主要讲解了如何开发和更细粒度地控制 Data Agent 的运行过程。首先通过一个示例说明，Agent 在选择工具时会利用上下文检索器返回的信息，将相关提示插入到输入中，从而帮助大模型做出正确的工具调用决策，并通过函数调用结果验证这种机制的有效性。随后重点讨论了 Agent 运行过程透明度不足、难以观察和干预的问题，指出仅依赖封装好的 `agent.chat` 接口会让任务执行像“摸盲盒”一样不可控。为此，文中介绍了如何借助 LlamaIndex 中的 `AgentRunner` 和 `AgentWorker` 组件，将 Agent 的执行拆分为可逐步调试的流程：先创建任务，再通过 `run_step` 逐步执行，直到任务结束，最后使用 `finalize_response` 获取最终结果。整体上，这一部分强调了通过分步运行机制提升 Agent 的可控性、可观察性和调试能力。"
+        }
+      ],
+      "node_id": "0152",
+      "summary": "本章主要介绍 Agent 的基本概念及其与大模型的关系，说明 Agent 是由大模型驱动、具备自主理解、规划、执行任务能力的更高级 AI 形态。文中引用了“Agent = 大模型 + 记忆 + 规划技能 + 使用工具”的定义，强调 Agent 不只是模型本身，而是结合了 Memory、Planning 和 Tool 使用能力的完整智能体。最后引出本章重点：将 RAG 应用构造模块进一步扩展，开发以数据为中心的 Data Agent。"
+    },
+    {
+      "title": "评估 RAG应用",
+      "start_index": 358,
+      "end_index": 358,
+      "nodes": [
+        {
+          "title": "为什么 RAG应用需要评估",
+          "start_index": 358,
+          "end_index": 358,
+          "node_id": "0172",
+          "summary": "本部分主要介绍了第10章“评估 RAG 应用”的背景与必要性，强调在软件上线前测试的重要性，并指出对 RAG 应用（包括 Agent）来说，评估比传统应用更关键。内容重点说明了为什么 RAG 应用需要评估：一是大模型输出存在不确定性，需要通过测试衡量其不可预知性；二是上线后需要可复用的评估方法来持续跟踪改进效果；三是外挂知识库会动态变化，可能引入新的干扰，因此需要定期检测和重新评估；四是 RAG 依赖基础大模型，需要评估不同模型选择及模型版本升级对应用效果的影响。"
+        },
+        {
+          "title": "RAG应用的评估依据与指标",
+          "start_index": 359,
+          "end_index": 360,
+          "node_id": "0173",
+          "summary": "这部分内容主要介绍了 RAG 应用的评估依据、常用指标以及整体评估流程。\n\n首先，文中指出 RAG 应用与传统应用不同：传统应用输出通常是确定性的、容易量化，而 RAG 应用处理的是自然语言输出，难以直接用简单数值衡量，因此需要借助更智能的评估工具和模型。\n\n接着，说明了 RAG 评估时通常需要的四类输入依据：\n- 输入问题（question）\n- 生成答案（answer）\n- 检索上下文（context）\n- 参考答案（reference_answer）\n\n在此基础上，文中列出了多种常见评估指标，包括：\n- 正确性（Correctness）\n- 语义相似度（Semantic Similarity）\n- 忠实度（Faithfulness），用于判断答案是否能从上下文推理出来、是否存在幻觉\n- 上下文相关性（Context Relevancy）\n- 答案相关性（Answer Relevancy）\n- 上下文精度（Context Precision）\n- 上下文召回率（Context Recall）\n\n最后，文中给出了 RAG 应用的评估流程：\n1. 明确评估目的、维度和指标\n2. 准备评估数据集及参考答案\n3. 将数据输入 RAG 系统，获取上下文和生成答案\n4. 将评估依据输入评估器，计算指标并分析整体性能\n\n同时还强调了组件级评估的重要性，尤其是对检索和生成两个关键阶段分别评估，以便更细致地发现问题并进行针对性优化。"
+        },
+        {
+          "title": "RAG应用的评估流程与方法",
+          "start_index": 360,
+          "end_index": 361,
+          "node_id": "0174",
+          "summary": "该部分主要介绍了 RAG 应用的评估方法与检索质量评估流程，重点包括：\n\n1. **RAG 应用的整体评估流程**\n   - 明确评估目的、维度和指标。\n   - 准备评估数据集，数据可人工标注，也可借助大模型生成。\n   - 将问题输入 RAG 应用，获取检索上下文和生成答案。\n   - 将结果交给评估器，计算指标并分析整体性能。\n\n2. **组件级评估的重点**\n   - 强调对 RAG 中最关键的两个阶段进行单独评估：**检索**和**生成**。\n   - 通过拆分评估，可以更细致地发现问题并针对性优化。\n\n3. **检索质量评估指标**\n   - 介绍了使用 `RetrieverEvaluator` 评估检索模块的方法。\n   - 主要指标包括：\n     - **命中率（hit_rate）**\n     - **平均倒数排名（mrr）**\n     - **Cohere 重排相关性（cohere-rerank-relevancy）**\n\n4. **检索评估数据集的生成**\n   - 说明可以通过单次查询评估，也可以批量评估。\n   - 由于检索评估依赖“问题—参考上下文”配对数据，因此需要构造检索评估数据集。\n   - 提到可使用 `generate_question_context_pairs` 方法借助大模型从已有文档中生成评估数据，也可以自行构造。\n\n5. **示例代码与实现思路**\n   - 展示了如何读取文档、切分为节点（Node）、为节点设置 ID。\n   - 构建向量索引和检索器，为后续检索评估做准备。"
+        },
+        {
+          "title": "评估检索质量",
+          "start_index": 361,
+          "end_index": 361,
+          "nodes": [
+            {
+              "title": "生成检索评估数据集",
+              "start_index": 361,
+              "end_index": 363,
+              "node_id": "0176",
+              "summary": "这部分内容主要讲解了 RAG 应用中“检索质量评估”的方法与实践，重点包括：\n\n1. **检索质量评估指标**\n   - 介绍了使用 `RetrieverEvaluator` 对检索模块进行评估。\n   - 主要指标包括：\n     - **命中率（hit_rate）**：检索结果是否命中期望上下文。\n     - **平均倒数排名（mrr）**：衡量正确上下文在检索结果中的排序质量。\n     - **cohere-rerank-relevancy**：利用 Cohere Rerank 模型评估排序相关性。\n   - 评估依据是输入问题与期望上下文（Node）之间的相关性。\n\n2. **生成检索评估数据集**\n   - 说明可以通过 `evaluate` 进行单次查询评估，也可以通过 `evaluate_dataset` 对批量数据进行评估。\n   - 为了批量评估，需要构造“问题-上下文”数据对。\n   - 使用 `generate_question_context_pairs` 借助大模型，从已有文档中自动生成检索评估数据集。\n   - 示例中展示了：\n     - 读取本地文档并切分为 `Node`\n     - 构建向量检索器\n     - 自定义中文 Prompt 生成问题\n     - 将生成的评估数据保存为 JSON 文件\n   - 同时强调保存到本地可以避免重复生成，后续直接加载即可。\n\n3. **加载和检查评估数据**\n   - 演示了如何从 JSON 文件中加载 `EmbeddingQAFinetuneDataset`。\n   - 读取并打印生成的问题，检查评估问题是否合理。\n   - 指出数据集中除了问题外，还包含 `relevant_docs` 字段，用于后续评估时判断检索结果是否匹配期望文档。\n\n4. **运行检索评估流程**\n   - 介绍了检索评估的基本步骤：\n     1. 加载检索评估数据集\n     2. 构造 `RetrieverEvaluator` 并设置指标\n     3. 调用 `evaluate` 查看结果\n   - 示例中开始展示如何基于 `mrr` 和 `hit_rate` 构建评估器，为后续检索效果测试做准备。"
+            },
+            {
+              "title": "运行评估检索过程的程序",
+              "start_index": 363,
+              "end_index": 365,
+              "node_id": "0177",
+              "summary": "这部分内容主要讲的是 RAG 应用中的评估方法，重点分为两块：检索评估和响应质量评估。\n\n首先，文档介绍了如何评估检索过程。它说明在生成检索评估数据集时，除了输入问题之外，还需要保存该问题对应的期望相关文档，这些信息存放在 `relevant_docs` 字段中。随后给出了运行检索评估程序的基本流程：加载检索评估数据集、构造 `RetrieverEvaluator` 并设置评估指标、调用 `evaluate` 方法查看结果。示例代码展示了如何从 JSON 文件加载数据集，使用 `mrr` 和 `hit_rate` 作为指标，对前几个评估样本逐个进行检索评估，并且也说明了可以直接使用 `evaluate_dataset` 对整个数据集批量评估。\n\n接着，文档转入响应质量评估，强调这是 RAG 应用评估的核心，因为它直接影响端到端用户体验。这里说明响应评估可以针对单次响应，也可以基于批量数据集自动化评估。为了进行响应评估，需要构造比检索评估更丰富的数据集，不仅包含问题和上下文，还可能需要模型生成的答案甚至参考答案。文档还介绍了如何借助大模型和 `RagDatasetGenerator.from_documents` 从文档中自动生成响应评估数据集，并通过设置每个 chunk 生成的问题数量和问题生成提示词来控制生成过程。"
+            }
+          ],
+          "node_id": "0175",
+          "summary": "该部分主要介绍了 RAG 应用中“检索质量评估”的方法与流程，重点包括：\n\n1. **检索评估的核心指标**\n   - **命中率（hit_rate）**：衡量检索结果是否命中期望上下文。\n   - **平均倒数排名（mrr）**：衡量正确上下文在检索结果中的排序质量。\n   - **cohere-rerank-relevancy**：利用 Cohere Rerank 模型的排序结果评估检索相关性。\n\n2. **检索评估的依据**\n   - 评估主要基于**输入问题**与**期望上下文（检索出的 Node）**之间的相关性。\n\n3. **检索评估数据集的生成**\n   - 介绍了如何使用 `generate_question_context_pairs` 方法，借助大模型从已有文档中自动生成检索评估数据集。\n   - 也说明了可以手动构造这类数据集。\n\n4. **批量与单次评估方式**\n   - 可以通过 `evaluate` 方法对单次查询进行评估。\n   - 也可以通过 `evaluate_dataset` 方法对构造好的数据集进行批量评估。\n\n5. **示例代码流程**\n   - 从本地文档读取数据并构造 `Node`。\n   - 使用 `SentenceSplitter` 对文档切分。\n   - 为节点设置 ID。\n   - 构建 `VectorStoreIndex` 并生成检索器。\n   - 引入 `RetrieverEvaluator` 等评估组件进行后续检索质量分析。"
+        },
+        {
+          "title": "评估响应质量",
+          "start_index": 365,
+          "end_index": 365,
+          "nodes": [
+            {
+              "title": "生成响应评估数据集",
+              "start_index": 365,
+              "end_index": 367,
+              "node_id": "0179",
+              "summary": "This partial document explains how to evaluate RAG applications, focusing on response quality after retrieval. It covers:\n\n- How to generate a response evaluation dataset using a large model, including creating questions from documents and saving/loading the dataset.\n- The structure of the generated evaluation data, such as `query`, `reference_contexts`, and `reference_answers`.\n- How to perform single-response evaluation for a RAG query using different evaluators.\n- The required inputs for response evaluation, including the user query, the model response, and reference answers.\n- Example evaluators for measuring faithfulness, relevancy, and context relevancy, with sample code showing how to query a document engine and compute scores.\n\nOverall, the section introduces practical methods and code for building automated evaluation workflows for RAG response quality."
+            },
+            {
+              "title": "单次响应评估",
+              "start_index": 367,
+              "end_index": 369,
+              "node_id": "0180",
+              "summary": "这部分主要介绍了 RAG 应用的响应评估方法，重点分为两类：单次响应评估和批量响应评估。\n\n首先，单次响应评估说明了如何针对某一次查询结果，从多个维度进行打分。评估时需要构造对应的 Evaluator，并输入必要参数，包括 query、response，以及在正确性和语义相似度评估中需要的 reference。文中列举了多个常见评估器及其用途，如 FaithfulnessEvaluator 用于忠实度评估，RelevancyEvaluator 用于综合相关性评估，ContextRelevancyEvaluator 用于上下文相关性，AnswerRelevancyEvaluator 用于答案相关性，CorrectnessEvaluator 用于正确性评估，SemanticSimilarityEvaluator 用于语义相似度评估。通过示例代码展示了如何对南京天气问题的响应进行逐项评估，并强调部分评估器必须提供参考答案，否则会报错。\n\n其次，批量响应评估介绍了如何基于评估数据集，对多个查询结果并行执行评估，从而获得整体性能统计。文中使用 LabelledRagDataset 加载评估数据集，并通过 BatchEvalRunner 同时组织多个评估器，在异步并行模式下对查询引擎进行批量测试。这样可以对多个样本的响应进行统一评估，提升效率，并便于综合分析 RAG 应用的整体表现。"
+            },
+            {
+              "title": "批量响应评估",
+              "start_index": 369,
+              "end_index": 371,
+              "node_id": "0181",
+              "summary": "该部分主要介绍了 RAG 应用的两类评估方法：一是“批量响应评估”，通过 BatchEvalRunner 结合多个评估器（如 Faithfulness、Relevancy、Correctness、Semantic Similarity）对查询引擎的多个问答样本进行并行评估，并统计平均分数、以表格形式展示结果，从而提升评估效率；二是“基于自定义标准的评估”，使用 GuidelineEvaluator 按企业或业务自定义的指导原则（如答案完整性、避免模糊表达、尽量使用明确数据）对响应进行逐条检查，判断是否通过并给出反馈，用于满足特定场景下的质量要求。"
+            }
+          ],
+          "node_id": "0178",
+          "summary": "This partial document focuses on **evaluating RAG applications**, especially the **quality of generated responses** in an end-to-end workflow.\n\nMain points covered:\n- It explains that **response quality evaluation is a key part of RAG evaluation** because it directly affects user experience.\n- It notes that evaluation can be done:\n  - on a **single response**,\n  - on a **single process**, or\n  - in **batch mode** over a dataset using multiple evaluators.\n- It introduces how to **generate a response evaluation dataset** using an LLM.\n- It distinguishes **response evaluation datasets** from **retrieval evaluation datasets**:\n  - response evaluation needs not only the question and retrieved context,\n  - but also the model-generated answer,\n  - and sometimes a reference answer.\n- It mentions the use of **`generate_dataset_from_nodes`** and **`RagDatasetGenerator.from_documents`** to automatically create evaluation data.\n- A code example shows:\n  - loading documents from a local text file,\n  - creating a dataset generator,\n  - generating questions per chunk/node,\n  - and using a prompt to instruct the model to produce exam-style questions based on the provided context.\n\nOverall, the section is about **building evaluation datasets and assessing response quality for enterprise RAG systems**."
+        },
+        {
+          "title": "基于自定义标准的评估",
+          "start_index": 371,
+          "end_index": 372,
+          "node_id": "0182",
+          "summary": "这部分主要介绍了如何使用自定义标准对 RAG 应用进行评估。文中指出，前面的评估方法多依赖通用指标，如答案对上下文的遵循程度、与参考答案的相似度等；而在企业级场景中，往往还需要满足一些特定的业务要求，因此可以借助 `GuidelineEvaluator` 来定义个性化评估指南。\n\n内容重点包括：\n- 通过自定义 `GUIDELINES` 列表设置评估标准，例如：\n  - 答案要完整回答问题\n  - 避免模糊或含糊表达\n  - 尽可能使用明确的统计数据或数字\n- 为每条标准分别创建评估器，并对模型回答进行逐项检查\n- 使用 `evaluate_response` 方法对查询和回答进行评估，输出是否通过以及反馈信息\n- 这种方式适合在应用上线前验证是否符合企业业务规范、响应原则或特殊要求\n\n整体上，这一节强调了：RAG 评估不仅可以看通用质量指标，还可以根据实际业务场景制定专属规则进行更细粒度的检查。"
+        }
+      ],
+      "node_id": "0171",
+      "summary": "本部分主要介绍了第10章“评估 RAG 应用”的背景与必要性，强调在 RAG 应用（包括 Agent）上线前后进行系统评估的重要性。内容指出，虽然借助 LlamaIndex、LangChain 等框架可以快速开发 RAG 应用，但由于大模型输出存在不确定性、上线后需要持续衡量改进效果、外挂知识库会动态变化并可能引入干扰，以及底层大模型的选型与版本升级都会影响应用表现，因此必须通过科学、可复用的测试与评估手段来验证应用质量、监控性能变化并支持持续优化。"
+    },
+    {
+      "title": "企业级 RAG应用的常见优化策略",
+      "start_index": 373,
+      "end_index": 373,
+      "nodes": [
+        {
+          "title": "选择合适的知识块大小",
+          "start_index": 373,
+          "end_index": 373,
+          "nodes": [
+            {
+              "title": "为什么知识块大小很重要",
+              "start_index": 373,
+              "end_index": 374,
+              "node_id": "0185",
+              "summary": "这部分内容主要介绍了企业级 RAG 应用在从原型走向“生产就绪”系统时常见的优化方向，强调仅靠快速搭建原型并不足以满足企业场景对性能、准确性、合规性和工程稳定性的要求。文中首先指出企业级 RAG 面临的典型挑战，包括多源异构数据处理困难、海量知识文档带来的高精度检索需求、复杂业务任务不再局限于事实问答，以及对响应时间和输出质量的更高要求。\n\n随后，本章聚焦于“知识块大小（chunk_size）”这一基础但关键的参数，说明它会直接影响文档切分、向量化存储、检索上下文质量以及最终回答效果。内容分析了 chunk_size 过小会导致上下文不足、重要信息可能无法被检索到，而 chunk_size 过大则可能带来语义不够精确、性能下降、上下文窗口溢出和 token 成本增加等问题。同时指出，不同任务类型对知识块大小的需求不同，例如事实性问答通常适合较小块，而摘要、总结、对比类任务可能需要更大的块。\n\n最后，文中提出应通过评估框架和评估数据集来系统选择最优 chunk_size，并介绍将使用 MiniTruthfulQADataset 结合 RAGAS 或 LlamaIndex Evaluation 模块，从忠实度、正确性、相关性以及响应延迟等指标来比较不同 chunk_size 的效果。"
+            },
+            {
+              "title": "评估知识块大小",
+              "start_index": 374,
+              "end_index": 378,
+              "node_id": "0186",
+              "summary": "该部分主要讲的是企业级 RAG 应用中的两类常见优化策略。\n\n第一部分围绕 **chunk_size（知识块大小）** 展开，说明它对向量化存储、检索效果和生成质量的关键影响：  \n- chunk_size 太小会导致知识块粒度过细、上下文不足，可能检索不到关键内容；  \n- chunk_size 太大会带来语义不够精确、性能下降、上下文窗口溢出和 token 成本升高等问题；  \n- 不同任务对知识块大小的需求不同，例如事实问答适合较小块，而摘要、总结、对比类任务可能需要更大的块。  \n文中强调，chunk_size 的选择本质上是在检索精度、上下文完整性和性能成本之间做平衡，并建议通过评估框架和评估数据集来选择最优参数。\n\n接着介绍了 **如何评估不同 chunk_size 的效果**：  \n- 使用 MiniTruthfulQADataset 数据集；  \n- 重点评估忠实度、相关性、正确性以及响应延迟；  \n- 通过构建不同 chunk_size 下的向量索引和查询引擎，循环测试多个问题；  \n- 汇总平均指标后比较不同设置，从而确定最合适的 chunk_size。\n\n第二部分开始讨论 **分离检索阶段与生成阶段的知识块**。  \n文中指出，虽然可以通过调节 chunk_size 来平衡检索与生成，但在复杂企业数据场景中，统一的知识块策略往往不够理想。原因包括：  \n- 一个知识块可能既包含有利于生成的详细信息，也包含会干扰向量检索的关键词；  \n- 问答场景中，检索时适合少量精确知识块，但生成时可能需要更多上下文才能形成完整答案。  \n\n因此，提出一种优化思路：**检索阶段使用的知识块与生成阶段输入给大模型的知识块可以不同**，即不一定直接把检索到的前 K 个块原样用于生成。文末还引出了经典 RAG 中检索与生成知识块一致的模式，并为后续介绍分离策略做铺垫。"
+            }
+          ],
+          "node_id": "0184",
+          "summary": "本部分主要介绍第11章“企业级 RAG 应用的常见优化策略”的背景与问题意识，强调原型应用虽然可以快速搭建，但要达到企业级“生产就绪”标准仍面临多方面挑战。文中概述了企业级 RAG 常见的四类难点：多源多形态数据难以统一处理、海量知识文档对检索精度要求更高、业务任务不局限于简单事实问答、以及对响应时间、准确性和合规性等工程指标要求更高。随后说明本章将结合 LlamaIndex 的建议与指导原则，讨论企业级 RAG 的优化方法。最后引出第11.1节“选择合适的知识块大小”，并指出知识块大小是一个基础但容易被忽视的重要参数。"
+        },
+        {
+          "title": "分离检索阶段的知识块与生成阶段的知识块",
+          "start_index": 378,
+          "end_index": 378,
+          "nodes": [
+            {
+              "title": "为什么需要分离",
+              "start_index": 378,
+              "end_index": 378,
+              "node_id": "0188",
+              "summary": "这部分内容主要讲第11章“企业级 RAG 应用的常见优化策略”中的知识块优化方法。前半部分提到可以通过对不同 chunk_size 的实验评估结果进行统计比较，从而选择最适合业务场景的知识块大小。随后重点介绍“检索阶段与生成阶段知识块分离”的优化思路：由于企业数据环境复杂，单一的知识块切分策略往往难以同时兼顾检索精确性和生成所需的语义丰富性，因此可以让检索用的知识块与最终输入大模型生成答案的知识块不同。文中解释了这样做的原因，例如原始知识块可能包含影响向量检索的噪声信息，或者用户问题适合精确检索少量块，但生成答案又需要更完整的上下文。最后还提到经典 RAG 中检索和生成使用同一批知识块，并引出后续对常见分离策略及实现方式的说明。"
+            },
+            {
+              "title": "常见的分离策略及实现",
+              "start_index": 378,
+              "end_index": 386,
+              "node_id": "0189",
+              "summary": "这部分内容主要讲的是企业级 RAG 应用中的知识块优化策略，重点围绕“如何在检索精确性和生成上下文丰富性之间取得平衡”展开。\n\n主要内容包括：\n\n1. **chunk_size 的选择与评估**\n   - 通过不同 chunk_size 的实验和评估指标统计结果，帮助选择最适合业务场景的知识块大小。\n\n2. **检索阶段与生成阶段知识块分离的必要性**\n   - 说明统一的知识块策略在复杂企业数据中往往难以兼顾检索和生成需求。\n   - 提出检索用小块、生成用大块的思路，以提升整体效果。\n\n3. **常见的分离策略**\n   - **问题扩充到完整问答对**：检索时只嵌入问题，生成时连同答案一起输入大模型。\n   - **扩充知识块所在的上下文窗口**：检索到某个块后，连同其前后窗口内的相关块一起送入模型。\n   - **从知识摘要扩充到知识内容**：先检索摘要块，再根据摘要找到对应的原始内容块用于生成。\n   - **从小知识块扩充到大知识块**：对同一内容做多粒度切分，先检索小块，再自动合并为更大的块供生成使用。\n\n4. **LlamaIndex 中的实现方式**\n   - 介绍了利用 `Node` 参数、`SentenceWindowNodeParser`、`MetadataReplacementPostProcessor`、`DocumentSummaryIndex`、`HierarchicalNodeParser` 和 `AutoMergingRetriever` 等组件来实现上述策略。\n   - 通过代码示例说明如何在嵌入、检索和生成阶段使用不同内容。\n\n5. **策略效果与适用场景**\n   - 小块有利于提高召回精度，大块有利于提供更完整上下文。\n   - 强调这些方法通常需要结合业务场景灵活使用，而不是单独依赖某一种方案。\n\n整体来看，这一部分是在讲如何通过多种知识块分离与扩展方法，优化企业级 RAG 系统的检索质量和生成质量。"
+            }
+          ],
+          "node_id": "0187",
+          "summary": "该部分主要讲解企业级 RAG 应用中的一种优化思路：先通过实验比较不同 chunk_size 的评估结果，选择最合适的知识块大小；随后引出“检索阶段”和“生成阶段”知识块分离的策略。文中说明了为什么统一的知识块切分策略在复杂企业数据场景下往往难以兼顾检索精度与生成所需的语义丰富性，并举例说明：有些知识块适合用于生成但不利于精确检索，而问答场景中检索与生成对上下文的需求也不同。因此，常见做法是让检索用的知识块与最终输入大模型生成的知识块不完全一致。最后还提到传统 RAG 中检索与生成通常使用同一批知识块，并为后续介绍具体分离策略做铺垫。"
+        },
+        {
+          "title": "优化对大文档集知识库的检索",
+          "start_index": 387,
+          "end_index": 387,
+          "nodes": [
+            {
+              "title": "元数据过滤 + 向量检索",
+              "start_index": 387,
+              "end_index": 392,
+              "node_id": "0191",
+              "summary": "This partial document focuses on optimization strategies for retrieval in enterprise-scale RAG systems, especially when dealing with large and diverse document collections where simple text splitting and top-k vector search are insufficient. It explains that retrieval-stage issues such as low precision and interference between unrelated knowledge are common, and introduces hierarchical retrieval as a key solution.\n\nThe main strategy covered first is **metadata filtering + vector retrieval**. The document describes how to attach metadata such as category or region to document chunks during indexing, then use an LLM to infer the likely metadata from a user query, filter the vector store by that metadata, and finally perform semantic vector search within the filtered subset. It discusses the advantages of this approach, such as simplicity and fast automatic filtering, as well as its limitations, including the need to design metadata labels and the uncertainty of LLM-based metadata inference.\n\nIt then presents an implementation example using **LlamaIndex’s VectorIndexAutoRetriever**, showing how to:\n- generate metadata automatically with an LLM,\n- insert that metadata during ingestion,\n- store the indexed chunks in a vector database,\n- and configure an auto retriever with metadata descriptions so it can infer filters from natural language queries.\n\nThe second strategy introduced is **summary retrieval + content retrieval**. This method creates summaries for documents and stores both summaries and original content as separate embedding levels, linked together. Retrieval first searches at the summary level, then uses the matched summaries to locate and recursively retrieve the corresponding detailed content. The document notes that this enables semantic search at both levels, but also adds complexity and cost because summaries must be generated, and errors in summary matching can prevent retrieval of useful context."
+            },
+            {
+              "title": "摘要检索+ 内容检索",
+              "start_index": 392,
+              "end_index": 398,
+              "node_id": "0192",
+              "summary": "本部分主要介绍了企业级 RAG 应用中的一种优化检索策略：**摘要检索 + 内容检索的两级递归检索方案**。核心思想是先对每个原始文档生成摘要，并在摘要层建立向量索引；检索时先命中摘要，再通过摘要节点中保存的二级检索器引用，进一步回到原始文档内容层进行精细检索，从而找到更相关的上下文用于生成答案。\n\n文中首先说明了这种方案的**原理与架构**：摘要层和内容层都支持语义检索，能够兼顾检索效率与上下文精度，但也存在依赖大模型生成摘要、增加成本，以及摘要匹配错误会导致后续无法找到有效上下文等缺点。\n\n随后给出了一个完整的**实现流程**，以城市信息查询为例：\n1. **准备原始文档**，加载多个城市文本，并为每个文档设置固定的 `index_id`。\n2. **生成摘要**，使用 `SummaryIndex` 和 `tree_summarize` 方式为每个文档生成摘要，并将摘要持久化保存，同时写入文档元数据中。\n3. **构造原始文档索引与检索器**，将文档切分后建立向量索引，并持久化存储，作为二级检索使用。\n4. **构造摘要 Node**，使用 `IndexNode` 将摘要文本作为节点内容，并在 `obj` 属性中绑定对应的二级检索器，使摘要被命中后可自动递归检索原始内容。\n5. **构造摘要索引**，把所有摘要节点组成最终对外使用的摘要向量索引。\n6. **测试检索效果**，通过查询“上海市的人口多少”验证系统能够先检索摘要，再自动进入上海市对应的二级检索器，最终返回原始文档节点并生成答案。\n\n整体来看，这一节重点讲解了如何利用 **IndexNode、MetadataFilters、VectorStoreIndex、RetrieverQueryEngine** 等组件，实现一个可递归展开的两级检索架构，以提升企业级 RAG 在复杂文档场景下的检索准确性与上下文召回能力。"
+            },
+            {
+              "title": "多文档 Agentic RAG",
+              "start_index": 399,
+              "end_index": 406,
+              "node_id": "0193",
+              "summary": "This partial document explains a multi-document Agentic RAG architecture for enterprise knowledge applications. It first describes why classic RAG is insufficient for more complex tasks such as summarization, cross-document comparison, and tool-augmented workflows. It then introduces a two-level agent design: a lower-level Tool Agent for each document or knowledge base, and a higher-level Top Agent that routes user requests to the appropriate Tool Agent.\n\nThe implementation section shows how to build this system using three PDF papers as examples. For each document, it creates both a vector-based query engine for factual questions and a summary-based query engine for holistic summaries, then wraps them as tools inside a ReAct-based Tool Agent. These Tool Agents are then converted into tools for the Top Agent, which uses function-calling to select the right document agent and answer user queries.\n\nThe document also discusses testing the system and interpreting the agent reasoning flow. Finally, it presents an optimization for scaling to many documents: using an ObjectIndex-based tool retriever to narrow down the set of candidate tools before the Top Agent reasons over them, improving efficiency and reducing errors."
+            }
+          ],
+          "node_id": "0190",
+          "summary": "This section discusses how to optimize retrieval for large-document knowledge bases in RAG applications, especially in enterprise settings where many documents from different sources can cause poor retrieval accuracy and interference if only simple text splitting and top-k search are used. It introduces the idea of hierarchical filtering and retrieval, and focuses on one approach: metadata filtering plus vector search. The document explains the workflow of this method: first infer metadata from the user query with an LLM, then use metadata filters in the vector database to narrow down candidate chunks, and finally apply vector similarity search to retrieve the most relevant top-K chunks. It also summarizes the advantages and limitations of this approach, noting that it is simple and efficient but requires metadata design, depends on uncertain LLM inference, only supports exact metadata matching rather than semantic search, and relies on a vector database."
+        },
+        {
+          "title": "使用高级检索方法",
+          "start_index": 406,
+          "end_index": 407,
+          "nodes": [
+            {
+              "title": "融合检索",
+              "start_index": 407,
+              "end_index": 415,
+              "node_id": "0195",
+              "summary": "This partial document focuses on advanced retrieval optimization techniques for enterprise RAG applications, especially beyond basic vector search. It first explains why retrieval quality depends on multiple stages such as data loading/splitting, embedding, indexing, and retrieval algorithms. The main topic is fusion retrieval: combining results from multiple retrievers or index types and using RRF (Reciprocal Rank Fusion) or similar methods to rerank and improve final results. The document walks through a custom implementation of a fusion retriever, including query rewriting, building a vector retriever and a keyword-table retriever, running parallel asynchronous retrieval, reranking results, and integrating the retriever into a query engine. It also introduces LlamaIndex’s built-in QueryFusionRetriever as a simpler alternative, noting its supported fusion modes. Finally, the text begins introducing recursive retrieval as another strategy for improving retrieval accuracy through layered, multi-stage search."
+            },
+            {
+              "title": "递归检索",
+              "start_index": 415,
+              "end_index": 437,
+              "node_id": "0196",
+              "summary": "This partial document explains several enterprise RAG optimization techniques, focusing on advanced retrieval strategies in LlamaIndex.\n\nMain points covered:\n- **Fusion retrieval**: combining a vector retriever and keyword retriever with `QueryFusionRetriever`, and using different reranking modes such as reciprocal rerank, relative score, distance-based score, and simple ranking.\n- **Recursive retrieval concepts**: introducing hierarchical retrieval as a way to improve precision by retrieving across multiple levels of nodes or components.\n- **Node-to-Node recursive retrieval**: building parent and child nodes at different chunk sizes, linking child `IndexNode`s to parent nodes, and using `RecursiveRetriever` to move from fine-grained nodes to broader context.\n- **Summary-based recursive retrieval**: generating summary nodes from base nodes, linking summaries back to content nodes, and using summaries as an intermediate retrieval layer.\n- **Question-based recursive retrieval**: mentioning the use of hypothetical questions as auxiliary retrieval nodes to improve matching.\n- **Node-to-query-engine recursive retrieval**: linking a retrieved node to a secondary query engine, especially useful for embedded structured data like tables inside documents.\n- **Table handling in web documents**: parsing web pages, extracting tables as Markdown, generating table summaries, converting table content into DataFrames, and querying them with `PandasQueryEngine`.\n- **Node-to-agent recursive retrieval**: creating document-specific agents for different files/cities, linking summary `IndexNode`s to agents, and letting recursive retrieval enter the appropriate agent to answer questions.\n- **Practical implementation details**: use of persistence, metadata extraction, index construction, and query engine dictionaries to support recursive lookup and multi-level retrieval."
+            }
+          ],
+          "node_id": "0194",
+          "summary": "这部分内容主要讲解了企业级 RAG 应用中的检索优化策略，重点包括：\n\n1. **工具检索器的验证方法**  \n   通过直接调用工具检索器的 `retrieve` 方法，输入相同的自然语言问题，检查返回的工具列表及其排序，从而验证检索到的工具是否正确、是否能支持 Agent 回答问题。文中还说明了通过设置 `similarity_top_k=2` 可以观察到排名前两位的相关工具，其中首位工具通常就是最匹配的目标工具。\n\n2. **RAG 中检索阶段的重要性**  \n   强调检索是 RAG 应用最关键的环节之一，检索的召回率和精确性会直接影响后续生成答案的质量。并指出影响检索效果的因素很多，包括原始知识质量、输入问题、索引类型、嵌入模型、大模型、检索算法和重排序算法等。\n\n3. **检索优化的整体思路**  \n   说明有些因素需要在数据加载、分割、嵌入和索引阶段优化，而另一些则需要在检索阶段结合整体流程进行调整，以提升最终效果。\n\n4. **高级检索方法介绍**  \n   本节开始介绍经典向量语义检索之外的更复杂检索技巧，帮助在实际企业应用中根据需求选择更高效的检索方式。\n\n5. **融合检索（Fusion Retrieval）**  \n   重点介绍融合检索的概念：通过多个不同检索方法或不同索引同时检索，再利用 RRF（倒数排名融合）等算法对结果重排序，综合多个结果以提高召回和精度，弥补单一检索方式的不足。\n\n6. **LlamaIndex 中的融合检索实现**  \n   提到 LlamaIndex 框架已经内置了融合检索器，同时也支持用户根据已有知识自定义融合检索器。后续内容将先讲自定义实现，再讲如何使用现成组件。"
+        }
+      ],
+      "node_id": "0183",
+      "summary": "本部分主要介绍第11章“企业级 RAG 应用的常见优化策略”的背景与问题意识，强调原型应用与真正可用于企业生产环境的 RAG 系统之间存在明显差距。文中指出企业级 RAG 面临的典型挑战包括：多来源、多形态数据难以统一处理；海量知识文档对检索精度要求更高；业务任务不局限于简单事实问答；以及对响应时间、准确性和合规性等工程指标要求更高。随后说明本章将参考 LlamaIndex 的实践建议，系统讨论企业级 RAG 的优化方法。接着进入第11.1节，提出“选择合适的知识块大小”这一基础但关键的参数问题，并引出其重要性。"
+    },
+    {
+      "title": "构建端到端的企业级 RAG应用",
+      "start_index": 438,
+      "end_index": 437,
+      "nodes": [
+        {
+          "title": "对生产型 RAG应用的主要考量",
+          "start_index": 438,
+          "end_index": 439,
+          "node_id": "0198",
+          "summary": "这部分主要介绍了构建端到端企业级 RAG 应用时需要重点考虑的问题，以及本章的整体内容安排。核心要点包括：\n\n1. **生产型 RAG 应用与原型应用的区别**  \n   说明原型阶段只需关注基本功能，而真正面向生产和企业环境的应用，还需要考虑架构拆分、扩展性、稳定性和协作机制。\n\n2. **知识库索引构造与使用分离**  \n   在生产环境中，索引的构建、文档导入、维护和优化通常需要独立的管理后台完成，不能在每次检索时临时构建。\n\n3. **前后端分离的服务化设计**  \n   企业级应用中，查询引擎、对话引擎或 Agent 能力应通过 API 服务对外提供，而不是直接在后台交互。\n\n4. **多用户与多租户支持**  \n   需要考虑不同用户之间的会话、记忆、索引隔离，以及多租户场景下的知识库、缓存和存储资源隔离。\n\n5. **企业级非功能性需求**  \n   强调性能、扩展性、成本、安全、调试能力和用户体验等方面的优化，例如流式响应、缓存、本地存储、模型与向量库选择、Prompt 优化、并发控制和日志追踪等。\n\n6. **本章内容概览**  \n   说明本章将进一步介绍典型的端到端企业级 RAG 架构，以及构建全栈 RAG 应用的案例、技术和组件。\n\n7. **企业级 RAG 应用场景引入**  \n   开始描述一个企业内部共享的智能知识问答助手场景，面向员工提供基于私有知识和数据的自然语言搜索与问答能力。"
+        },
+        {
+          "title": "端到端的企业级 RAG应用架构",
+          "start_index": 439,
+          "end_index": 440,
+          "nodes": [
+            {
+              "title": "数据存储层",
+              "start_index": 440,
+              "end_index": 441,
+              "node_id": "0200",
+              "summary": "这部分主要介绍了企业级端到端 RAG 应用的整体架构与核心组成，重点包括：\n\n1. **RAG 应用的使用场景与管理能力**\n   - 面向企业内部员工和外部客户的多渠道接入场景，如企业门户、呼叫中心、公众号、企业微信、应用程序等。\n   - 管理后台需要提供知识维护、索引管理、API 发布以及 API 使用日志查询与跟踪等能力。\n\n2. **企业级 RAG 应用的架构分层**\n   - 文中给出了完整的端到端企业级 RAG 应用架构，并开始分层说明各模块职责。\n\n3. **数据存储层**\n   - 负责持久化存储 RAG 应用中的各类数据，包括：\n     - 原始知识文档与数据（文档、图片、视频、结构化数据、网页、API 数据、用户上传内容等）\n     - 用于检索的向量数据\n     - 运行过程中产生的其他数据，如账号信息、查询与对话数据、系统日志、中间转换数据等\n   - 介绍了常见存储形式：\n     - 关系数据库\n     - 向量库\n     - 文档存储\n     - 图数据库等其他形式\n   - 强调数据存储层通过专有管理接口向上层提供服务。\n\n4. **AI 模型层**\n   - 说明 RAG 应用常用的模型类型：\n     - 大模型：用于查询转换、响应生成、语义路由等\n     - 嵌入模型：用于生成向量\n     - 其他模型：如 Rerank 重排序模型\n   - 提到可通过 API 调用模型，并借助 LangChain、LlamaIndex 等框架简化模型接入。\n\n5. **RAG 工作流与 API 模块**\n   - 指出这是 RAG 应用的核心模块。\n   - 在 Web 端到端应用中，该模块通常以 API 服务形式提供，而不一定以独立可运行程序存在。\n   - 开始引出其主要能力，尤其是“检索前处理”等流程。"
+            },
+            {
+              "title": "AI模型层",
+              "start_index": 441,
+              "end_index": 441,
+              "node_id": "0201",
+              "summary": "这部分主要介绍了企业级 RAG 应用的整体架构分层，重点说明了数据存储层、AI 模型层以及 RAG 工作流与 API 模块的职责与作用。\n\n主要内容包括：\n- **数据存储层**：用于保存鉴权管理数据、用户账号信息、查询与对话数据、系统日志、知识导入与转换的中间数据等，并说明了常见存储形式：\n  - 关系数据库：存储结构化信息和元数据\n  - 向量库：存储知识块向量，用于语义检索\n  - 文档存储：保存原始知识文档\n  - 其他存储：如图数据库，用于知识图谱\n- **AI 模型层**：介绍 RAG 应用中会用到的大模型、嵌入模型以及 Rerank 等其他模型，并说明这些模型通常通过 API 提供给上层调用，框架如 LangChain、LlamaIndex 可屏蔽底层差异。\n- **RAG 工作流与 API 模块**：强调这是 RAG 应用的核心模块，在 Web 应用中通常以 API 形式对前端提供服务，而不是独立运行程序，并开始引出其功能之一——**检索前处理**。"
+            },
+            {
+              "title": "RAG工作流与 API模块",
+              "start_index": 441,
+              "end_index": 442,
+              "node_id": "0202",
+              "summary": "这部分主要介绍了企业级 RAG 应用的整体架构与核心模块划分，重点包括：\n\n1. **数据存储层**  \n   说明 RAG 应用需要存储的内容，如鉴权管理数据、用户账号信息、查询与对话数据、系统日志、知识导入与转换的中间数据等，并列举了常见存储形式：\n   - 关系数据库：存储结构化数据和元数据\n   - 向量库：存储知识块向量，用于语义检索\n   - 文档存储：保存原始知识文档\n   - 其他存储：如图数据库，用于知识图谱\n\n2. **AI 模型层**  \n   介绍 RAG 中会用到的模型类型，包括：\n   - 大模型：用于查询转换、响应生成、语义路由等核心任务\n   - 嵌入模型：将文档转换为向量\n   - 其他模型：如 Rerank 重排序模型  \n   同时提到可通过 LangChain、LlamaIndex 等框架屏蔽底层 API 差异。\n\n3. **RAG 工作流与 API 模块**  \n   这是 RAG 应用的核心处理部分，通常以 API 形式对外提供服务，主要能力包括：\n   - 检索前处理：查询转换、语义路由等，提升检索效果\n   - 检索：从索引中召回相关知识块\n   - 检索后处理：融合、去重、重排序，并组装进 Prompt\n   - 生成：基于检索上下文和问题生成回答\n   - API 发布：通过 FastAPI、Flask 等框架提供对话、历史查询、文档上传、知识库管理等接口\n\n4. **前端应用模块**  \n   说明前端通常使用 Vue 或 React 构建，基于 HTML、JavaScript、CSS 实现，典型形态是智能问答/ChatBot 风格的交互界面。"
+            },
+            {
+              "title": "前端应用模块",
+              "start_index": 442,
+              "end_index": 443,
+              "node_id": "0203",
+              "summary": "这部分主要介绍了企业级 RAG 应用的端到端架构中几个关键模块及其职责分工。首先说明了检索流程中的前处理、检索、后处理、生成以及 API 发布等环节：前处理用于查询转换、语义路由等以提升检索效果；检索阶段负责从索引中召回相关知识块；后处理对检索结果进行融合、去重和重排序；生成阶段基于检索到的上下文生成最终回答；API 发布则通过 Web 框架将这些能力对外提供服务。随后重点讲解了前端应用模块，指出其通常基于 Vue 或 React 构建，并包含账号管理、对话与会话管理、ChatBot 管理以及配置项设置等核心功能。最后开始引出后台管理模块，强调企业级智能问答系统还需要完善的后台支撑。"
+            },
+            {
+              "title": "后台管理模块",
+              "start_index": 443,
+              "end_index": 445,
+              "node_id": "0204",
+              "summary": "这部分主要介绍了企业级端到端 RAG 应用的前端与后台管理模块设计，以及全栈 RAG 应用案例的引入。\n\n主要内容包括：\n1. 前端应用的核心功能模块：\n   - 账号管理：注册、登录、绑定、改密、注销等。\n   - 对话与会话管理：通过 API 与后端交互，支持连续对话、会话上下文、历史记录、归档、备份和删除，并可按业务场景细分为知识问答、数据查询分析、文档对话等。\n   - ChatBot 管理：支持不同风格或能力的聊天机器人创建、配置和删除。\n   - 配置项目：如 UI 风格、对话保存时间、本地目录、大模型选择、Prompt 自定义等。\n\n2. 后台管理模块的设计：\n   - 强调企业级 RAG 应用需要独立的后台管理，以实现知识库和索引的可视化、规范化、全生命周期管理。\n   - 索引与知识库管理：负责文档加载、索引构建、知识库导入/备份，以及检索测试、模型配置、重复筛选等。\n   - 应用与 API 管理：支持多应用配置、API 发布与鉴权、日志管理、应用测试，以及 RAG 流程的可视化编排。\n   - 模型管理：管理大模型、嵌入模型、Rerank 模型，支持在线模型与本地模型，并进行连通性测试、成本配置和日志跟踪。\n   - 系统管理：包括账号、安全权限、系统日志、存储目录、数据库连接等基础管理功能。\n\n3. 全栈 RAG 应用案例的铺垫：\n   - 说明后续将通过两个案例展示如何构建端到端的企业级全栈 RAG 应用。\n   - 重点解决知识库索引与使用分离、前后端分离、多用户/多租户支持，以及企业级非功能性需求等问题。\n   - 引出一个简单的全栈 RAG 查询应用案例作为后续内容的开始。"
+            }
+          ],
+          "node_id": "0199",
+          "summary": "This partial document explains key considerations for building enterprise-grade RAG applications, especially for shared and SaaS scenarios. It emphasizes supporting multiple users and tenants with isolated dialogue state, memory, indexes, knowledge bases, and storage resources. It also highlights non-functional requirements such as better performance, scalability, cost control, security, debugging, and user experience, recommending techniques like streaming responses, caching, choosing suitable models/vector databases, prompt and workflow optimization, and traffic control.\n\nThe document then introduces an end-to-end enterprise RAG architecture for an internal knowledge and Q&A assistant that can serve employees and external customers through multiple channels. It also describes the management backend for maintaining knowledge, indexes, APIs, and usage logs. Finally, it begins outlining the data storage layer, including persistent storage for raw knowledge documents and data, vector embeddings for retrieval, and other operational data needed by the application."
+        },
+        {
+          "title": "端到端的全栈 RAG应用案例",
+          "start_index": 445,
+          "end_index": 445,
+          "nodes": [
+            {
+              "title": "简单的全栈 RAG查询应用",
+              "start_index": 445,
+              "end_index": 464,
+              "node_id": "0206",
+              "summary": "这部分文档主要讲的是如何构建一个端到端的企业级全栈 RAG 应用，重点包括后端服务拆分、索引管理、API 设计以及前端交互实现。\n\n核心内容有：\n\n1. **模型管理与系统管理模块**\n   - 介绍了 RAG 应用中对大模型、嵌入模型、Rerank 模型的统一管理。\n   - 强调需要支持模型连通性测试、成本配置、日志跟踪等。\n   - 系统管理模块则负责账号、安全权限、系统日志、存储目录和数据库配置等辅助功能。\n\n2. **简单全栈 RAG 查询应用案例**\n   - 以 LlamaIndex、Ollama、OpenAI Embedding、Chroma、FastAPI、React + TypeScript 为技术栈，演示一个完整的前后端分离 RAG Web 应用。\n   - 用户可以通过前端上传文档、查询知识、查看原始来源和已索引文档列表。\n\n3. **Index Server 索引服务设计**\n   - 将索引管理独立成一个远程可调用的服务，负责：\n     - 初始化或加载索引\n     - 插入新文档到索引\n     - 查询索引\n     - 获取已上传文档列表\n   - 重点说明了共享索引的并发访问问题，并通过 `Lock` 实现顺序化访问。\n   - 还介绍了索引持久化存储和文档元数据保存。\n\n4. **API Server 设计与实现**\n   - 使用 FastAPI 构建后端 API 层，提供测试、查询、上传文档、获取文档列表等接口。\n   - API Server 通过 `BaseManager` 远程调用 Index Server 的功能。\n   - 说明了 CORS、异常处理、文件上传临时存储与清理等实现细节。\n\n5. **前端 Web UI 应用**\n   - 使用 React + TypeScript 构建前端界面。\n   - 重点展示前端如何封装 API 调用函数，并在组件中处理查询输入、异步请求和结果展示。\n   - 还介绍了如何启动和测试前端应用，以及通过 `/docs` 查看 FastAPI 自动生成的接口文档。\n\n6. **全栈 RAG 应用的工程化思路**\n   - 总结了构建企业级 RAG 应用时需要考虑的关键点：\n     - 前后端分离\n     - 索引服务独立部署\n     - 索引持久化与增量更新\n     - 多用户并发访问控制\n   - 指出当前案例是原型，后续可扩展为多租户、独立知识库、多轮对话和后台管理系统。\n\n7. **基于多文档 Agent 的端到端对话应用预告**\n   - 文档最后引出下一部分内容：将多文档 Agent 能力通过 API 提供给前端，实现支持连续对话的 ChatBot 应用。\n   - 重点将涉及复杂 Agent 架构、流式输出、多文档问答以及多用户/多租户支持。"
+            },
+            {
+              "title": "基于多文档 Agent的端到端对话应用",
+              "start_index": 464,
+              "end_index": 486,
+              "node_id": "0207",
+              "summary": "这部分主要讲解了如何把一个多文档 Agentic RAG 系统扩展成端到端的企业级对话应用，重点包括以下内容：\n\n1. **全栈 RAG 应用的架构升级**\n   - 将前端 UI、后端 API、知识库和索引服务分离。\n   - 引入分布式设计思路，例如独立索引服务器。\n   - 支持持久化存储和动态插入索引，而不是一次性构建索引。\n   - 考虑多用户并发访问与索引操作的顺序化处理。\n\n2. **基于多文档 Agent 的端到端对话系统**\n   - 在已有多文档 Agent 的基础上，构建支持连续对话的 ChatBot 应用。\n   - 通过 API 将 Agent 能力暴露给前端调用，实现对多个城市文档的问答、总结和跨文档推理。\n   - 支持复杂知识型任务、流式输出和多用户/多租户场景。\n\n3. **后端 Agent 模块设计**\n   - 为每个文档创建单独的 Tool Agent，分别使用向量索引和摘要索引处理事实性问题与总结性问题。\n   - 再将这些 Tool Agent 组织成 Top Agent，通过工具检索器选择合适工具进行推理。\n   - 使用 `CallbackManager` 为后续的事件跟踪和流式输出预留接口。\n\n4. **后端 API 模块实现**\n   - 使用 FastAPI 提供 `/api/chat` 对话接口。\n   - 采用类似大模型对话 API 的消息格式，支持携带完整历史消息实现多轮对话。\n   - 实现了三种形式：\n     - 非流式 API\n     - 基础流式 API（基于 `StreamingResponse` 和 SSE）\n     - 增强流式 API（可实时展示 Agent 的中间推理和工具调用过程）\n\n5. **Agent 中间过程的流式跟踪**\n   - 通过自定义 `StreamingCallbackHandler` 监听 `FUNCTION_CALL` 和 `AGENT_STEP` 事件。\n   - 将工具调用信息和步骤输出放入队列，再由 API 线程异步读取并推送给客户端。\n   - 这样前端不仅能看到最终答案，还能看到 Agent 的推理过程和工具使用情况。\n\n6. **前端 ChatBot UI 应用**\n   - 使用 React/Next.js 和 Vercel AI SDK 快速构建支持流式响应的聊天界面。\n   - 前端可以实时显示 Agent 的中间状态、工具调用结果和最终回答。\n   - 通过这种方式提升调试效率和用户体验。\n\n7. **未来优化方向**\n   - 建议在服务端保存用户对话历史和明细，减少客户端负担。\n   - 引入用户管理、安全认证、数据库或缓存来保存上下文。\n   - 可利用 Agent 记忆能力和缓存机制，为不同用户维护独立会话状态，提升性能与可扩展性。"
+            }
+          ],
+          "node_id": "0205",
+          "summary": "该部分主要介绍了企业级 RAG 应用中的模型管理与系统管理模块，以及端到端全栈 RAG 应用案例的引入。\n\n重点包括：\n- **模型管理模块**：用于管理 RAG 应用中的大模型、嵌入模型和 Rerank 模型，支持模型调用入口、参数配置、在线 API 模型与本地模型的统一管理，并涉及连通性测试、成本配置和底层日志跟踪等能力。\n- **系统管理模块**：提供账号管理、安全权限管理、系统日志管理、存储目录管理、数据库连接与参数配置等辅助功能。\n- **端到端全栈 RAG 应用案例**：将通过两个案例展示如何结合 LlamaIndex 和 RAG 开发技术构建完整应用，重点解决企业生产中的关键问题，包括知识库索引构造与使用分离、前后端分离、多用户/多租户支持，以及企业级非功能性需求。\n- **简单全栈 RAG 查询应用**：作为第一个案例的开端，基于 LlamaIndex 官方基础案例构建一个简单的分布式 RAG 查询应用。"
+        }
+      ],
+      "node_id": "0197",
+      "summary": "The partial document contains only an instruction asking for a description of the document’s main points and specifies that the response should be returned directly without any extra text."
+    },
+    {
+      "title": "新型 RAG范式原理与实现",
+      "start_index": 487,
+      "end_index": 487,
+      "nodes": [
+        {
+          "title": "自纠错 RAG：C-RAG",
+          "start_index": 487,
+          "end_index": 487,
+          "nodes": [
+            {
+              "title": "C-RAG诞生的动机",
+              "start_index": 487,
+              "end_index": 488,
+              "node_id": "0210",
+              "summary": "该部分主要介绍第13章“新型 RAG 范式原理与实现”的背景与核心内容，重点讲解一种实验性的新型 RAG 范式——自纠错 RAG（C-RAG）。文中先说明 RAG 正在从经典范式向模块化范式演进，并强调这些新范式仍处于探索阶段，但理解其动机和原理有助于优化 RAG 应用。\n\n随后重点阐述 C-RAG 的提出动机：尽可能提高检索上下文的相关性，因为经典 RAG 即使经过设计，也难以保证检索结果始终完全相关。C-RAG 的核心思想是在检索之后增加“事后纠错”机制，对召回知识进行自我评估，并根据评估结果进行调整。\n\n最后介绍 C-RAG 的基本原理：在传统 RAG 基础上加入评估器、查询转换和搜索模块。系统会将检索到的内容分为相关、存疑和不相关三类；对于相关内容直接用于生成，对于存疑或不相关内容则通过重写查询、网络搜索等方式补充外部知识，从而提升最终回答的准确性。"
+            },
+            {
+              "title": "C-RAG的原理",
+              "start_index": 488,
+              "end_index": 489,
+              "node_id": "0211",
+              "summary": "这部分内容主要介绍了 **C-RAG（Corrective RAG）** 这一新型 RAG 范式的原理与实现思路，核心重点包括：\n\n1. **C-RAG 的提出背景**\n   - 经典 RAG 即使前期设计良好，也难以保证检索到的知识在实际运行时完全相关。\n   - C-RAG 的 “C” 代表一种 **事后纠错与调整机制**，用于提升检索结果质量。\n\n2. **C-RAG 的基本工作流程**\n   - 在检索到知识后，系统会先对这些知识进行 **自我评估**。\n   - 根据评估结果，进行不同处理：\n     - 删除不相关知识；\n     - 对问题进行查询重写后重新检索；\n     - 借助搜索引擎等外部渠道补充知识。\n\n3. **C-RAG 的原理结构**\n   - 相比经典 RAG，C-RAG 增加了几个关键模块：\n     - **评估器模块**：判断召回文档与问题的相关性；\n     - **查询转换模块**：对原问题进行重写；\n     - **搜索模块**：通过网络搜索补充知识。\n   - 评估结果通常会把知识分为：\n     - 相关知识\n     - 存疑知识\n     - 不相关知识\n\n4. **C-RAG 的处理策略**\n   - 如果检索结果中至少有一个节点是相关的，就交给大模型生成答案。\n   - 对于存疑或不相关知识，则通过搜索或其他方式补充，并在此之前重写问题以提高检索效果。\n\n5. **C-RAG 的实现准备**\n   - 文中开始介绍一个简单的 C-RAG 实现案例。\n   - 首先准备了 3 类 Prompt：\n     - **生成答案的 Prompt**\n     - **评估相关性的 Prompt**\n     - **重写输入问题的 Prompt**\n   - 这些 Prompt 用于支持后续的 C-RAG 流程实现与测试。\n\n总体来看，这一部分主要是在说明：**C-RAG 通过“检索后评估 + 纠错补充”的方式，提升 RAG 系统的回答准确性和相关性。**"
+            },
+            {
+              "title": "C-RAG的实现",
+              "start_index": 489,
+              "end_index": 494,
+              "node_id": "0212",
+              "summary": "This partial document explains an implementation of **C-RAG**, a conditional RAG workflow that improves retrieval quality before generation. It covers:\n\n- **Prompt design** for three tasks:\n  - generating answers from context,\n  - evaluating whether retrieved content is relevant,\n  - rewriting the user query for better search.\n- **Building a retriever** using LlamaIndex and a vector store index for semantic retrieval.\n- **Relevance evaluation** of retrieved nodes with an LLM, filtering out irrelevant results.\n- **Query rewriting** when the initial retrieval is insufficient, to better capture the user’s intent.\n- **Web search integration** using Tavily to fetch real-time external information when needed.\n- **Answer generation** by combining filtered retrieved text and web search results into a custom context for the LLM.\n- **A full test workflow** comparing ordinary query engine output with the C-RAG pipeline on a sample question that includes both knowledge-base and real-time information needs.\n- **Discussion of C-RAG limitations**, such as imperfect relevance judgment and potential risks of using web search in enterprise settings.\n\nThe document then transitions into **Self-RAG**, introducing it as a more advanced RAG paradigm and beginning with the motivation for why it was proposed, especially to address problems like **over-retrieval** in standard RAG."
+            }
+          ],
+          "node_id": "0209",
+          "summary": "该部分主要介绍了第13章“新型 RAG 范式原理与实现”的内容，重点说明 RAG 正从经典范式向模块化、新型范式演进，并强调这些新范式多处于实验探索阶段，但理解其动机和原理有助于优化 RAG 应用。随后引入了自纠错 RAG（C-RAG / Corrective-RAG），说明其来源于中科大与 Google 研究院等提出的论文，并概述了 C-RAG 的核心动机：尽可能提高检索上下文的相关性，即通过索引、检索算法和查询重写等手段，从大量知识中筛选出更适合回答问题的内容。"
+        },
+        {
+          "title": "自省式 RAG：Self-RAG",
+          "start_index": 494,
+          "end_index": 494,
+          "nodes": [
+            {
+              "title": "Self-RAG 诞生的动机",
+              "start_index": 494,
+              "end_index": 495,
+              "node_id": "0214",
+              "summary": "这部分主要介绍了第13章中的一种新型 RAG 扩展范式——Self-RAG（自省式 RAG），并围绕其提出背景、核心动机和基本原理展开说明。\n\n主要内容包括：\n\n1. **对 C-RAG 的简要补充说明**\n   - 提到 C-RAG 作为一种较简单的 RAG 扩展方式，虽然有效，但存在局限性。\n   - 例如，依赖大模型进行相关性评估可能带来不确定性和误过滤问题。\n   - 使用网络搜索在一些企业级场景中也可能引入风险。\n\n2. **Self-RAG 的提出与特点**\n   - Self-RAG 由华盛顿大学、IBM 人工智能研究院等机构提出。\n   - 其核心思想是让模型通过“自我反思”来学习检索、生成和批判。\n   - 文中指出它在开源原型测试中表现优于传统 RAG。\n\n3. **Self-RAG 的动机**\n   - 传统 RAG 存在两个主要问题：\n     - **过度检索**：不管问题是否简单，都先检索，可能引入无关内容。\n     - **输出一致性问题**：模型不一定严格依据检索到的事实生成答案，可能仍然出错。\n   - 文中用“学生查参考书答题”的比喻来解释这两个问题。\n   - 还提到一些常见缓解方法，如先判断是否需要检索、要求严格依据参考知识回答、通过多轮评估优化答案，但这些方法会增加系统复杂度和不确定性。\n\n4. **Self-RAG 的原理**\n   - Self-RAG 与传统 RAG 的关键区别在于：它通过**模型层微调**，让大模型具备判断是否需要检索、以及按需检索的能力。\n   - 再结合应用层设计，提高生成结果的准确性和质量。\n   - 文末开始引出 Self-RAG 的基本工作流程。"
+            },
+            {
+              "title": "Self-RAG 的原理",
+              "start_index": 495,
+              "end_index": 502,
+              "node_id": "0215",
+              "summary": "这部分主要介绍了 Self-RAG 这一新型 RAG 范式的原理、评估机制和实现思路，重点内容包括：\n\n1. **经典 RAG 的两个核心问题**\n   - **检索效率问题**：传统 RAG 往往对所有问题都先检索，再生成答案，导致效率不高。\n   - **输出一致性问题**：即使检索到了知识，大模型也不一定严格依据检索内容回答，可能出现不一致或“编造”现象。\n\n2. **Self-RAG 的基本思想**\n   - 与传统 RAG 不同，Self-RAG 通过**模型微调**让大模型具备：\n     - 判断是否需要检索的能力；\n     - 按需检索的能力；\n     - 对生成结果进行自我评估和选择的能力。\n   - 其目标是提升生成答案的**准确性**和**质量**。\n\n3. **Self-RAG 的工作流程**\n   - **判断是否检索**：先由模型决定当前问题是否需要外部知识。\n   - **按需检索**：如果需要，则检索相关知识块；如果不需要，则直接回答。\n   - **增强生成**：将问题与检索到的知识组合，生成多个候选答案。\n   - **评估与选择**：对多个候选答案进行评估，选出最佳答案输出。\n\n4. **Self-RAG 的四类评估指标**\n   - **Retrieve**：判断是否需要检索。\n   - **IsREL**：判断检索知识是否相关。\n   - **IsSUP**：判断答案是否被检索知识支持。\n   - **IsUSE**：判断答案对问题是否有用。\n   - 文中还解释了这些指标的具体含义和取值方式。\n\n5. **自省 token 的机制**\n   - Self-RAG 不是依赖额外的 Prompt 评估，而是通过微调让模型在推理时直接输出表示判断结果的特殊 token，例如：\n     - `[Retrieval]`\n     - `[Relevant]`\n     - `[Fully supported]`\n     - `[Utility:5]`\n   - 这些 token 体现了模型的“自我反省”过程。\n\n6. **输出评估与打分方法**\n   - 为了比较多个候选答案，需要利用模型输出中的 **logprobs（对数概率）** 来量化这些自省 token 的置信度。\n   - 文中说明了如何根据 token 的概率计算：\n     - **IsREL** 的相关性分数；\n     - **IsSUP** 的支持度分数；\n     - **IsUSE** 的有效性分数。\n   - 并给出了一个基于代码的示例，说明如何从输出 token 和概率中计算最终评分。\n\n7. **Self-RAG 的实现说明**\n   - 介绍了开源项目中的微调模型 **selfrag_llama2_7b**。\n   - 说明该项目主要提供了模型微调和测试方法，但应用层框架需要开发者自行构建。\n   - 本节后续将通过实际测试来观察该模型的自省 token 输出效果。\n\n总体来看，这部分内容围绕 **Self-RAG 如何通过模型内置的自我判断与评估机制，改进传统 RAG 的检索效率和答案一致性** 展开，并进一步介绍了其评估指标、概率打分方法以及开源实现基础。"
+            },
+            {
+              "title": "Self-RAG 的实现",
+              "start_index": 502,
+              "end_index": 515,
+              "node_id": "0216",
+              "summary": "这部分文档主要介绍了 Self-RAG 的原理、评估方法以及一个基于开源模型的原型实现流程。\n\n核心内容包括：\n\n1. **Self-RAG 的评估算法**\n   - 通过模型输出中的“自省 token”来判断回答是否需要检索、是否相关、是否被证据支持、以及回答是否有用。\n   - 利用 `logprobs` 中的对数概率计算各类 token 的得分，并通过公式得到最终评估分数。\n   - 说明了对数概率需要用 `exp` 转换为普通概率，以及实际实现时要从推理工具中获取 `pred_tokens` 和 `pred_log_probs_dict` 等字段。\n\n2. **Self-RAG 模型测试**\n   - 使用 `selfrag_llama2_7b` 模型和 `llama_cpp` 进行推理测试。\n   - 展示了两类问题的不同输出：\n     - 创作类问题会输出 `[No Retrieval]`，表示无需检索。\n     - 事实类问题会输出 `[Retrieval]`，表示需要先检索外部知识。\n   - 在提供相关知识后，模型会进一步输出 `[Relevant]`、`[Fully supported]`、`[Utility:5]` 等自省 token。\n\n3. **Self-RAG 原型应用实现**\n   - 构建了一个自定义查询引擎 `SelfRAGQueryEngine`。\n   - 流程是：先让模型判断是否需要检索；如果需要，则调用检索器获取相关文档；然后对每个检索段落分别重新生成答案并打分；最后选择得分最高的答案输出。\n   - 还实现了后处理函数，用于去除自省 token 和特殊结束符。\n\n4. **评估函数实现细节**\n   - 介绍了如何计算：\n     - **相关性分数** `_relevance_score`\n     - **有用性分数** `_is_useful_score`\n     - **支持度分数** `_is_supported_score`\n   - 最终将这些分数组合成段落总分，用于选择最佳答案。\n\n5. **应用测试示例**\n   - 使用简单构造的 Xiaomi 14 文档作为知识库。\n   - 测试了一个无需检索的创作问题和一个需要检索的事实问题。\n   - 结果表明该 Self-RAG 原型能够根据问题类型自动决定是否检索，并从多个候选答案中选出最优结果。\n\n6. **Self-RAG 的优化思考**\n   - 文末指出当前原型还有优化空间，尤其是多次生成与检索排序之间可能存在重复性，导致评估意义被削弱。"
+            },
+            {
+              "title": "Self-RAG 的优化",
+              "start_index": 515,
+              "end_index": 516,
+              "node_id": "0217",
+              "summary": "这部分内容主要介绍了 Self-RAG 的优化思路以及新型 RAG 范式 RAPTOR 的引入背景。\n\n首先，文中说明 Self-RAG 通过模型层微调，使大模型具备了自动判断是否需要检索、以及对生成结果进行自我评估的能力，从而减少了应用层的复杂度。随后指出原型应用中的两个问题：一是检索结果按语义相似度排序后，生成结果的评分往往与检索排序一致，导致评估意义下降；二是在复杂知识场景下，往往需要一次输入多个文档来保证答案完整性，而不是只输入单个文档。因此，作者建议通过改变检索策略来充分发挥 Self-RAG 的自评估能力，例如多次融合检索、使用不同的查询重写方法、不同检索算法或不同的 Rerank 策略，以便在多轮生成中选出质量最高的答案。\n\n接着，内容转入 RAPTOR（Recursive Abstractive Processing for Tree-Organized Retrieval）这一树状检索 RAG 范式，介绍其来源于斯坦福大学的相关论文。文中阐述了 RAPTOR 的动机：传统 RAG 主要依赖向量检索召回前 K 个最相关知识块，适合事实性问答，但对于需要跨章节理解、总结和归纳的复杂问题，这种方式往往不够。例如针对《西游记》的整体性问题，仅靠局部章节召回无法充分回答，必须对整本书进行更高层次的理解与抽象。"
+            }
+          ],
+          "node_id": "0213",
+          "summary": "本部分主要介绍了新型 RAG 范式中的 C-RAG 局限性，以及自省式 RAG（Self-RAG）的提出背景与核心动机。内容指出，C-RAG 虽然是较简单的 RAG 扩展方式，但在利用大模型进行相关性评估时存在不确定性和模型依赖性，可能导致错误过滤；同时，网络搜索在企业级场景中也可能带来风险。随后重点转入 Self-RAG，说明它由华盛顿大学、IBM 人工智能研究院等提出，旨在通过“自我反思”机制增强检索、生成与批判能力，并在测试中优于传统 RAG。最后解释了 Self-RAG 的诞生动机之一是解决经典 RAG 的“过度检索”问题，即不加区分地检索 top-K 相关知识，可能引入无关或偏离内容，从而影响生成结果。"
+        },
+        {
+          "title": "检索树 RAG：RAPTOR",
+          "start_index": 516,
+          "end_index": 516,
+          "nodes": [
+            {
+              "title": "RAPTOR 诞生的动机",
+              "start_index": 516,
+              "end_index": 517,
+              "node_id": "0219",
+              "summary": "该部分主要介绍了 Self-RAG 的检索优化思路以及新型 RAG 范式 RAPTOR 的基本概念与动机。\n\n核心内容包括：\n1. **Self-RAG 的多次检索与生成策略**\n   - 由于实际知识结构复杂，很多场景下需要一次性输入多个文档，而不是只输入单个文档。\n   - 为了更好发挥 Self-RAG 的自我评估能力，建议采用**多次检索、分别生成与评估**的方式，而不是一次检索后直接基于多个文档统一生成。\n   - 文中给出了几种可行的优化策略：\n     - 查询重写后再次检索，并尝试不同重写算法；\n     - 使用不同检索算法获取不同相关知识；\n     - 检索后使用不同的 Rerank 算法重排序，形成不同知识重点。\n   - 强调这些优化方法需要在实际应用中不断探索和完善。\n\n2. **RAPTOR：树状检索的递归抽象处理**\n   - 介绍了另一种 RAG 范式 **RAPTOR**，即 Recursive Abstractive Processing for Tree-Organized Retrieval。\n   - 说明其来源于斯坦福大学相关论文。\n\n3. **RAPTOR 的诞生动机**\n   - 经典 RAG 通常依赖向量检索召回前 K 个相关知识块，适合事实性问答。\n   - 但对于需要**整体理解、总结和宏观语义把握**的问题，这种局部召回方式不够，例如《西游记》中孙悟空成长为斗战胜佛的过程，需要对整本书进行理解与归纳。\n   - 因此，RAPTOR 试图解决传统 RAG 只能关注局部细节、难以把握整体语义的问题。\n\n4. **RAPTOR 的基本原理**\n   - 目标是构造一个**从上到下、从概要到细节、从宏观到微观**的多层树状知识库。\n   - 这样既能支持事实性细节问答，也能支持需要高层语义理解的问题。\n   - 文末引出 RAPTOR 树状知识库的具体构造方法。"
+            },
+            {
+              "title": "RAPTOR 的原理",
+              "start_index": 517,
+              "end_index": 519,
+              "node_id": "0220",
+              "summary": "这部分主要介绍了 RAPTOR 这一新型 RAG 范式的原理与实现思路，核心是通过构建“从上到下、从概要到细节”的树状知识库来提升大模型的检索与理解能力。文中先说明了传统检索方式难以同时兼顾局部细节和整体语义，因此 RAPTOR 通过多层次节点树来弥补这一不足。\n\n主要内容包括：\n- RAPTOR 的基本原理：从原始文档切分得到基础 Leaf Node，先做向量嵌入，再通过聚类把相关节点归组，并为每组生成摘要节点；随后对新生成的摘要节点继续递归执行“嵌入→聚类→摘要”的过程，直到无法再分组，最终形成一棵多层树状知识库。\n- 节点树结构：底层节点对应原始细节，中间层节点是对多个底层节点的概括，顶层节点则是更高层次的总结；所有节点的向量都会存入向量库用于检索。\n- 检索方式：介绍了两种检索模式，一种是从根节点开始逐层向下的树遍历检索，另一种是将树展开后进行全量向量检索。前者更符合层级语义，后者更简单快速且不易遗漏。\n- RAPTOR 的优势：能够在不同语义层次上进行表示与检索，提高召回率；既能回答细节问题，也能回答需要高层概括的问题；尤其适合处理需要综合多个知识块才能回答的复杂问题。\n- RAPTOR 的实现重点：强调其索引本质上仍是向量存储索引，但关键在于如何通过递归生成树状节点结构，并在所有节点上建立索引。"
+            },
+            {
+              "title": "RAPTOR 的实现",
+              "start_index": 519,
+              "end_index": 523,
+              "node_id": "0221",
+              "summary": "这部分主要介绍了 RAPTOR 这一新型 RAG 范式的原理与实现方法，重点包括：\n\n1. **RAPTOR 的检索思想**\n   - 通过构建多层级的树状语义结构，在不同层次上表示文档内容。\n   - 支持两种检索方式：树遍历检索和更简单的全量检索。\n   - 强调其优势在于提升召回率、适应不同层次的问题，并更适合回答需要综合多个知识块的问题。\n\n2. **RAPTOR 的索引构建流程**\n   - 采用普通向量存储索引，但核心在于如何构造树状 Node 结构。\n   - 通过“嵌入（embedding）→聚类（cluster）→摘要（summary）”的循环迭代，不断生成更高层的父 Node。\n   - 最终将所有层级的 Node 都加入向量索引中，形成完整的树状索引。\n\n3. **RAPTOR 的关键实现细节**\n   - 展示了基于文档列表构造多级树状索引的核心代码逻辑。\n   - 包括文档切分、批量生成向量、聚类、生成摘要、设置 parent_id、插入索引等步骤。\n   - 说明了父 Node 会作为下一轮迭代的当前 Node，直到达到设定树深度。\n\n4. **聚类与摘要生成的实现**\n   - 摘要生成可借助 LlamaIndex 的 `tree_summarize` 响应生成器实现。\n   - 聚类通常依赖现成的机器学习工具，如 scikit-learn。\n   - 这些步骤可以并行化以提升效率。\n\n5. **检索实现**\n   - 推荐使用简单的全量检索，即直接对向量索引进行相似度检索。\n   - 由于 RAPTOR 本质上仍是普通向量索引，因此检索实现较为直接。\n\n6. **本章总结与方法论**\n   - 回顾了 C-RAG、Self-RAG、RAPTOR 等新型 RAG 范式的动机、原理与适用场景。\n   - 强调这些方法并非万能，需要根据实际问题灵活选择，并进行充分测试与评估。\n   - 最后总结高级 RAG 的核心目标：帮助 RAG 应用从原型走向生产级、从“能用”走向“好用”。"
+            }
+          ],
+          "node_id": "0218",
+          "summary": "该部分主要讨论了 Self-RAG 在实际应用中的检索与生成优化思路，以及新型 RAG 范式 RAPTOR 的引入与动机。\n\n首先，文本指出在复杂知识场景下，单次检索并只输入一个文档往往不足以保证答案完整，因此更适合采用多次检索、融合多个文档上下文的方式，让大模型获得更充分的参考知识。同时，Self-RAG 的自我评估能力也更适合在多轮检索与多轮生成中发挥作用，通过不同检索结果分别生成和评估，筛选出质量更高的输出。文中还列举了几种可行的优化策略，包括：查询重写后再次检索、使用不同检索算法获取不同知识、以及通过不同的 Rerank 方法形成不同的知识重点。\n\n接着，文本进入 13.3 节，介绍检索树 RAG 范式 RAPTOR（Recursive Abstractive Processing for Tree-Organized Retrieval），并说明其来源于斯坦福大学相关论文。随后在 13.3.1 中阐述 RAPTOR 的诞生动机：传统 RAG 主要依赖向量检索召回前 K 个相关知识块，适合事实性问答，但对于需要整体理解、归纳总结和跨章节综合分析的问题则能力有限。以《西游记》为例，回答“孙悟空如何成长为斗战胜佛”这类问题，不能只靠零散章节召回，而需要对整本书进行阅读、理解和总结，因此需要更适合树状组织与递归抽象处理的检索范式。"
+        }
+      ],
+      "node_id": "0208",
+      "summary": "本部分主要介绍第13章“新型 RAG 范式原理与实现”的内容，重点说明随着 RAG 在更多场景中的应用，经典 RAG 正在向模块化 RAG 演进，并引出一些新型、实验性的 RAG 范式及其原理。随后重点展开 13.1 节“自纠错 RAG（C-RAG）”，介绍其来源、提出者以及诞生动机。C-RAG 的核心目标是尽可能提高检索上下文的相关性，即通过优化索引、检索算法和查询重写等方式，从大量知识中筛选出更有助于回答问题的上下文。"
+    },
+    {
+      "title": "高级篇小结",
+      "start_index": 523,
+      "end_index": 523,
+      "node_id": "0222",
+      "summary": "这部分内容主要总结了高级 RAG 相关章节的核心要点，强调从原型到生产级 RAG 应用之间的差距。文中指出，简单的 RAG 原型并不等于可稳定运行的企业级应用，真正落地需要深入理解内部原理，并结合优化方法、技巧、工具以及持续测试评估来实现“生产就绪”。\n\n同时，这部分回顾了高级篇中介绍的主要主题，包括：\n- 高级 RAG 中的新模块与算法\n- Agentic RAG 的开发方法\n- RAG 应用评估\n- 常见优化策略\n- 企业环境下端到端 RAG 应用的架构与实现\n- 新型 RAG 范式，如 C-RAG、Self-RAG、RAPTOR 的动机、原理与适用场景\n\n文中还提到这些新型范式并非万能解法，学习重点在于理解其设计思想，并根据实际业务灵活使用。最后强调，LlamaIndex 官方生态中的第三方实现代码包可作为学习和研究这些范式的重要参考材料。"
+    }
+  ]
+}
